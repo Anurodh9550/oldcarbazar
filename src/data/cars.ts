@@ -29,7 +29,7 @@ export const carListings: CarListing[] = [
     location: "Ahmedabad",
     badge: "FEATURED",
     image:
-      "https://images.unsplash.com/photo-1494976388531-d1058498beb8?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=600&h=400&fit=crop",
   },
   {
     id: "3",
@@ -116,7 +116,7 @@ export const carListings: CarListing[] = [
     location: "Kolkata",
     badge: "FEATURED",
     image:
-      "https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1502877338535-766e1452684a?w=600&h=400&fit=crop",
   },
   {
     id: "12",

@@ -61,6 +61,16 @@ function sellerIdFromForm(form: SellCarFormData) {
 const DEFAULT_IMAGE =
   "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=600&h=400&fit=crop";
 
+const BROKEN_REMOTE_IMAGES = new Set([
+  "https://images.unsplash.com/photo-1494976388531-d1058498beb8?w=600&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=600&h=400&fit=crop",
+]);
+
+function normalizeImageUrl(src: string | undefined) {
+  if (!src || BROKEN_REMOTE_IMAGES.has(src)) return DEFAULT_IMAGE;
+  return src;
+}
+
 function formToListing(
   form: SellCarFormData,
   photos: string[] | undefined,
@@ -109,6 +119,8 @@ function formToListing(
 function normalizeStoredListing(raw: UserCarListing): UserCarListing {
   return {
     ...raw,
+    image: normalizeImageUrl(raw.image),
+    images: raw.images?.map(normalizeImageUrl),
     sellerId: raw.sellerId ?? raw.phone ?? "",
     status: raw.status ?? "active",
     createdAt: raw.createdAt ?? Date.now(),
