@@ -516,15 +516,33 @@ export const api = {
 
   async uploadListingPhotos(photos: string[]) {
     const urls: string[] = [];
+    const failures: string[] = [];
+
     for (const [index, photo] of photos.entries()) {
       if (!photo.startsWith("data:")) {
         urls.push(photo);
         continue;
       }
-      const file = await dataUrlToFile(photo, `listing-photo-${index + 1}.jpg`);
-      const uploaded = await this.uploadMedia(file);
-      urls.push(uploaded.secure_url || uploaded.url);
+      try {
+        const file = await dataUrlToFile(photo, `listing-photo-${index + 1}.jpg`);
+        const uploaded = await this.uploadMedia(file);
+        urls.push(uploaded.secure_url || uploaded.url);
+      } catch (err) {
+        // Don't kill the whole submission — collect failures and continue.
+        failures.push(err instanceof Error ? err.message : String(err));
+        console.error(`Photo ${index + 1} upload failed:`, err);
+      }
     }
+
+    if (urls.length === 0 && photos.length > 0) {
+      const first = failures[0] || "unknown error";
+      throw new ApiError(
+        502,
+        `Photo upload failed (${first}). Please try smaller files (under 10 MB) or contact support.`,
+        { failures }
+      );
+    }
+
     return urls;
   },
 

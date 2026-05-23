@@ -248,12 +248,22 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
 
   const getMyListings = useCallback(
     (sellerId: string) => {
+      // When a regular user is signed in, `userListings` is the result of
+      // /listings/mine/, which is already scoped to their account. Returning it
+      // directly avoids issues when the form's phone/email differ from the
+      // logged-in user's record (which broke the previous string-match filter).
+      if (!admin) return userListings;
+
       const key = sellerId.trim().toLowerCase();
       return userListings.filter(
-        (l) => l.sellerId === key || l.phone === sellerId || l.email === sellerId
+        (l) =>
+          l.sellerId === key ||
+          l.sellerId === sellerId ||
+          l.phone === sellerId ||
+          (l.email && l.email.toLowerCase() === key)
       );
     },
-    [userListings]
+    [admin, userListings]
   );
 
   const getSellerStats = useCallback(
