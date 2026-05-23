@@ -1,6 +1,8 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
+import { resolveListingImageUrl } from "@/lib/listingImages";
 
 type ListingImageProps = {
   src: string;
@@ -22,6 +24,9 @@ export default function ListingImage({
   width,
   height,
 }: ListingImageProps) {
+  const [failed, setFailed] = useState(false);
+  const resolved = failed ? resolveListingImageUrl(undefined) : resolveListingImageUrl(src);
+
   if (src.startsWith("data:")) {
     if (fill) {
       return (
@@ -45,13 +50,14 @@ export default function ListingImage({
 
   return (
     <Image
-      src={src}
+      src={resolved}
       alt={alt}
       fill={fill}
       width={fill ? undefined : width}
       height={fill ? undefined : height}
       className={className}
       sizes={sizes}
+      onError={() => setFailed(true)}
     />
   );
 }

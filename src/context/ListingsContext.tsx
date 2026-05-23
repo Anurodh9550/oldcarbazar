@@ -13,6 +13,7 @@ import { useAuth } from "@/context/AuthContext";
 import { carListings, type CarListing } from "@/data/cars";
 import type { SellCarFormData } from "@/data/sellCarForm";
 import { api } from "@/lib/api";
+import { DEFAULT_LISTING_IMAGE } from "@/lib/listingImages";
 import type {
   ListingModeration,
   ListingStatus,
@@ -50,8 +51,7 @@ type ListingsContextValue = {
 
 const ListingsContext = createContext<ListingsContextValue | null>(null);
 
-const DEFAULT_IMAGE =
-  "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=600&h=400&fit=crop";
+const DEFAULT_IMAGE = DEFAULT_LISTING_IMAGE;
 
 const BROKEN_REMOTE_IMAGES = new Set([
   "https://images.unsplash.com/photo-1494976388531-d1058498beb8?w=600&h=400&fit=crop",

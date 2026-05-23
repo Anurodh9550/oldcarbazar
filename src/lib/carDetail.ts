@@ -149,16 +149,26 @@ export function buildCarDetail(car: CarListing): CarDetail {
         ? "Second Owner"
         : "Third Owner";
 
-  const images =
+  const validRemote = (urls: string[]) =>
+    urls.filter((u) => u && (u.startsWith("https://") || u.startsWith("data:")));
+
+  let images =
     car.images && car.images.length > 0
-      ? car.images
-      : [
+      ? validRemote(car.images)
+      : validRemote([
           car.image,
           GALLERY_POOL[numId % GALLERY_POOL.length],
           GALLERY_POOL[(numId + 1) % GALLERY_POOL.length],
           GALLERY_POOL[(numId + 2) % GALLERY_POOL.length],
           GALLERY_POOL[(numId + 3) % GALLERY_POOL.length],
-        ];
+        ]);
+
+  if (images.length === 0) {
+    images = [
+      GALLERY_POOL[numId % GALLERY_POOL.length],
+      GALLERY_POOL[(numId + 1) % GALLERY_POOL.length],
+    ];
+  }
 
   const features =
     user?.features && user.features.length > 0
