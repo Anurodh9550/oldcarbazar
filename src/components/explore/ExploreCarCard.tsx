@@ -4,6 +4,8 @@ import ListingImage from "@/components/ListingImage";
 import Link from "next/link";
 import type { EnrichedCar } from "@/lib/carMeta";
 import { getCarDetailPath } from "@/lib/carDetail";
+import { toggleShortlist, isShortlisted } from "@/lib/shortlist";
+import { useState } from "react";
 import { HeartIcon } from "../icons";
 import WhatsAppIcon from "../WhatsAppIcon";
 
@@ -31,6 +33,7 @@ export default function ExploreCarCard({
   const showDeal = showDiscount && car.isDiscounted && car.originalPriceLakh;
   const detailHref = getCarDetailPath(car.id);
   const whatsappHref = `https://wa.me/919876543210?text=${encodeURIComponent(`Hi, I'm interested in ${car.title} on Old Car Bazar.`)}`;
+  const [saved, setSaved] = useState(() => isShortlisted(car.id));
 
   return (
     <article
@@ -61,17 +64,19 @@ export default function ExploreCarCard({
         <div className="p-3">
           <div className="flex items-start justify-between gap-2">
             <h3 className="card-title line-clamp-2 flex-1 leading-snug">{car.title}</h3>
-            <span
-              role="button"
-              tabIndex={0}
-              aria-label="Add to wishlist"
+            <button
+              type="button"
+              aria-label={saved ? "Remove from shortlist" : "Add to shortlist"}
               onClick={(e) => {
                 e.preventDefault();
+                e.stopPropagation();
+                toggleShortlist(car.id);
+                setSaved((v) => !v);
               }}
-              className="shrink-0 text-gray-400 hover:text-[#f75d34]"
+              className={`shrink-0 ${saved ? "text-[#f75d34]" : "text-gray-400 hover:text-[#f75d34]"}`}
             >
               <HeartIcon className="h-4 w-4" />
-            </span>
+            </button>
           </div>
 
           <p className="mt-1 text-caption">{car.specs}</p>
