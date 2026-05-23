@@ -94,32 +94,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     async function hydrateSession() {
       try {
-        if (getAccessToken()) {
-          const apiUser = await api.me();
+        if (!getAccessToken()) {
           if (!alive) return;
-          const nextUser = apiUserToUser(apiUser);
-          setUser(nextUser);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(nextUser));
-          setRegisteredUsers((prev) => {
-            const apiRegistered = apiUserToRegisteredUser(apiUser);
-            const existing = prev.find((u) => u.id === apiRegistered.id);
-            return existing
-              ? prev.map((u) => (u.id === apiRegistered.id ? apiRegistered : u))
-              : [apiRegistered, ...prev];
-          });
+          setUser(null);
+          localStorage.removeItem(STORAGE_KEY);
+          return;
         }
+
+        const apiUser = await api.me();
+        if (!alive) return;
+        const nextUser = apiUserToUser(apiUser);
+        setUser(nextUser);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(nextUser));
+        setRegisteredUsers((prev) => {
+          const apiRegistered = apiUserToRegisteredUser(apiUser);
+          const existing = prev.find((u) => u.id === apiRegistered.id);
+          return existing
+            ? prev.map((u) => (u.id === apiRegistered.id ? apiRegistered : u))
+            : [apiRegistered, ...prev];
+        });
       } catch {
         clearTokens();
+        if (alive) {
+          setUser(null);
+          localStorage.removeItem(STORAGE_KEY);
+        }
       } finally {
         if (alive) setLoading(false);
       }
-    }
-
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) setUser(JSON.parse(saved));
-    } catch {
-      /* ignore */
     }
     try {
       const savedUsers = localStorage.getItem(USERS_KEY);
@@ -137,6 +139,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       alive = false;
     };
+  }, []);
+
+  useEffect(() => {
+    const onSessionExpired = () => {
+      clearTokens();
+      setUser(null);
+      localStorage.removeItem(STORAGE_KEY);
+    };
+    window.addEventListener("ocb-auth-expired", onSessionExpired);
+    return () => window.removeEventListener("ocb-auth-expired", onSessionExpired);
   }, []);
 
   useEffect(() => {
@@ -258,7 +270,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo(
     () => ({
       user,
-      isLoggedIn: !!user,
+      isLoggedIn: Boolean(user) && Boolean(getAccessToken()),
       loading,
       login,
       register,

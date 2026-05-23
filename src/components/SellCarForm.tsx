@@ -47,7 +47,7 @@ type SellCarFormProps = {
 
 export default function SellCarForm({ defaultContact, embedded }: SellCarFormProps) {
   const router = useRouter();
-  const { user, promoteToSeller } = useAuth();
+  const { user, isLoggedIn, promoteToSeller } = useAuth();
   const { addListing } = useListings();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<SellCarFormData>(() => ({
@@ -132,6 +132,11 @@ export default function SellCarForm({ defaultContact, embedded }: SellCarFormPro
       }
     }
 
+    if (!isLoggedIn) {
+      setError("Please log in again to publish your listing.");
+      return;
+    }
+
     setSubmitting(true);
     setError("");
     try {
@@ -144,10 +149,12 @@ export default function SellCarForm({ defaultContact, embedded }: SellCarFormPro
       setSuccess(true);
       setTimeout(() => router.push("/my-listings"), 2000);
     } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Could not publish listing. Please try again.";
       setError(
-        err instanceof Error
-          ? err.message
-          : "Could not publish listing. Please try again."
+        message.includes("Authentication") || message.includes("credentials")
+          ? "Session expired. Log out, log in again, then publish."
+          : message
       );
     } finally {
       setSubmitting(false);

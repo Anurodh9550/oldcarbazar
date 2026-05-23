@@ -224,6 +224,9 @@ async function refreshAccessToken() {
   });
   if (!res.ok) {
     clearTokens();
+    if (isBrowser()) {
+      window.dispatchEvent(new Event("ocb-auth-expired"));
+    }
     return null;
   }
   const data = await res.json();
@@ -255,6 +258,9 @@ async function apiFetch<T>(
     const nextToken = await refreshAccessToken();
     if (nextToken) {
       return apiFetch<T>(path, init, false);
+    }
+    if (isBrowser()) {
+      window.dispatchEvent(new Event("ocb-auth-expired"));
     }
   }
 
