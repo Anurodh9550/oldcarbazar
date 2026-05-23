@@ -11,7 +11,7 @@ type AuthModalProps = {
 };
 
 type Tab = "login" | "register";
-type View = "form" | "forgot" | "otp";
+type View = "form" | "forgot";
 
 const initialForm = {
   name: "",
@@ -19,7 +19,6 @@ const initialForm = {
   phone: "",
   password: "",
   confirmPassword: "",
-  otp: "",
 };
 
 export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
@@ -29,7 +28,6 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [form, setForm] = useState(initialForm);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [otpTimer, setOtpTimer] = useState(0);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -44,19 +42,12 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     };
   }, [isOpen, onClose]);
 
-  useEffect(() => {
-    if (otpTimer <= 0) return;
-    const id = setInterval(() => setOtpTimer((t) => t - 1), 1000);
-    return () => clearInterval(id);
-  }, [otpTimer]);
-
   const resetModal = () => {
     setTab("login");
     setView("form");
     setForm(initialForm);
     setError("");
     setLoading(false);
-    setOtpTimer(0);
   };
 
   const handleClose = () => {
@@ -66,16 +57,6 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
   const updateField = (field: keyof typeof form, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
-    setError("");
-  };
-
-  const sendOtp = () => {
-    if (!form.phone || form.phone.length < 10) {
-      setError("Please enter a valid 10-digit phone number.");
-      return;
-    }
-    setOtpTimer(30);
-    setView("otp");
     setError("");
   };
 
@@ -98,21 +79,11 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     e.preventDefault();
     if (loading) return;
 
-    if (view === "otp") {
-      if (form.otp.length !== 6) {
-        setError("Enter the 6-digit OTP sent to your phone.");
-        return;
-      }
-      handleClose();
-      return;
-    }
-
     if (view === "forgot") {
-      if (!form.phone || form.phone.length < 10) {
-        setError("Enter your phone number to reset password.");
-        return;
-      }
-      sendOtp();
+      // SMS gateway not configured yet — direct user to support.
+      setError(
+        "Password reset abhi support team se hota hai. Mail karein: support@oldcarbazar.com"
+      );
       return;
     }
 
@@ -193,11 +164,9 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               <h2 id="auth-modal-title" className="section-title">
                 {view === "forgot"
                   ? "Forgot Password"
-                  : view === "otp"
-                    ? "Verify OTP"
-                    : tab === "login"
-                      ? "Login"
-                      : "Create Account"}
+                  : tab === "login"
+                    ? "Login"
+                    : "Create Account"}
               </h2>
               <motion.button
                 type="button"
@@ -234,73 +203,30 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4 p-6">
-              {view === "otp" && (
-                <div className="space-y-4">
-                  <p className="text-body-muted">
-                    We sent a 6-digit OTP to{" "}
-                    <span className="font-semibold text-gray-900">
-                      +91 {form.phone || "your number"}
-                    </span>
-                  </p>
-                  <label className="block">
-                    <span className="mb-1 block text-xs font-medium text-gray-600">
-                      One Time Verify Number (OTP)
-                    </span>
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      maxLength={6}
-                      value={form.otp}
-                      onChange={(e) =>
-                        updateField("otp", e.target.value.replace(/\D/g, ""))
-                      }
-                      placeholder="Enter 6-digit OTP"
-                      className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-center text-lg tracking-[0.5em] outline-none focus:border-[#f75d34] focus:ring-2 focus:ring-[#f75d34]/20"
-                    />
-                  </label>
-                  <div className="flex items-center justify-between text-sm">
-                    <button
-                      type="button"
-                      disabled={otpTimer > 0}
-                      onClick={sendOtp}
-                      className="font-medium text-[#f75d34] disabled:text-gray-400"
-                    >
-                      {otpTimer > 0 ? `Resend in ${otpTimer}s` : "Resend OTP"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setView("form");
-                        setForm((f) => ({ ...f, otp: "" }));
-                      }}
-                      className="text-gray-500 hover:text-gray-800"
-                    >
-                      ← Back
-                    </button>
-                  </div>
-                </div>
-              )}
-
               {view === "forgot" && (
                 <div className="space-y-4">
-                  <p className="text-body-muted">
-                    Enter your registered phone number. Hum OTP bhejenge password
-                    reset ke liye.
-                  </p>
-                  <Field
-                    label="Phone"
-                    type="tel"
-                    value={form.phone}
-                    onChange={(v) =>
-                      updateField("phone", v.replace(/\D/g, "").slice(0, 10))
-                    }
-                    placeholder="10-digit mobile number"
-                    prefix="+91"
-                    required
-                  />
+                  <div className="rounded-lg bg-orange-50 px-4 py-3 text-sm text-gray-700">
+                    <p className="font-medium text-gray-900">
+                      Password reset abhi available nahi hai.
+                    </p>
+                    <p className="mt-1 text-body-muted">
+                      Apna phone aur registered name bhejein:{" "}
+                      <a
+                        href="mailto:support@oldcarbazar.com"
+                        className="font-semibold text-[#f75d34] hover:underline"
+                      >
+                        support@oldcarbazar.com
+                      </a>
+                      <br />
+                      Team 24 ghante mein password reset kar degi.
+                    </p>
+                  </div>
                   <button
                     type="button"
-                    onClick={() => setView("form")}
+                    onClick={() => {
+                      setView("form");
+                      setError("");
+                    }}
                     className="text-caption sm:text-sm hover:text-[#f75d34]"
                   >
                     ← Back to Login
@@ -401,23 +327,21 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 </motion.p>
               )}
 
-              <motion.button
-                type="submit"
-                disabled={loading}
-                whileHover={{ scale: 1.02, backgroundColor: "#e54d24" }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full rounded-lg bg-[#f75d34] py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"
-              >
-                {loading
-                  ? "Please wait..."
-                  : view === "otp"
-                  ? "Verify & Continue"
-                  : view === "forgot"
-                    ? "Send OTP"
+              {view !== "forgot" && (
+                <motion.button
+                  type="submit"
+                  disabled={loading}
+                  whileHover={{ scale: 1.02, backgroundColor: "#e54d24" }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full rounded-lg bg-[#f75d34] py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {loading
+                    ? "Please wait..."
                     : tab === "register"
                       ? "Create Account"
                       : "Login"}
-              </motion.button>
+                </motion.button>
+              )}
 
               {view === "form" && tab === "register" && (
                 <p className="text-center text-caption">
