@@ -9,8 +9,16 @@ import {
   useState,
 } from "react";
 import { seedBuyers } from "@/data/admin";
+import {
+  api,
+  apiUserToRegisteredUser,
+  apiUserToUser,
+  clearTokens,
+  getAccessToken,
+} from "@/lib/api";
 
 export type User = {
+  id?: string;
   name: string;
   email: string;
   phone: string;
@@ -38,7 +46,9 @@ export type RegisteredUser = {
 type AuthContextValue = {
   user: User | null;
   isLoggedIn: boolean;
-  login: (user: User) => void;
+  loading: boolean;
+  login: (identifier: string, password: string) => Promise<User>;
+  register: (data: User & { password: string; city?: string }) => Promise<User>;
   logout: () => void;
   registeredUsers: RegisteredUser[];
   /** Mark a registered user as seller (called when they post a listing). */
@@ -76,9 +86,35 @@ function buildSeedRegistry(): RegisteredUser[] {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [registeredUsers, setRegisteredUsers] = useState<RegisteredUser[]>([]);
+  const [loading, setLoading] = useState(true);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
+    let alive = true;
+
+    async function hydrateSession() {
+      try {
+        if (getAccessToken()) {
+          const apiUser = await api.me();
+          if (!alive) return;
+          const nextUser = apiUserToUser(apiUser);
+          setUser(nextUser);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(nextUser));
+          setRegisteredUsers((prev) => {
+            const apiRegistered = apiUserToRegisteredUser(apiUser);
+            const existing = prev.find((u) => u.id === apiRegistered.id);
+            return existing
+              ? prev.map((u) => (u.id === apiRegistered.id ? apiRegistered : u))
+              : [apiRegistered, ...prev];
+          });
+        }
+      } catch {
+        clearTokens();
+      } finally {
+        if (alive) setLoading(false);
+      }
+    }
+
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) setUser(JSON.parse(saved));
@@ -96,6 +132,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setRegisteredUsers(buildSeedRegistry());
     }
     setHydrated(true);
+    hydrateSession();
+
+    return () => {
+      alive = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -112,8 +153,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem(USERS_KEY, JSON.stringify(registeredUsers));
   }, [registeredUsers, hydrated]);
 
-  const upsertRegisteredUser = useCallback((data: User) => {
-    const id = makeUserId(data.email, data.phone);
+  const upsertRegisteredUser = useCallback((data: User, role: UserRole = "buyer") => {
+    const id = data.id ?? makeUserId(data.email, data.phone);
     setRegisteredUsers((prev) => {
       const existing = prev.find(
         (u) => u.id === id || u.email === data.email || u.phone === data.phone
@@ -137,7 +178,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         name: data.name,
         email: data.email,
         phone: data.phone,
-        role: "buyer",
+        role,
         status: "active",
         createdAt: Date.now(),
         lastLoginAt: Date.now(),
@@ -148,14 +189,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = useCallback(
-    (data: User) => {
-      setUser(data);
-      upsertRegisteredUser(data);
+    async (identifier: string, password: string) => {
+      const data = await api.login(identifier.trim(), password);
+      const nextUser = apiUserToUser(data.user);
+      setUser(nextUser);
+      upsertRegisteredUser(nextUser, data.user.role);
+      return nextUser;
+    },
+    [upsertRegisteredUser]
+  );
+
+  const register = useCallback(
+    async (payload: User & { password: string; city?: string }) => {
+      const data = await api.register({
+        name: payload.name,
+        email: payload.email,
+        phone: payload.phone,
+        password: payload.password,
+        city: payload.city,
+      });
+      const nextUser = apiUserToUser(data.user);
+      setUser(nextUser);
+      upsertRegisteredUser(nextUser, data.user.role);
+      return nextUser;
     },
     [upsertRegisteredUser]
   );
 
   const logout = useCallback(() => {
+    clearTokens();
     setUser(null);
   }, []);
 
@@ -197,7 +259,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     () => ({
       user,
       isLoggedIn: !!user,
+      loading,
       login,
+      register,
       logout,
       registeredUsers,
       promoteToSeller,
@@ -208,7 +272,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }),
     [
       user,
+      loading,
       login,
+      register,
       logout,
       registeredUsers,
       promoteToSeller,

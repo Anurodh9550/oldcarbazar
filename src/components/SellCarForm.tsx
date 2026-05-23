@@ -59,6 +59,7 @@ export default function SellCarForm({ defaultContact, embedded }: SellCarFormPro
   const [photos, setPhotos] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [cityModalOpen, setCityModalOpen] = useState(false);
 
   const update = (field: keyof SellCarFormData, value: string | boolean) => {
@@ -120,7 +121,8 @@ export default function SellCarForm({ defaultContact, embedded }: SellCarFormPro
     setStep((s) => Math.max(s - 1, 1));
   };
 
-  const submit = () => {
+  const submit = async () => {
+    if (submitting) return;
     for (let s = 1; s <= TOTAL_STEPS - 1; s++) {
       const err = validateStep(s);
       if (err) {
@@ -129,14 +131,27 @@ export default function SellCarForm({ defaultContact, embedded }: SellCarFormPro
         return;
       }
     }
-    addListing(form, photos);
-    if (user) {
-      promoteToSeller((user.email || user.phone).trim().toLowerCase());
-    } else {
-      promoteToSeller((form.email || form.phone).trim().toLowerCase());
+
+    setSubmitting(true);
+    setError("");
+    try {
+      await addListing(form, photos);
+      if (user) {
+        promoteToSeller((user.email || user.phone).trim().toLowerCase());
+      } else {
+        promoteToSeller((form.email || form.phone).trim().toLowerCase());
+      }
+      setSuccess(true);
+      setTimeout(() => router.push("/my-listings"), 2000);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Could not publish listing. Please try again."
+      );
+    } finally {
+      setSubmitting(false);
     }
-    setSuccess(true);
-    setTimeout(() => router.push("/my-listings"), 2000);
   };
 
   if (success) {
@@ -714,9 +729,14 @@ export default function SellCarForm({ defaultContact, embedded }: SellCarFormPro
           )}
           <button
             type="submit"
+            disabled={submitting}
             className="rounded-lg bg-[#f75d34] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#e54d24]"
           >
-            {step < TOTAL_STEPS ? "Continue" : "Publish Listing"}
+            {submitting
+              ? "Publishing..."
+              : step < TOTAL_STEPS
+                ? "Continue"
+                : "Publish Listing"}
           </button>
         </div>
       </form>

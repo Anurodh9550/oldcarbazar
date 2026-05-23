@@ -8,7 +8,12 @@ import {
   useMemo,
   useState,
 } from "react";
-import { seedAdmins } from "@/data/admin";
+import {
+  api,
+  clearAdminTokens,
+  getAdminAccessToken,
+} from "@/lib/api";
+import type { RegisteredUser } from "@/context/AuthContext";
 import type {
   AdminActivity,
   AdminActivityType,
@@ -57,8 +62,11 @@ type AdminContextValue = {
   admin: AdminUser | null;
   isAdmin: boolean;
   hydrated: boolean;
-  login: (email: string, password: string) => { ok: boolean; error?: string };
+  users: RegisteredUser[];
+  loading: boolean;
+  login: (email: string, password: string) => Promise<{ ok: boolean; error?: string }>;
   logout: () => void;
+  refreshAdminData: () => Promise<void>;
   /** Activity log of admin operations. Newest first. */
   activity: AdminActivity[];
   logActivity: (type: AdminActivityType, message: string, target?: string) => void;
@@ -70,6 +78,8 @@ type AdminContextValue = {
   settings: AdminSettings;
   updateSettings: (patch: Partial<AdminSettings>) => void;
   resetSettings: () => void;
+  blockUser: (id: string) => void;
+  unblockUser: (id: string) => void;
 };
 
 const AdminContext = createContext<AdminContextValue | null>(null);
@@ -121,7 +131,35 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const [activity, setActivity] = useState<AdminActivity[]>([]);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [settings, setSettings] = useState<AdminSettings>(defaultSettings);
+  const [users, setUsers] = useState<RegisteredUser[]>([]);
+  const [loading, setLoading] = useState(true);
   const [hydrated, setHydrated] = useState(false);
+
+  const refreshAdminData = useCallback(async () => {
+    if (!getAdminAccessToken()) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    try {
+      const [me, remoteSettings, remoteActivity, remoteUsers] = await Promise.all([
+        api.adminMe(),
+        api.adminSettings(),
+        api.adminActivity(),
+        api.adminUsers(),
+      ]);
+      setAdmin(me);
+      setSettings((prev) => ({ ...prev, ...remoteSettings }));
+      setActivity(remoteActivity);
+      setUsers(remoteUsers);
+      localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(me));
+    } catch {
+      clearAdminTokens();
+      setAdmin(null);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     try {
@@ -153,6 +191,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       /* ignore */
     }
     setHydrated(true);
+    refreshAdminData();
   }, []);
 
   useEffect(() => {
@@ -197,32 +236,25 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   );
 
   const login = useCallback(
-    (email: string, password: string) => {
-      const match = seedAdmins.find(
-        (a) =>
-          a.email.toLowerCase() === email.trim().toLowerCase() &&
-          a.password === password
-      );
-      if (!match) {
-        return { ok: false, error: "Invalid email or password." };
+    async (email: string, password: string) => {
+      try {
+        const next = await api.adminLogin(email, password);
+        setAdmin(next);
+        localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(next));
+        await refreshAdminData();
+        return { ok: true };
+      } catch (err) {
+        return {
+          ok: false,
+          error: err instanceof Error ? err.message : "Invalid email or password.",
+        };
       }
-      const next: AdminUser = {
-        id: match.id,
-        name: match.name,
-        email: match.email,
-        role: match.role,
-        avatar: match.avatar,
-        createdAt: Date.now(),
-        lastLoginAt: Date.now(),
-      };
-      setAdmin(next);
-      logActivity("admin-login", `${next.name} signed in`, next.email);
-      return { ok: true };
     },
-    [logActivity]
+    [refreshAdminData]
   );
 
   const logout = useCallback(() => {
+    clearAdminTokens();
     setAdmin(null);
   }, []);
 
@@ -249,19 +281,58 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     setInquiries((prev) => prev.filter((i) => i.id !== id));
   }, []);
 
+  const toApiSettings = (patch: Partial<AdminSettings>) => {
+    const out: Record<string, unknown> = {};
+    if ("autoApproveListings" in patch) out.auto_approve_listings = patch.autoApproveListings;
+    if ("maintenanceMode" in patch) out.maintenance_mode = patch.maintenanceMode;
+    if ("emailNotifications" in patch) out.email_notifications = patch.emailNotifications;
+    if ("smsNotifications" in patch) out.sms_notifications = patch.smsNotifications;
+    if ("whatsappEnabled" in patch) out.whatsapp_enabled = patch.whatsappEnabled;
+    if ("maxPhotosPerListing" in patch) out.max_photos_per_listing = patch.maxPhotosPerListing;
+    if ("minListingPrice" in patch) out.min_listing_price = patch.minListingPrice;
+    if ("maxListingPrice" in patch) out.max_listing_price = patch.maxListingPrice;
+    if ("blockedKeywords" in patch) out.blocked_keywords = patch.blockedKeywords;
+    if ("supportEmail" in patch) out.support_email = patch.supportEmail;
+    if ("supportPhone" in patch) out.support_phone = patch.supportPhone;
+    if ("brandColor" in patch) out.brand_color = patch.brandColor;
+    return out;
+  };
+
   const updateSettings = useCallback((patch: Partial<AdminSettings>) => {
     setSettings((prev) => ({ ...prev, ...patch }));
+    if (getAdminAccessToken()) {
+      api.updateAdminSettings(toApiSettings(patch)).catch(() => {
+        /* keep optimistic UI */
+      });
+    }
   }, []);
 
   const resetSettings = useCallback(() => setSettings(defaultSettings), []);
+
+  const blockUser = useCallback((id: string) => {
+    setUsers((prev) =>
+      prev.map((u) => (u.id === id ? { ...u, status: "blocked" } : u))
+    );
+    api.adminBlockUser(id, true).catch(() => refreshAdminData());
+  }, [refreshAdminData]);
+
+  const unblockUser = useCallback((id: string) => {
+    setUsers((prev) =>
+      prev.map((u) => (u.id === id ? { ...u, status: "active" } : u))
+    );
+    api.adminBlockUser(id, false).catch(() => refreshAdminData());
+  }, [refreshAdminData]);
 
   const value = useMemo(
     () => ({
       admin,
       isAdmin: !!admin,
       hydrated,
+      users,
+      loading,
       login,
       logout,
+      refreshAdminData,
       activity,
       logActivity,
       clearActivity,
@@ -272,12 +343,17 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       settings,
       updateSettings,
       resetSettings,
+      blockUser,
+      unblockUser,
     }),
     [
       admin,
       hydrated,
+      users,
+      loading,
       login,
       logout,
+      refreshAdminData,
       activity,
       logActivity,
       clearActivity,
@@ -288,6 +364,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       settings,
       updateSettings,
       resetSettings,
+      blockUser,
+      unblockUser,
     ]
   );
 

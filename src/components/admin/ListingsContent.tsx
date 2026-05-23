@@ -124,7 +124,9 @@ export default function ListingsContent() {
   const [rejectReason, setRejectReason] = useState("");
 
   const combined: EnrichedListing[] = useMemo(() => {
-    return [...userListings.map(enrich), ...carListings.map(enrich)];
+    return userListings.length > 0
+      ? userListings.map(enrich)
+      : carListings.map(enrich);
   }, [userListings]);
 
   const cities = useMemo(() => {

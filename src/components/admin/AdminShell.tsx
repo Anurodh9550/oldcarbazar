@@ -6,7 +6,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAdmin } from "@/context/AdminContext";
-import { useAuth } from "@/context/AuthContext";
 import { useListings } from "@/context/ListingsContext";
 import { adminRoleColors, adminRoleLabels } from "@/data/admin";
 import {
@@ -101,8 +100,7 @@ function resolveTitle(pathname: string) {
 export default function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? "/admin";
   const router = useRouter();
-  const { admin, logout, inquiries, activity } = useAdmin();
-  const { registeredUsers } = useAuth();
+  const { admin, logout, inquiries, activity, users } = useAdmin();
   const { userListings } = useListings();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -114,7 +112,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   ).length;
   const flaggedCount = userListings.filter((l) => l.flagged).length;
   const newInquiries = inquiries.filter((i) => i.status === "new").length;
-  const blockedUsers = registeredUsers.filter((u) => u.status === "blocked").length;
+  const blockedUsers = users.filter((u) => u.status === "blocked").length;
 
   const badges: Record<string, number> = useMemo(
     () => ({

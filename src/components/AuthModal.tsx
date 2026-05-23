@@ -23,11 +23,12 @@ const initialForm = {
 };
 
 export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
-  const { login } = useAuth();
+  const { login, register } = useAuth();
   const [tab, setTab] = useState<Tab>("login");
   const [view, setView] = useState<View>("form");
   const [form, setForm] = useState(initialForm);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [otpTimer, setOtpTimer] = useState(0);
 
   useEffect(() => {
@@ -54,6 +55,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     setView("form");
     setForm(initialForm);
     setError("");
+    setLoading(false);
     setOtpTimer(0);
   };
 
@@ -90,20 +92,14 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     return "";
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
 
     if (view === "otp") {
       if (form.otp.length !== 6) {
         setError("Enter the 6-digit OTP sent to your phone.");
         return;
-      }
-      if (tab === "register") {
-        login({
-          name: form.name.trim(),
-          email: form.email.trim(),
-          phone: form.phone,
-        });
       }
       handleClose();
       return;
@@ -124,11 +120,25 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         setError(err);
         return;
       }
-      sendOtp();
+      try {
+        setLoading(true);
+        await register({
+          name: form.name.trim(),
+          email: form.email.trim(),
+          phone: form.phone,
+          password: form.password,
+        });
+        handleClose();
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Registration failed.");
+      } finally {
+        setLoading(false);
+      }
       return;
     }
 
-    if (!form.email && !form.phone) {
+    const identifier = (form.email || form.phone).trim();
+    if (!identifier) {
       setError("Enter email or phone to login.");
       return;
     }
@@ -136,15 +146,15 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       setError("Password is required.");
       return;
     }
-    login({
-      name:
-        form.name.trim() ||
-        form.email.split("@")[0] ||
-        `User ${form.phone.slice(-4)}`,
-      email: form.email.trim(),
-      phone: form.phone,
-    });
-    handleClose();
+    try {
+      setLoading(true);
+      await login(identifier, form.password);
+      handleClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login failed.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -392,23 +402,26 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
               <motion.button
                 type="submit"
+                disabled={loading}
                 whileHover={{ scale: 1.02, backgroundColor: "#e54d24" }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full rounded-lg bg-[#f75d34] py-3 text-sm font-semibold text-white"
+                className="w-full rounded-lg bg-[#f75d34] py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"
               >
-                {view === "otp"
+                {loading
+                  ? "Please wait..."
+                  : view === "otp"
                   ? "Verify & Continue"
                   : view === "forgot"
                     ? "Send OTP"
                     : tab === "register"
-                      ? "Register & Verify OTP"
+                      ? "Create Account"
                       : "Login"}
               </motion.button>
 
               {view === "form" && tab === "register" && (
                 <p className="text-center text-caption">
-                  After register, OTP will be sent to your phone for one-time
-                  verification.
+                  Your account will be created in the Django backend and you will
+                  be logged in automatically.
                 </p>
               )}
             </form>

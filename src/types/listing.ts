@@ -47,5 +47,5 @@ export type UserCarListing = CarListing &
 export function isUserListing(
   listing: CarListing
 ): listing is UserCarListing {
-  return listing.id.startsWith("user-");
+  return listing.id.startsWith("user-") || "sellerId" in listing;
 }

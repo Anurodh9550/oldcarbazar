@@ -20,7 +20,7 @@ export default function AdminLogin() {
     if (hydrated && admin) router.replace("/admin");
   }, [hydrated, admin, router]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     if (!email || !password) {
@@ -28,15 +28,17 @@ export default function AdminLogin() {
       return;
     }
     setLoading(true);
-    setTimeout(() => {
-      const result = login(email, password);
+    try {
+      const result = await login(email, password);
       if (!result.ok) {
         setError(result.error ?? "Login failed.");
         setLoading(false);
         return;
       }
       router.replace("/admin");
-    }, 250);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fillDemo = (idx: number) => {

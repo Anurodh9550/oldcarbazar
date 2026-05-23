@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { useAdmin } from "@/context/AdminContext";
-import { useAuth } from "@/context/AuthContext";
 import { useListings } from "@/context/ListingsContext";
 import ListingImage from "@/components/ListingImage";
 import StatCard from "./StatCard";
@@ -31,8 +30,7 @@ function monthLabel(date: Date) {
 export default function DashboardContent() {
   const { userListings, allListings, setListingModeration, toggleFeatured } =
     useListings();
-  const { registeredUsers } = useAuth();
-  const { inquiries, activity, settings } = useAdmin();
+  const { inquiries, activity, settings, users } = useAdmin();
 
   const pending = userListings.filter(
     (l) => (l.moderation ?? "approved") === "pending"
@@ -47,15 +45,15 @@ export default function DashboardContent() {
 
   const totalSeed = allListings.length - userListings.length;
   const totalListings = allListings.length;
-  const totalUsers = registeredUsers.length;
+  const totalUsers = users.length;
   const sellersSet = new Set(userListings.map((l) => l.sellerId));
   const sellerCount = Math.max(
     sellersSet.size,
-    registeredUsers.filter((u) => u.role === "seller" || u.role === "both").length
+    users.filter((u) => u.role === "seller" || u.role === "both").length
   );
   const buyerCount =
     totalUsers -
-    registeredUsers.filter((u) => u.role === "seller").length;
+    users.filter((u) => u.role === "seller").length;
 
   const totalViews = userListings.reduce((s, l) => s + l.views, 0);
   const totalInquiriesCount = inquiries.length;
@@ -541,7 +539,7 @@ export default function DashboardContent() {
             </p>
             <Row label="Auto approve" value={settings.autoApproveListings ? "ON" : "OFF"} />
             <Row label="Maintenance mode" value={settings.maintenanceMode ? "ENABLED" : "Off"} />
-            <Row label="Blocked users" value={`${registeredUsers.filter((u) => u.status === "blocked").length}`} />
+            <Row label="Blocked users" value={`${users.filter((u) => u.status === "blocked").length}`} />
             <Row label="Flagged listings" value={`${userListings.filter((l) => l.flagged).length}`} />
           </div>
         </div>

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useAdmin } from "@/context/AdminContext";
-import { useAuth, type RegisteredUser } from "@/context/AuthContext";
+import type { RegisteredUser } from "@/context/AuthContext";
 import { useListings } from "@/context/ListingsContext";
 import { SearchIcon } from "./icons";
 
@@ -17,9 +17,8 @@ const roleColors: Record<string, string> = {
 };
 
 export default function UsersContent({ mode = "all" }: { mode?: Mode }) {
-  const { registeredUsers, blockUser, unblockUser } = useAuth();
   const { userListings } = useListings();
-  const { logActivity, inquiries } = useAdmin();
+  const { logActivity, inquiries, users, blockUser, unblockUser } = useAdmin();
 
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<"all" | "active" | "blocked">("all");
@@ -28,7 +27,7 @@ export default function UsersContent({ mode = "all" }: { mode?: Mode }) {
   // Build enriched user list: pull seller IDs we may not have in registry.
   const enriched = useMemo(() => {
     const map = new Map<string, RegisteredUser>();
-    for (const u of registeredUsers) map.set(u.id, u);
+    for (const u of users) map.set(u.id, u);
 
     for (const l of userListings) {
       const id = l.sellerId;
@@ -58,7 +57,7 @@ export default function UsersContent({ mode = "all" }: { mode?: Mode }) {
     }
 
     return [...map.values()];
-  }, [registeredUsers, userListings]);
+  }, [users, userListings]);
 
   const filtered = useMemo(() => {
     let list = enriched;
