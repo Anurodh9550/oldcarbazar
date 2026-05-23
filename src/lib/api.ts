@@ -430,14 +430,23 @@ export const api = {
 
   async register(payload: {
     name: string;
-    email: string;
+    email?: string;
     phone: string;
     password: string;
     city?: string;
   }) {
+    // Strip empty email — backend treats missing email as NULL (allowed).
+    const body: Record<string, string> = {
+      name: payload.name,
+      phone: payload.phone,
+      password: payload.password,
+    };
+    if (payload.email && payload.email.trim()) body.email = payload.email.trim();
+    if (payload.city && payload.city.trim()) body.city = payload.city.trim();
+
     const data = await apiFetch<AuthResponse>("/auth/register/", {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: JSON.stringify(body),
     });
     saveTokens(data.access, data.refresh);
     return data;

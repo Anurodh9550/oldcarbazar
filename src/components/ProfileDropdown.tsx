@@ -118,7 +118,9 @@ export default function ProfileDropdown() {
               <p className="truncate text-sm font-semibold text-gray-900">
                 {user?.name}
               </p>
-              <p className="truncate text-caption">{user?.email}</p>
+              {user?.email && (
+                <p className="truncate text-caption">{user.email}</p>
+              )}
               <p className="text-caption">+91 {user?.phone}</p>
             </div>
 

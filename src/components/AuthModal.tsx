@@ -81,10 +81,12 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
   const validateRegister = () => {
     if (!form.name.trim()) return "Name is required.";
-    if (!form.email.trim() || !form.email.includes("@"))
-      return "Valid email is required.";
     if (!form.phone.trim() || form.phone.length < 10)
-      return "Valid phone number is required.";
+      return "Valid 10-digit phone number is required.";
+    if (!/^[6-9]\d{9}$/.test(form.phone))
+      return "Phone must be 10 digits starting with 6-9.";
+    if (form.email.trim() && !form.email.includes("@"))
+      return "Email looks invalid. Leave blank to skip.";
     if (form.password.length < 6)
       return "Password must be at least 6 characters.";
     if (form.password !== form.confirmPassword)
@@ -106,8 +108,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     }
 
     if (view === "forgot") {
-      if (!form.email && !form.phone) {
-        setError("Enter email or phone to reset password.");
+      if (!form.phone || form.phone.length < 10) {
+        setError("Enter your phone number to reset password.");
         return;
       }
       sendOtp();
@@ -137,9 +139,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       return;
     }
 
-    const identifier = (form.email || form.phone).trim();
+    // Login: phone is primary, email also accepted.
+    const identifier = (form.phone || form.email).trim();
     if (!identifier) {
-      setError("Enter email or phone to login.");
+      setError("Enter phone number to login.");
       return;
     }
     if (!form.password) {
@@ -281,16 +284,9 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               {view === "forgot" && (
                 <div className="space-y-4">
                   <p className="text-body-muted">
-                    Enter your registered email or phone. We will send an OTP to
-                    reset your password.
+                    Enter your registered phone number. Hum OTP bhejenge password
+                    reset ke liye.
                   </p>
-                  <Field
-                    label="Email"
-                    type="email"
-                    value={form.email}
-                    onChange={(v) => updateField("email", v)}
-                    placeholder="you@email.com"
-                  />
                   <Field
                     label="Phone"
                     type="tel"
@@ -299,6 +295,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                       updateField("phone", v.replace(/\D/g, "").slice(0, 10))
                     }
                     placeholder="10-digit mobile number"
+                    prefix="+91"
+                    required
                   />
                   <button
                     type="button"
@@ -323,15 +321,6 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   )}
 
                   <Field
-                    label="Email"
-                    type="email"
-                    value={form.email}
-                    onChange={(v) => updateField("email", v)}
-                    placeholder="you@email.com"
-                    required
-                  />
-
-                  <Field
                     label="Phone Number"
                     type="tel"
                     value={form.phone}
@@ -340,7 +329,19 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     }
                     placeholder="10-digit mobile number"
                     required
+                    prefix="+91"
                   />
+
+                  {tab === "register" && (
+                    <Field
+                      label="Email (optional)"
+                      type="email"
+                      value={form.email}
+                      onChange={(v) => updateField("email", v)}
+                      placeholder="you@email.com"
+                      hint="Account recovery ke liye useful."
+                    />
+                  )}
 
                   {tab === "register" && view === "form" && (
                     <>
@@ -439,6 +440,8 @@ function Field({
   onChange,
   placeholder,
   required,
+  prefix,
+  hint,
 }: {
   label: string;
   type?: string;
@@ -446,20 +449,30 @@ function Field({
   onChange: (v: string) => void;
   placeholder?: string;
   required?: boolean;
+  prefix?: string;
+  hint?: string;
 }) {
   return (
     <label className="block">
       <span className="mb-1 block text-xs font-medium text-gray-600">
         {label}
       </span>
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        required={required}
-        className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 outline-none transition focus:border-[#f75d34] focus:ring-2 focus:ring-[#f75d34]/20"
-      />
+      <div className={`flex w-full overflow-hidden rounded-lg border border-gray-300 transition focus-within:border-[#f75d34] focus-within:ring-2 focus-within:ring-[#f75d34]/20`}>
+        {prefix && (
+          <span className="flex items-center bg-gray-50 px-3 text-sm font-medium text-gray-500">
+            {prefix}
+          </span>
+        )}
+        <input
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          required={required}
+          className="flex-1 bg-transparent px-4 py-2.5 text-sm text-gray-900 outline-none"
+        />
+      </div>
+      {hint && <span className="mt-1 block text-[11px] text-gray-400">{hint}</span>}
     </label>
   );
 }
