@@ -25,8 +25,12 @@ export default function UsersContent({ mode = "all" }: { mode?: Mode }) {
   const [status, setStatus] = useState<"all" | "active" | "blocked">("all");
   const [sort, setSort] = useState<"newest" | "name" | "activity">("newest");
 
-  // Build enriched user list: pull seller IDs from listings, and lead
-  // buyers from inquiry submissions (Name + Phone form on car detail page).
+  // Build enriched user list:
+  // 1) registered users from the auth registry
+  // 2) sellers we discover via their listings (in case the registry is stale)
+  // 3) registered users who submitted inquiries get promoted to a buyer role
+  // 4) anonymous "leads" — inquiry submissions whose phone/email isn't
+  //    linked to any registered account.
   const enriched = useMemo(() => {
     const map = new Map<string, RegisteredUser>();
     for (const u of users) map.set(u.id, u);
@@ -58,25 +62,29 @@ export default function UsersContent({ mode = "all" }: { mode?: Mode }) {
       }
     }
 
-    // Inquiry-only leads — buyers who used the Name+Phone form without
-    // creating a full account. We dedupe by phone (the only field we always
-    // collect) and skip anyone already in the registry by phone or email.
-    const knownPhones = new Set(
-      [...map.values()].map((u) => u.phone).filter(Boolean)
-    );
-    const knownEmails = new Set(
-      [...map.values()]
-        .map((u) => u.email.toLowerCase())
-        .filter(Boolean)
-    );
+    // Phone/email → registered user lookup so we can promote and dedupe.
+    const userByPhone = new Map<string, RegisteredUser>();
+    const userByEmail = new Map<string, RegisteredUser>();
+    for (const u of map.values()) {
+      if (u.phone) userByPhone.set(u.phone, u);
+      if (u.email) userByEmail.set(u.email.toLowerCase(), u);
+    }
+
+    const promoteToBuyer = (u: RegisteredUser) => {
+      if (u.role === "seller") u.role = "both";
+      else if (u.role !== "both") u.role = "buyer";
+    };
+
     const leadByPhone = new Map<string, RegisteredUser>();
     for (const inq of inquiries) {
       if (!inq.buyerPhone) continue;
-      if (knownPhones.has(inq.buyerPhone)) continue;
-      if (
-        inq.buyerEmail &&
-        knownEmails.has(inq.buyerEmail.toLowerCase())
-      ) {
+      const matchedUser =
+        userByPhone.get(inq.buyerPhone) ||
+        (inq.buyerEmail
+          ? userByEmail.get(inq.buyerEmail.toLowerCase())
+          : undefined);
+      if (matchedUser) {
+        promoteToBuyer(matchedUser);
         continue;
       }
       const existing = leadByPhone.get(inq.buyerPhone);

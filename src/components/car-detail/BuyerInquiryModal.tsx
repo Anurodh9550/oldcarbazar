@@ -19,9 +19,12 @@ export default function BuyerInquiryModal({
   onSubmitted,
   onClose,
 }: BuyerInquiryModalProps) {
+  // The buyer always types their own contact details — never auto-fill
+  // from the logged-in user. The same browser session may be used by
+  // multiple buyers and we want each lead to be entered fresh.
   const { user } = useAuth();
-  const [name, setName] = useState(user?.name ?? "");
-  const [phone, setPhone] = useState(user?.phone ?? "");
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -31,11 +34,6 @@ export default function BuyerInquiryModal({
       document.body.style.overflow = "";
     };
   }, []);
-
-  useEffect(() => {
-    if (user?.name && !name) setName(user.name);
-    if (user?.phone && !phone) setPhone(user.phone);
-  }, [user, name, phone]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
