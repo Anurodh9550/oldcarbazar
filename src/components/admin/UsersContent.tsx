@@ -14,6 +14,7 @@ const roleColors: Record<string, string> = {
   buyer: "bg-blue-50 text-blue-700 ring-blue-200",
   seller: "bg-emerald-50 text-emerald-700 ring-emerald-200",
   both: "bg-violet-50 text-violet-700 ring-violet-200",
+  lead: "bg-amber-50 text-amber-700 ring-amber-200",
 };
 
 export default function UsersContent({ mode = "all" }: { mode?: Mode }) {
@@ -24,7 +25,8 @@ export default function UsersContent({ mode = "all" }: { mode?: Mode }) {
   const [status, setStatus] = useState<"all" | "active" | "blocked">("all");
   const [sort, setSort] = useState<"newest" | "name" | "activity">("newest");
 
-  // Build enriched user list: pull seller IDs we may not have in registry.
+  // Build enriched user list: pull seller IDs from listings, and lead
+  // buyers from inquiry submissions (Name + Phone form on car detail page).
   const enriched = useMemo(() => {
     const map = new Map<string, RegisteredUser>();
     for (const u of users) map.set(u.id, u);
@@ -56,8 +58,52 @@ export default function UsersContent({ mode = "all" }: { mode?: Mode }) {
       }
     }
 
+    // Inquiry-only leads — buyers who used the Name+Phone form without
+    // creating a full account. We dedupe by phone (the only field we always
+    // collect) and skip anyone already in the registry by phone or email.
+    const knownPhones = new Set(
+      [...map.values()].map((u) => u.phone).filter(Boolean)
+    );
+    const knownEmails = new Set(
+      [...map.values()]
+        .map((u) => u.email.toLowerCase())
+        .filter(Boolean)
+    );
+    const leadByPhone = new Map<string, RegisteredUser>();
+    for (const inq of inquiries) {
+      if (!inq.buyerPhone) continue;
+      if (knownPhones.has(inq.buyerPhone)) continue;
+      if (
+        inq.buyerEmail &&
+        knownEmails.has(inq.buyerEmail.toLowerCase())
+      ) {
+        continue;
+      }
+      const existing = leadByPhone.get(inq.buyerPhone);
+      if (existing) {
+        if (inq.createdAt > existing.createdAt) {
+          existing.createdAt = inq.createdAt;
+        }
+        continue;
+      }
+      leadByPhone.set(inq.buyerPhone, {
+        id: `lead-${inq.buyerPhone}`,
+        name: inq.buyerName || "Unknown",
+        email: inq.buyerEmail ?? "",
+        phone: inq.buyerPhone,
+        role: "buyer",
+        status: "active",
+        city: inq.city ?? "",
+        createdAt: inq.createdAt,
+        loginCount: 0,
+      });
+    }
+    for (const lead of leadByPhone.values()) {
+      map.set(lead.id, lead);
+    }
+
     return [...map.values()];
-  }, [users, userListings]);
+  }, [users, userListings, inquiries]);
 
   const filtered = useMemo(() => {
     let list = enriched;
@@ -99,10 +145,13 @@ export default function UsersContent({ mode = "all" }: { mode?: Mode }) {
   const buyerStats = (u: RegisteredUser) => {
     const ourInquiries = inquiries.filter(
       (i) =>
-        i.buyerEmail === u.email || i.buyerPhone === u.phone || i.buyerName === u.name
+        (u.phone && i.buyerPhone === u.phone) ||
+        (u.email && i.buyerEmail === u.email)
     );
     return { inquiries: ourInquiries.length };
   };
+
+  const isLead = (u: RegisteredUser) => u.id.startsWith("lead-");
 
   const counts = useMemo(
     () => ({
@@ -238,9 +287,11 @@ export default function UsersContent({ mode = "all" }: { mode?: Mode }) {
                       </td>
                       <td className="px-4 py-3">
                         <span
-                          className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ring-1 ${roleColors[u.role]}`}
+                          className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ring-1 ${
+                            isLead(u) ? roleColors.lead : roleColors[u.role]
+                          }`}
                         >
-                          {u.role}
+                          {isLead(u) ? "lead" : u.role}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-xs text-slate-600">
@@ -272,28 +323,39 @@ export default function UsersContent({ mode = "all" }: { mode?: Mode }) {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-1.5">
-                          <Link
-                            href={`/admin/users/${encodeURIComponent(u.id)}`}
-                            className="rounded-lg border border-slate-200 px-3 py-1.5 text-[11px] font-semibold text-slate-700 hover:border-[#f75d34] hover:text-[#f75d34]"
-                          >
-                            Open
-                          </Link>
-                          {u.status === "active" ? (
-                            <button
-                              type="button"
-                              onClick={() => handleBlock(u)}
-                              className="rounded-lg bg-white px-3 py-1.5 text-[11px] font-semibold text-red-600 ring-1 ring-red-200 hover:bg-red-50"
+                          {isLead(u) ? (
+                            <Link
+                              href="/admin/inquiries"
+                              className="rounded-lg border border-slate-200 px-3 py-1.5 text-[11px] font-semibold text-slate-700 hover:border-[#f75d34] hover:text-[#f75d34]"
                             >
-                              Block
-                            </button>
+                              View inquiries
+                            </Link>
                           ) : (
-                            <button
-                              type="button"
-                              onClick={() => handleUnblock(u)}
-                              className="rounded-lg bg-emerald-600 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-emerald-500"
-                            >
-                              Unblock
-                            </button>
+                            <>
+                              <Link
+                                href={`/admin/users/${encodeURIComponent(u.id)}`}
+                                className="rounded-lg border border-slate-200 px-3 py-1.5 text-[11px] font-semibold text-slate-700 hover:border-[#f75d34] hover:text-[#f75d34]"
+                              >
+                                Open
+                              </Link>
+                              {u.status === "active" ? (
+                                <button
+                                  type="button"
+                                  onClick={() => handleBlock(u)}
+                                  className="rounded-lg bg-white px-3 py-1.5 text-[11px] font-semibold text-red-600 ring-1 ring-red-200 hover:bg-red-50"
+                                >
+                                  Block
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => handleUnblock(u)}
+                                  className="rounded-lg bg-emerald-600 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-emerald-500"
+                                >
+                                  Unblock
+                                </button>
+                              )}
+                            </>
                           )}
                         </div>
                       </td>

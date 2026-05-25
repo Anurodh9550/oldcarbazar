@@ -106,11 +106,6 @@ export default function BuyerInquiryModal({
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 p-6">
-          <p className="rounded-lg bg-orange-50 px-3 py-2.5 text-sm text-gray-700">
-            Apna naam aur phone bhejein — seller aapko 24 ghante mein contact
-            karega. Aapki detail admin panel par save ho jayegi.
-          </p>
-
           <label className="block">
             <span className="mb-1 block text-xs font-medium text-gray-600">
               Full Name <span className="text-red-500">*</span>
@@ -166,10 +161,6 @@ export default function BuyerInquiryModal({
           >
             {submitting ? "Sending..." : "Send & Get Seller Details"}
           </motion.button>
-
-          <p className="text-center text-[11px] text-gray-400">
-            Submit karke aap seller ko apna phone share kar rahe hain.
-          </p>
         </form>
       </motion.div>
     </div>
