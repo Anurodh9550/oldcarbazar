@@ -21,8 +21,6 @@ import type {
   Inquiry,
   InquiryStatus,
 } from "@/types/admin";
-import { carListings } from "@/data/cars";
-
 const ADMIN_SESSION_KEY = "oldCarBazar_admin_session";
 const ADMIN_ACTIVITY_KEY = "oldCarBazar_admin_activity";
 const ADMIN_INQUIRIES_KEY = "oldCarBazar_admin_inquiries";
@@ -84,48 +82,6 @@ type AdminContextValue = {
 
 const AdminContext = createContext<AdminContextValue | null>(null);
 
-function buildSeedInquiries(): Inquiry[] {
-  const names = [
-    "Ankit Sharma",
-    "Pooja Iyer",
-    "Vikas Yadav",
-    "Meera Pillai",
-    "Sandeep Kumar",
-    "Divya Nair",
-    "Rajesh Khanna",
-    "Shruti Banerjee",
-  ];
-  const messages = [
-    "Is the car still available for inspection this weekend?",
-    "Can you share the service history and insurance copy?",
-    "Final price kya hai? Discount possible?",
-    "Test drive can be arranged tomorrow at my place?",
-    "Mileage and condition real-time kaisi hai?",
-    "Loan facility available for this car?",
-    "RC transfer same day ho jayega?",
-    "Photos thodi aur clear mil sakti hain?",
-  ];
-  const statuses: InquiryStatus[] = ["new", "responded", "closed"];
-  const channels: Inquiry["channel"][] = ["whatsapp", "call", "form", "chat"];
-
-  return carListings.slice(0, 10).map((car, idx) => ({
-    id: `inq-${car.id}`,
-    listingId: car.id,
-    listingTitle: car.title,
-    buyerName: names[idx % names.length],
-    buyerPhone: `9${String(100000000 + idx * 73453).slice(0, 9)}`,
-    buyerEmail: `${names[idx % names.length].split(" ")[0].toLowerCase()}@gmail.com`,
-    sellerId: `seed-seller-${idx + 1}`,
-    sellerName: "Verified Dealer",
-    message: messages[idx % messages.length],
-    channel: channels[idx % channels.length],
-    status: statuses[idx % statuses.length],
-    createdAt: Date.now() - idx * 1000 * 60 * 60 * 6,
-    city: car.location,
-    price: car.price,
-  }));
-}
-
 export function AdminProvider({ children }: { children: React.ReactNode }) {
   const [admin, setAdmin] = useState<AdminUser | null>(null);
   const [activity, setActivity] = useState<AdminActivity[]>([]);
@@ -154,13 +110,13 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       setUsers(remoteUsers);
       localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(me));
 
-      // Inquiries: best-effort load. Falls back to whatever was hydrated
-      // from localStorage if the backend call fails.
+      // Inquiries: backend is source of truth. If the call fails we keep
+      // the existing list (initially empty) — never fall back to seed.
       try {
         const remoteInquiries = await api.adminInquiries();
         setInquiries(remoteInquiries);
-      } catch {
-        /* keep cached inquiries */
+      } catch (err) {
+        console.warn("Failed to load admin inquiries", err);
       }
     } catch {
       clearAdminTokens();
@@ -183,16 +139,16 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     } catch {
       /* ignore */
     }
+    // Drop any legacy seed/demo inquiries that may have been cached in a
+    // previous version. Backend is now the single source of truth for the
+    // Inquiries / Buyers views and we start with an empty list until the
+    // network response lands.
     try {
-      const inq = localStorage.getItem(ADMIN_INQUIRIES_KEY);
-      if (inq) {
-        setInquiries(JSON.parse(inq));
-      } else {
-        setInquiries(buildSeedInquiries());
-      }
+      localStorage.removeItem(ADMIN_INQUIRIES_KEY);
     } catch {
-      setInquiries(buildSeedInquiries());
+      /* ignore */
     }
+    setInquiries([]);
     try {
       const s = localStorage.getItem(ADMIN_SETTINGS_KEY);
       if (s) setSettings({ ...defaultSettings, ...JSON.parse(s) });
@@ -217,10 +173,9 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem(ADMIN_ACTIVITY_KEY, JSON.stringify(activity));
   }, [activity, hydrated]);
 
-  useEffect(() => {
-    if (!hydrated) return;
-    localStorage.setItem(ADMIN_INQUIRIES_KEY, JSON.stringify(inquiries));
-  }, [inquiries, hydrated]);
+  // Inquiries intentionally NOT persisted to localStorage — they are
+  // always re-fetched from the backend so we never show stale or seeded
+  // demo data in the admin views.
 
   useEffect(() => {
     if (!hydrated) return;
