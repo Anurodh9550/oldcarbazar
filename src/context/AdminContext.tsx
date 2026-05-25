@@ -153,6 +153,15 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       setActivity(remoteActivity);
       setUsers(remoteUsers);
       localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(me));
+
+      // Inquiries: best-effort load. Falls back to whatever was hydrated
+      // from localStorage if the backend call fails.
+      try {
+        const remoteInquiries = await api.adminInquiries();
+        setInquiries(remoteInquiries);
+      } catch {
+        /* keep cached inquiries */
+      }
     } catch {
       clearAdminTokens();
       setAdmin(null);
@@ -262,6 +271,11 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
   const setInquiryStatus = useCallback((id: string, status: InquiryStatus) => {
     setInquiries((prev) => prev.map((i) => (i.id === id ? { ...i, status } : i)));
+    if (getAdminAccessToken()) {
+      api.adminUpdateInquiryStatus(id, status).catch(() => {
+        /* keep optimistic UI */
+      });
+    }
   }, []);
 
   const addInquiry = useCallback(
@@ -279,6 +293,11 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
   const removeInquiry = useCallback((id: string) => {
     setInquiries((prev) => prev.filter((i) => i.id !== id));
+    if (getAdminAccessToken()) {
+      api.adminDeleteInquiry(id).catch(() => {
+        /* keep optimistic UI */
+      });
+    }
   }, []);
 
   const toApiSettings = (patch: Partial<AdminSettings>) => {

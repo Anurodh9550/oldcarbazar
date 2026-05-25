@@ -12,6 +12,8 @@ import type {
   AdminActivityType,
   AdminRole,
   AdminUser,
+  Inquiry,
+  InquiryStatus,
 } from "@/types/admin";
 
 const API_BASE =
@@ -66,6 +68,25 @@ type ApiActivity = {
   target?: string;
   actor_admin_name?: string | null;
   created_at: string;
+};
+
+type ApiInquiry = {
+  id: string;
+  listing: string;
+  listing_title: string;
+  listing_price: string;
+  buyer?: string | null;
+  buyer_name: string;
+  buyer_phone: string;
+  buyer_email?: string | null;
+  seller?: string | null;
+  seller_name: string;
+  message: string;
+  channel: "whatsapp" | "call" | "form" | "chat";
+  status: InquiryStatus;
+  city?: string;
+  created_at: string;
+  updated_at: string;
 };
 
 type ApiSettings = {
@@ -339,6 +360,25 @@ function apiActivityToActivity(item: ApiActivity): AdminActivity {
     actor: item.actor_admin_name ?? "admin",
     target: item.target,
     createdAt: new Date(item.created_at).getTime(),
+  };
+}
+
+export function apiInquiryToInquiry(item: ApiInquiry): Inquiry {
+  return {
+    id: item.id,
+    listingId: item.listing,
+    listingTitle: item.listing_title,
+    buyerName: item.buyer_name,
+    buyerPhone: item.buyer_phone,
+    buyerEmail: item.buyer_email ?? undefined,
+    sellerId: item.seller ?? "",
+    sellerName: item.seller_name,
+    message: item.message,
+    channel: item.channel,
+    status: item.status,
+    createdAt: new Date(item.created_at).getTime(),
+    city: item.city,
+    price: item.listing_price,
   };
 }
 
@@ -652,6 +692,60 @@ export const api = {
 
   async adminDeleteListing(id: string) {
     await adminApiFetch<unknown>(`/listings/${id}/`, { method: "DELETE" });
+  },
+
+  // ---------------- Inquiries (buyer ↔ seller leads) ---------------- //
+
+  async createInquiry(payload: {
+    listing: string;
+    buyer_name: string;
+    buyer_phone: string;
+    buyer_email?: string;
+    message?: string;
+    channel?: "whatsapp" | "call" | "form" | "chat";
+  }) {
+    const body: Record<string, string> = {
+      listing: payload.listing,
+      buyer_name: payload.buyer_name.trim(),
+      buyer_phone: payload.buyer_phone,
+      channel: payload.channel ?? "form",
+    };
+    if (payload.buyer_email && payload.buyer_email.trim()) {
+      body.buyer_email = payload.buyer_email.trim();
+    }
+    if (payload.message && payload.message.trim()) {
+      body.message = payload.message.trim();
+    }
+    return apiFetch<ApiInquiry>("/inquiries/", {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+  },
+
+  async myInquiries() {
+    const data = await apiFetch<ApiInquiry[] | Paginated<ApiInquiry>>(
+      "/inquiries/mine/?limit=100"
+    );
+    return unwrapList(data).map(apiInquiryToInquiry);
+  },
+
+  async adminInquiries() {
+    const data = await adminApiFetch<ApiInquiry[] | Paginated<ApiInquiry>>(
+      "/inquiries/?limit=200"
+    );
+    return unwrapList(data).map(apiInquiryToInquiry);
+  },
+
+  async adminUpdateInquiryStatus(id: string, status: InquiryStatus) {
+    const data = await adminApiFetch<ApiInquiry>(`/inquiries/${id}/status/`, {
+      method: "POST",
+      body: JSON.stringify({ status }),
+    });
+    return apiInquiryToInquiry(data);
+  },
+
+  async adminDeleteInquiry(id: string) {
+    await adminApiFetch<unknown>(`/inquiries/${id}/`, { method: "DELETE" });
   },
 };
 

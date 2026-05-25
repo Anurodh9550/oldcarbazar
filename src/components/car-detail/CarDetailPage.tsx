@@ -14,6 +14,7 @@ import {
 } from "@/lib/carDetail";
 import ExploreCarCard from "@/components/explore/ExploreCarCard";
 import SellerDetailsModal from "@/components/car-detail/SellerDetailsModal";
+import BuyerInquiryModal from "@/components/car-detail/BuyerInquiryModal";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { HeartIcon } from "@/components/icons";
 
@@ -37,6 +38,23 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
   const [loanLakh, setLoanLakh] = useState(0);
   const [showAllFeatures, setShowAllFeatures] = useState(false);
   const [showSeller, setShowSeller] = useState(false);
+  const [showInquiry, setShowInquiry] = useState(false);
+  const [inquirySubmitted, setInquirySubmitted] = useState(false);
+
+  const handleViewSellerClick = () => {
+    // First-time buyers must submit Name + Phone before seller info is revealed.
+    if (!inquirySubmitted) {
+      setShowInquiry(true);
+      return;
+    }
+    setShowSeller(true);
+  };
+
+  const handleInquirySubmitted = () => {
+    setInquirySubmitted(true);
+    setShowInquiry(false);
+    setShowSeller(true);
+  };
 
   const listing = findCarById(carId, allListings);
   const detail = useMemo(
@@ -163,10 +181,10 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
               )}
               <button
                 type="button"
-                onClick={() => setShowSeller(true)}
+                onClick={handleViewSellerClick}
                 className="text-btn mt-5 w-full rounded-xl bg-[#f75d34] py-3.5 text-white hover:bg-[#e54d24]"
               >
-                View Seller Details
+                {inquirySubmitted ? "View Seller Details" : "Get Seller Contact"}
               </button>
               <p className="text-caption mt-3 flex items-center gap-1">
                 <span aria-hidden>📍</span>
@@ -443,6 +461,15 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
           <div className="hidden lg:block" />
         </div>
       </div>
+
+      {showInquiry && (
+        <BuyerInquiryModal
+          listingId={detail.id}
+          listingTitle={detail.title}
+          onSubmitted={handleInquirySubmitted}
+          onClose={() => setShowInquiry(false)}
+        />
+      )}
 
       {showSeller && (
         <SellerDetailsModal
