@@ -18,7 +18,7 @@ const statusStyles: Record<ListingStatus, string> = {
 type Toast = { kind: "success" | "error"; text: string } | null;
 
 export default function MyListingsContent() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { getMyListings, removeListing, updateListingStatus } = useListings();
 
   const sellerId = user ? getSellerIdFromUser(user) : "";
@@ -47,6 +47,8 @@ export default function MyListingsContent() {
   const friendlyError = (err: unknown) => {
     if (err instanceof ApiError) {
       if (err.status === 401) {
+        logout();
+        setConfirmDelete(null);
         return "Your session has expired. Please log in again.";
       }
       return err.message;
