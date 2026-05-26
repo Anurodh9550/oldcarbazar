@@ -15,6 +15,7 @@ import {
   apiUserToUser,
   clearTokens,
   getAccessToken,
+  hasAccessToken,
 } from "@/lib/api";
 
 export type User = {
@@ -88,6 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [registeredUsers, setRegisteredUsers] = useState<RegisteredUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [hydrated, setHydrated] = useState(false);
+  const [tokenReady, setTokenReady] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -97,6 +99,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!getAccessToken()) {
           if (!alive) return;
           setUser(null);
+          setTokenReady(false);
           localStorage.removeItem(STORAGE_KEY);
           return;
         }
@@ -105,6 +108,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!alive) return;
         const nextUser = apiUserToUser(apiUser);
         setUser(nextUser);
+        setTokenReady(true);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(nextUser));
         setRegisteredUsers((prev) => {
           const apiRegistered = apiUserToRegisteredUser(apiUser);
@@ -117,6 +121,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         clearTokens();
         if (alive) {
           setUser(null);
+          setTokenReady(false);
           localStorage.removeItem(STORAGE_KEY);
         }
       } finally {
@@ -142,9 +147,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    const syncToken = () => setTokenReady(hasAccessToken());
+    syncToken();
+    window.addEventListener("ocb-auth-changed", syncToken);
+    window.addEventListener("ocb-auth-expired", syncToken);
+    return () => {
+      window.removeEventListener("ocb-auth-changed", syncToken);
+      window.removeEventListener("ocb-auth-expired", syncToken);
+    };
+  }, []);
+
+  useEffect(() => {
     const onSessionExpired = () => {
       clearTokens();
       setUser(null);
+      setTokenReady(false);
       localStorage.removeItem(STORAGE_KEY);
     };
     window.addEventListener("ocb-auth-expired", onSessionExpired);
@@ -205,6 +222,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await api.login(identifier.trim(), password);
       const nextUser = apiUserToUser(data.user);
       setUser(nextUser);
+      setTokenReady(true);
       upsertRegisteredUser(nextUser, data.user.role);
       return nextUser;
     },
@@ -222,6 +240,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       const nextUser = apiUserToUser(data.user);
       setUser(nextUser);
+      setTokenReady(true);
       upsertRegisteredUser(nextUser, data.user.role);
       return nextUser;
     },
@@ -231,6 +250,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(() => {
     clearTokens();
     setUser(null);
+    setTokenReady(false);
   }, []);
 
   const promoteToSeller = useCallback((idOrEmail: string) => {
@@ -270,7 +290,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo(
     () => ({
       user,
-      isLoggedIn: Boolean(user) && Boolean(getAccessToken()),
+      isLoggedIn: Boolean(user) && tokenReady,
       loading,
       login,
       register,
@@ -284,6 +304,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }),
     [
       user,
+      tokenReady,
       loading,
       login,
       register,

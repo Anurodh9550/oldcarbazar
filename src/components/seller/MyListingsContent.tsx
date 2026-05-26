@@ -6,6 +6,7 @@ import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { useMemo, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { getSellerIdFromUser, useListings } from "@/context/ListingsContext";
+import { ApiError, hasAccessToken } from "@/lib/api";
 import type { ListingStatus, UserCarListing } from "@/types/listing";
 
 const statusStyles: Record<ListingStatus, string> = {
@@ -43,11 +44,29 @@ export default function MyListingsContent() {
     window.setTimeout(() => setToast(null), 3500);
   };
 
+  const friendlyError = (err: unknown) => {
+    if (err instanceof ApiError) {
+      if (err.status === 401) {
+        return "Session expire ho gaya. Dubara login karein.";
+      }
+      return err.message;
+    }
+    return err instanceof Error ? err.message : "Kuch galat ho gaya. Phir try karein.";
+  };
+
+  const ensureSession = () => {
+    if (hasAccessToken()) return true;
+    flashToast("error", "Please login again to continue.");
+    window.dispatchEvent(new Event("ocb-auth-expired"));
+    return false;
+  };
+
   const handleStatusChange = async (
     car: UserCarListing,
     next: ListingStatus
   ) => {
     if (busyId) return;
+    if (!ensureSession()) return;
     setBusyId(car.id);
     setBusyAction(next === "sold" ? "sold" : "relist");
     try {
@@ -59,12 +78,7 @@ export default function MyListingsContent() {
           : `Re-listed "${car.title}".`
       );
     } catch (err) {
-      flashToast(
-        "error",
-        err instanceof Error
-          ? err.message
-          : "Could not update listing. Try again."
-      );
+      flashToast("error", friendlyError(err));
     } finally {
       setBusyId(null);
       setBusyAction(null);
@@ -73,6 +87,7 @@ export default function MyListingsContent() {
 
   const handleConfirmDelete = async () => {
     if (!confirmDelete) return;
+    if (!ensureSession()) return;
     const target = confirmDelete;
     setBusyId(target.id);
     setBusyAction("delete");
@@ -81,12 +96,7 @@ export default function MyListingsContent() {
       flashToast("success", `Deleted "${target.title}".`);
       setConfirmDelete(null);
     } catch (err) {
-      flashToast(
-        "error",
-        err instanceof Error
-          ? err.message
-          : "Could not delete listing. Try again."
-      );
+      flashToast("error", friendlyError(err));
     } finally {
       setBusyId(null);
       setBusyAction(null);

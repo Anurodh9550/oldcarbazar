@@ -180,19 +180,33 @@ function isBrowser() {
 
 export function getAccessToken() {
   if (!isBrowser()) return null;
-  return localStorage.getItem(ACCESS_TOKEN_KEY);
+  const token = localStorage.getItem(ACCESS_TOKEN_KEY);
+  return token?.trim() ? token : null;
+}
+
+/** True when a non-empty user JWT is stored (seller/buyer session). */
+export function hasAccessToken() {
+  return Boolean(getAccessToken());
+}
+
+function notifyAuthChanged() {
+  if (isBrowser()) {
+    window.dispatchEvent(new Event("ocb-auth-changed"));
+  }
 }
 
 export function saveTokens(access: string, refresh: string) {
   if (!isBrowser()) return;
   localStorage.setItem(ACCESS_TOKEN_KEY, access);
   localStorage.setItem(REFRESH_TOKEN_KEY, refresh);
+  notifyAuthChanged();
 }
 
 export function clearTokens() {
   if (!isBrowser()) return;
   localStorage.removeItem(ACCESS_TOKEN_KEY);
   localStorage.removeItem(REFRESH_TOKEN_KEY);
+  notifyAuthChanged();
 }
 
 export function getAdminAccessToken() {
@@ -234,6 +248,14 @@ async function parseResponse<T>(res: Response): Promise<T> {
   return data as T;
 }
 
+function sessionExpiredError(data: unknown) {
+  return new ApiError(
+    401,
+    "Session expire ho gaya. Dubara login karein.",
+    data
+  );
+}
+
 async function refreshAccessToken() {
   const refresh = getRefreshToken();
   if (!refresh) return null;
@@ -250,12 +272,16 @@ async function refreshAccessToken() {
     }
     return null;
   }
-  const data = await res.json();
-  if (data.access) {
-    localStorage.setItem(ACCESS_TOKEN_KEY, data.access);
-    return data.access as string;
+  const data = (await res.json()) as { access?: string; refresh?: string };
+  if (!data.access) return null;
+
+  localStorage.setItem(ACCESS_TOKEN_KEY, data.access);
+  // ROTATE_REFRESH_TOKENS blacklists the old refresh — must persist the new one.
+  if (data.refresh) {
+    localStorage.setItem(REFRESH_TOKEN_KEY, data.refresh);
   }
-  return null;
+  notifyAuthChanged();
+  return data.access;
 }
 
 async function apiFetch<T>(
@@ -275,14 +301,22 @@ async function apiFetch<T>(
     headers,
   });
 
-  if (res.status === 401 && retry) {
-    const nextToken = await refreshAccessToken();
-    if (nextToken) {
-      return apiFetch<T>(path, init, false);
+  if (res.status === 401) {
+    if (retry) {
+      const nextToken = await refreshAccessToken();
+      if (nextToken) {
+        return apiFetch<T>(path, init, false);
+      }
     }
+    clearTokens();
     if (isBrowser()) {
       window.dispatchEvent(new Event("ocb-auth-expired"));
     }
+    const contentType = res.headers.get("content-type") ?? "";
+    const data = contentType.includes("application/json")
+      ? await res.json()
+      : null;
+    throw sessionExpiredError(data);
   }
 
   return parseResponse<T>(res);
