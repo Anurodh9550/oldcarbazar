@@ -206,6 +206,10 @@ export function clearTokens() {
   if (!isBrowser()) return;
   localStorage.removeItem(ACCESS_TOKEN_KEY);
   localStorage.removeItem(REFRESH_TOKEN_KEY);
+  // Also flush any cached user/listing copies so the UI cannot keep showing a
+  // logged-in header (and stale listings) after the JWT is gone.
+  localStorage.removeItem("oldCarBazar_user");
+  localStorage.removeItem("oldCarBazar_user_listings");
   notifyAuthChanged();
 }
 
@@ -302,20 +306,25 @@ async function apiFetch<T>(
   });
 
   if (res.status === 401) {
+    // The token was sent but the server rejected it (expired access *and*
+    // refresh, account deleted, or signing key changed on redeploy). We
+    // already attempted a silent refresh once via the `retry` flag — if that
+    // also failed, treat the session as dead and clean everything so the UI
+    // immediately reflects "logged out".
     if (retry) {
       const nextToken = await refreshAccessToken();
       if (nextToken) {
         return apiFetch<T>(path, init, false);
       }
     }
-    clearTokens();
-    if (isBrowser()) {
-      window.dispatchEvent(new Event("ocb-auth-expired"));
-    }
     const contentType = res.headers.get("content-type") ?? "";
     const data = contentType.includes("application/json")
       ? await res.json()
       : null;
+    clearTokens();
+    if (isBrowser()) {
+      window.dispatchEvent(new Event("ocb-auth-expired"));
+    }
     throw sessionExpiredError(data);
   }
 

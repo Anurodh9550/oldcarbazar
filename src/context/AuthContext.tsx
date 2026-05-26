@@ -148,12 +148,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const syncToken = () => setTokenReady(hasAccessToken());
+    const onStorage = (e: StorageEvent) => {
+      // Reflect logout / token rotation from another tab.
+      if (e.key === "oldCarBazar_access_token") syncToken();
+    };
     syncToken();
     window.addEventListener("ocb-auth-changed", syncToken);
     window.addEventListener("ocb-auth-expired", syncToken);
+    window.addEventListener("storage", onStorage);
     return () => {
       window.removeEventListener("ocb-auth-changed", syncToken);
       window.removeEventListener("ocb-auth-expired", syncToken);
+      window.removeEventListener("storage", onStorage);
     };
   }, []);
 
@@ -163,6 +169,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       setTokenReady(false);
       localStorage.removeItem(STORAGE_KEY);
+      // Wipe any cached listings so MyListings can't keep showing stale rows.
+      localStorage.removeItem("oldCarBazar_user_listings");
     };
     window.addEventListener("ocb-auth-expired", onSessionExpired);
     return () => window.removeEventListener("ocb-auth-expired", onSessionExpired);

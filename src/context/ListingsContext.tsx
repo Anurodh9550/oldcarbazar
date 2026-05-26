@@ -100,16 +100,29 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
         const mine = await api.myListings();
         setUserListings(mine);
       } else {
+        // Not signed in → never show seller-only rows from a previous session.
         setUserListings([]);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not load listings.");
       // Keep static demo listings as a graceful fallback if the backend sleeps.
       setApiListings([]);
+      if (!isLoggedIn) setUserListings([]);
     } finally {
       setLoading(false);
     }
   }, [admin, isLoggedIn]);
+
+  // When the auth session is invalidated (event from api.ts on a 401),
+  // drop the cached "my listings" immediately so the UI does not keep showing
+  // stale rows that belong to a logged-out account.
+  useEffect(() => {
+    const onExpired = () => {
+      setUserListings([]);
+    };
+    window.addEventListener("ocb-auth-expired", onExpired);
+    return () => window.removeEventListener("ocb-auth-expired", onExpired);
+  }, []);
 
   useEffect(() => {
     try {
