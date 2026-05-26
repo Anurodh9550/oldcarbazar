@@ -233,18 +233,34 @@ export default function ListingsContent() {
     logActivity("listing-featured", `Featured ${selected.size} listing(s)`);
     setSelected(new Set());
   };
-  const bulkDelete = () => {
+  const bulkDelete = async () => {
     if (
       !confirm(
         `Delete ${selected.size} seller listing(s) permanently? Seed listings are skipped.`
       )
     )
       return;
-    selected.forEach((id) => {
-      const l = userListings.find((u) => u.id === id);
-      if (l) removeListing(id);
-    });
-    logActivity("listing-deleted", `Deleted ${selected.size} listing(s)`);
+    const targets = Array.from(selected)
+      .map((id) => userListings.find((u) => u.id === id))
+      .filter(Boolean) as typeof userListings;
+    let deleted = 0;
+    const failures: string[] = [];
+    for (const l of targets) {
+      try {
+        await removeListing(l.id);
+        deleted += 1;
+      } catch (err) {
+        failures.push(
+          `${l.title}: ${err instanceof Error ? err.message : "Failed"}`
+        );
+      }
+    }
+    if (deleted > 0) {
+      logActivity("listing-deleted", `Deleted ${deleted} listing(s)`);
+    }
+    if (failures.length) {
+      alert(`Some deletions failed:\n${failures.join("\n")}`);
+    }
     setSelected(new Set());
   };
 
@@ -285,10 +301,18 @@ export default function ListingsContent() {
     clearFlag(id);
     logActivity("listing-approved", `Cleared flag on "${title}"`, id);
   };
-  const handleDelete = (id: string, title: string) => {
+  const handleDelete = async (id: string, title: string) => {
     if (!confirm("Delete this listing permanently?")) return;
-    removeListing(id);
-    logActivity("listing-deleted", `Deleted "${title}"`, id);
+    try {
+      await removeListing(id);
+      logActivity("listing-deleted", `Deleted "${title}"`, id);
+    } catch (err) {
+      alert(
+        err instanceof Error
+          ? `Could not delete: ${err.message}`
+          : "Could not delete listing."
+      );
+    }
   };
 
   return (

@@ -29,8 +29,8 @@ type ListingsContextValue = {
   error: string;
   refreshListings: () => Promise<void>;
   addListing: (form: SellCarFormData, photos?: string[]) => Promise<UserCarListing>;
-  removeListing: (id: string) => void;
-  updateListingStatus: (id: string, status: ListingStatus) => void;
+  removeListing: (id: string) => Promise<void>;
+  updateListingStatus: (id: string, status: ListingStatus) => Promise<void>;
   setListingModeration: (
     id: string,
     moderation: ListingModeration,
@@ -148,29 +148,54 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
-  const removeListing = useCallback((id: string) => {
-    setUserListings((prev) => prev.filter((l) => l.id !== id));
-    setApiListings((prev) => prev.filter((l) => l.id !== id));
-    const request = admin ? api.adminDeleteListing(id) : api.deleteListing(id);
-    request.catch((err) => {
-      setError(err instanceof Error ? err.message : "Could not delete listing.");
-      refreshListings();
-    });
-  }, [admin, refreshListings]);
+  const removeListing = useCallback(
+    async (id: string): Promise<void> => {
+      const prevUser = userListings;
+      const prevApi = apiListings;
+      setUserListings((prev) => prev.filter((l) => l.id !== id));
+      setApiListings((prev) => prev.filter((l) => l.id !== id));
+      try {
+        if (admin) {
+          await api.adminDeleteListing(id);
+        } else {
+          await api.deleteListing(id);
+        }
+      } catch (err) {
+        setUserListings(prevUser);
+        setApiListings(prevApi);
+        const message =
+          err instanceof Error ? err.message : "Could not delete listing.";
+        setError(message);
+        throw err instanceof Error ? err : new Error(message);
+      }
+    },
+    [admin, userListings, apiListings]
+  );
 
-  const updateListingStatus = useCallback((id: string, status: ListingStatus) => {
-    setUserListings((prev) =>
-      prev.map((l) => (l.id === id ? { ...l, status } : l))
-    );
-    setApiListings((prev) =>
-      prev.map((l) => (l.id === id ? { ...l, status } : l))
-    );
-    if (admin) return;
-    api.updateListingStatus(id, status).catch((err) => {
-      setError(err instanceof Error ? err.message : "Could not update listing.");
-      refreshListings();
-    });
-  }, [admin, refreshListings]);
+  const updateListingStatus = useCallback(
+    async (id: string, status: ListingStatus): Promise<void> => {
+      const prevUser = userListings;
+      const prevApi = apiListings;
+      setUserListings((prev) =>
+        prev.map((l) => (l.id === id ? { ...l, status } : l))
+      );
+      setApiListings((prev) =>
+        prev.map((l) => (l.id === id ? { ...l, status } : l))
+      );
+      if (admin) return;
+      try {
+        await api.updateListingStatus(id, status);
+      } catch (err) {
+        setUserListings(prevUser);
+        setApiListings(prevApi);
+        const message =
+          err instanceof Error ? err.message : "Could not update listing.";
+        setError(message);
+        throw err instanceof Error ? err : new Error(message);
+      }
+    },
+    [admin, userListings, apiListings]
+  );
 
   const setListingModeration = useCallback(
     (id: string, moderation: ListingModeration, reason?: string) => {

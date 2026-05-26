@@ -109,11 +109,19 @@ export default function ListingDetail({ listingId }: { listingId: string }) {
     clearFlag(car.id);
     logActivity("listing-approved", `Cleared flag on "${car.title}"`, car.id);
   };
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!confirm("Delete listing permanently?")) return;
-    removeListing(car.id);
-    logActivity("listing-deleted", `Deleted "${car.title}"`, car.id);
-    router.push("/admin/listings");
+    try {
+      await removeListing(car.id);
+      logActivity("listing-deleted", `Deleted "${car.title}"`, car.id);
+      router.push("/admin/listings");
+    } catch (err) {
+      alert(
+        err instanceof Error
+          ? `Could not delete: ${err.message}`
+          : "Could not delete listing."
+      );
+    }
   };
 
   const gallery = car.images && car.images.length > 0 ? car.images : [car.image];
