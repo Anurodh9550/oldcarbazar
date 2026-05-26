@@ -533,6 +533,15 @@ export function apiListingToCarListing(item: ApiListing): UserCarListing {
   const cover = item.cover_image || photoUrls[0] || "";
   const sellerId = item.seller_id || item.seller_email || item.seller_phone || "";
 
+  const priceMatch = /([0-9]+(?:\.[0-9]+)?)/.exec(item.price_label ?? "");
+  const priceInrNumber = Number(item.price_inr);
+  let priceLakh: string | undefined;
+  if (priceMatch) {
+    priceLakh = priceMatch[1];
+  } else if (Number.isFinite(priceInrNumber) && priceInrNumber > 0) {
+    priceLakh = (priceInrNumber / 100000).toString();
+  }
+
   return {
     id: item.id,
     sellerId,
@@ -565,6 +574,16 @@ export function apiListingToCarListing(item: ApiListing): UserCarListing {
     featured: item.featured,
     flagged: item.flagged,
     flagReason: item.flag_reason,
+    brand: item.brand,
+    model: item.model,
+    variant: item.variant,
+    year: item.year,
+    kms: item.kms,
+    fuel: item.fuel,
+    transmission: item.transmission,
+    owners: item.owners,
+    priceLakh,
+    city: item.location,
     createdAt: item.created_at ? new Date(item.created_at).getTime() : Date.now(),
     views: item.views ?? 0,
     inquiries: item.inquiries_count ?? 0,
@@ -671,6 +690,19 @@ export const api = {
       method: "POST",
       body: JSON.stringify(formToApiPayload(form, photos)),
     });
+    return apiListingToCarListing(data);
+  },
+
+  async updateListing(id: string, form: SellCarFormData, photos: string[]) {
+    const data = await apiFetch<ApiListing>(
+      `/listings/${id}/`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(formToApiPayload(form, photos)),
+      },
+      true,
+      true
+    );
     return apiListingToCarListing(data);
   },
 

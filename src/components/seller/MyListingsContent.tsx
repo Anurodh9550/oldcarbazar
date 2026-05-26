@@ -257,6 +257,15 @@ export default function MyListingsContent() {
                             : "Relist"}
                         </button>
                       )}
+                      <Link
+                        href={`/my-listings/${car.id}/edit`}
+                        aria-disabled={isBusy}
+                        className={`rounded-lg border border-[#f75d34] px-4 py-2 text-xs font-semibold text-[#f75d34] hover:bg-[#f75d34]/10 ${
+                          isBusy ? "pointer-events-none opacity-60" : ""
+                        }`}
+                      >
+                        Edit
+                      </Link>
                       <button
                         type="button"
                         disabled={isBusy}

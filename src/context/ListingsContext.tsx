@@ -29,6 +29,11 @@ type ListingsContextValue = {
   error: string;
   refreshListings: () => Promise<void>;
   addListing: (form: SellCarFormData, photos?: string[]) => Promise<UserCarListing>;
+  updateListing: (
+    id: string,
+    form: SellCarFormData,
+    photos?: string[]
+  ) => Promise<UserCarListing>;
   removeListing: (id: string) => Promise<void>;
   updateListingStatus: (id: string, status: ListingStatus) => Promise<void>;
   setListingModeration: (
@@ -168,6 +173,21 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
           : prev
       );
       return listing;
+    },
+    []
+  );
+
+  const updateListing = useCallback(
+    async (id: string, form: SellCarFormData, photos?: string[]) => {
+      const uploadedPhotos = await api.uploadListingPhotos(photos ?? []);
+      const updated = await api.updateListing(id, form, uploadedPhotos);
+      setUserListings((prev) =>
+        prev.map((l) => (l.id === id ? updated : l))
+      );
+      setApiListings((prev) =>
+        prev.map((l) => (l.id === id ? updated : l))
+      );
+      return updated;
     },
     []
   );
@@ -354,6 +374,7 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
       error,
       refreshListings,
       addListing,
+      updateListing,
       removeListing,
       updateListingStatus,
       setListingModeration,
@@ -370,6 +391,7 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
       error,
       refreshListings,
       addListing,
+      updateListing,
       removeListing,
       updateListingStatus,
       setListingModeration,

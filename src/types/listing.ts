@@ -20,6 +20,18 @@ export type ListingSellerMeta = {
   mileage?: string;
   features?: string[];
   whatsapp?: boolean;
+  /** Raw fields kept around so the seller-side edit form can prefill itself
+   * without an extra detail fetch (which would also bump the view counter). */
+  brand?: string;
+  model?: string;
+  variant?: string;
+  year?: number;
+  kms?: number;
+  fuel?: string;
+  transmission?: string;
+  owners?: string;
+  priceLakh?: string;
+  city?: string;
 };
 
 export type ListingAdminMeta = {

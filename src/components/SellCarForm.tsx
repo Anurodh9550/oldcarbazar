@@ -43,20 +43,39 @@ type SellCarFormProps = {
     email: string;
   };
   embedded?: boolean;
+  mode?: "create" | "edit";
+  /** Required when `mode === "edit"`. */
+  listingId?: string;
+  /** Pre-fills the form (used by the edit flow). */
+  initialData?: SellCarFormData;
+  /** Existing photo URLs (used by the edit flow). */
+  initialPhotos?: string[];
+  /** Optional override for where to navigate after a successful submit. */
+  successRedirect?: string;
 };
 
-export default function SellCarForm({ defaultContact, embedded }: SellCarFormProps) {
+export default function SellCarForm({
+  defaultContact,
+  embedded,
+  mode = "create",
+  listingId,
+  initialData,
+  initialPhotos,
+  successRedirect,
+}: SellCarFormProps) {
   const router = useRouter();
   const { user, isLoggedIn, promoteToSeller } = useAuth();
-  const { addListing } = useListings();
+  const { addListing, updateListing } = useListings();
+  const isEdit = mode === "edit";
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<SellCarFormData>(() => ({
     ...initialSellForm,
     sellerName: defaultContact?.sellerName ?? "",
     phone: defaultContact?.phone ?? "",
     email: defaultContact?.email ?? "",
+    ...(initialData ?? {}),
   }));
-  const [photos, setPhotos] = useState<string[]>([]);
+  const [photos, setPhotos] = useState<string[]>(() => initialPhotos ?? []);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -133,27 +152,47 @@ export default function SellCarForm({ defaultContact, embedded }: SellCarFormPro
     }
 
     if (!isLoggedIn) {
-      setError("Please log in again to publish your listing.");
+      setError(
+        isEdit
+          ? "Please log in again to save your changes."
+          : "Please log in again to publish your listing."
+      );
+      return;
+    }
+
+    if (isEdit && !listingId) {
+      setError("Missing listing id — refresh and try again.");
       return;
     }
 
     setSubmitting(true);
     setError("");
     try {
-      await addListing(form, photos);
-      if (user) {
-        promoteToSeller((user.email || user.phone).trim().toLowerCase());
+      if (isEdit && listingId) {
+        await updateListing(listingId, form, photos);
       } else {
-        promoteToSeller((form.email || form.phone).trim().toLowerCase());
+        await addListing(form, photos);
+        if (user) {
+          promoteToSeller((user.email || user.phone).trim().toLowerCase());
+        } else {
+          promoteToSeller((form.email || form.phone).trim().toLowerCase());
+        }
       }
       setSuccess(true);
-      setTimeout(() => router.push("/my-listings"), 2000);
+      setTimeout(
+        () => router.push(successRedirect ?? "/my-listings"),
+        isEdit ? 1200 : 2000
+      );
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "Could not publish listing. Please try again.";
+        err instanceof Error
+          ? err.message
+          : isEdit
+            ? "Could not save changes. Please try again."
+            : "Could not publish listing. Please try again.";
       setError(
         message.includes("Authentication") || message.includes("credentials")
-          ? "Session expired. Log out, log in again, then publish."
+          ? "Session expired. Log out, log in again, then try again."
           : message
       );
     } finally {
@@ -169,9 +208,13 @@ export default function SellCarForm({ defaultContact, embedded }: SellCarFormPro
         className="rounded-2xl border border-green-200 bg-green-50 p-10 text-center"
       >
         <p className="text-4xl">✓</p>
-        <h2 className="mt-3 text-xl font-bold text-gray-900">Listing Published!</h2>
+        <h2 className="mt-3 text-xl font-bold text-gray-900">
+          {isEdit ? "Changes Saved!" : "Listing Published!"}
+        </h2>
         <p className="mt-2 text-gray-600">
-          Your car is now live on Old Car Bazar. Redirecting to your listings…
+          {isEdit
+            ? "Your listing has been updated. Redirecting to your listings…"
+            : "Your car is now live on Old Car Bazar. Redirecting to your listings…"}
         </p>
         <Link
           href="/my-listings"
@@ -737,13 +780,17 @@ export default function SellCarForm({ defaultContact, embedded }: SellCarFormPro
           <button
             type="submit"
             disabled={submitting}
-            className="rounded-lg bg-[#f75d34] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#e54d24]"
+            className="rounded-lg bg-[#f75d34] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#e54d24] disabled:cursor-not-allowed disabled:opacity-70"
           >
             {submitting
-              ? "Publishing..."
+              ? isEdit
+                ? "Saving..."
+                : "Publishing..."
               : step < TOTAL_STEPS
                 ? "Continue"
-                : "Publish Listing"}
+                : isEdit
+                  ? "Save Changes"
+                  : "Publish Listing"}
           </button>
         </div>
       </form>
