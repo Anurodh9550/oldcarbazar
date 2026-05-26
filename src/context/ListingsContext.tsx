@@ -194,10 +194,11 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
 
   const removeListing = useCallback(
     async (id: string): Promise<void> => {
-      const prevUser = userListings;
-      const prevApi = apiListings;
-      setUserListings((prev) => prev.filter((l) => l.id !== id));
-      setApiListings((prev) => prev.filter((l) => l.id !== id));
+      // Pessimistic: only mutate local state after the backend confirms.
+      // Previously we removed optimistically and rolled back on error — that
+      // made silent failures look like the listing was deleted and then
+      // "magically came back" after refresh, which is exactly the confusion
+      // sellers reported.
       try {
         if (admin) {
           await api.adminDeleteListing(id);
@@ -205,40 +206,53 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
           await api.deleteListing(id);
         }
       } catch (err) {
-        setUserListings(prevUser);
-        setApiListings(prevApi);
         const message =
           err instanceof Error ? err.message : "Could not delete listing.";
         setError(message);
         throw err instanceof Error ? err : new Error(message);
       }
+      setUserListings((prev) => prev.filter((l) => l.id !== id));
+      setApiListings((prev) => prev.filter((l) => l.id !== id));
+      // Defensive sync so two tabs / cached localStorage can't resurrect it.
+      refreshListings().catch(() => undefined);
     },
-    [admin, userListings, apiListings]
+    [admin, refreshListings]
   );
 
   const updateListingStatus = useCallback(
     async (id: string, status: ListingStatus): Promise<void> => {
-      const prevUser = userListings;
-      const prevApi = apiListings;
-      setUserListings((prev) =>
-        prev.map((l) => (l.id === id ? { ...l, status } : l))
-      );
-      setApiListings((prev) =>
-        prev.map((l) => (l.id === id ? { ...l, status } : l))
-      );
-      if (admin) return;
+      if (admin) {
+        // Admin tokens don't have a per-seller status endpoint; just reflect
+        // the change locally so the moderation UI updates instantly.
+        setUserListings((prev) =>
+          prev.map((l) => (l.id === id ? { ...l, status } : l))
+        );
+        setApiListings((prev) =>
+          prev.map((l) => (l.id === id ? { ...l, status } : l))
+        );
+        return;
+      }
+
+      let updated: UserCarListing;
       try {
-        await api.updateListingStatus(id, status);
+        updated = await api.updateListingStatus(id, status);
       } catch (err) {
-        setUserListings(prevUser);
-        setApiListings(prevApi);
         const message =
           err instanceof Error ? err.message : "Could not update listing.";
         setError(message);
         throw err instanceof Error ? err : new Error(message);
       }
+      setUserListings((prev) =>
+        prev.map((l) => (l.id === id ? { ...l, ...updated } : l))
+      );
+      setApiListings((prev) =>
+        prev.map((l) => (l.id === id ? { ...l, ...updated } : l))
+      );
+      // Sync against the server so other tabs / stale caches pick up the
+      // new status immediately.
+      refreshListings().catch(() => undefined);
     },
-    [admin, userListings, apiListings]
+    [admin, refreshListings]
   );
 
   const setListingModeration = useCallback(

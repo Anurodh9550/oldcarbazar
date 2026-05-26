@@ -3,7 +3,7 @@
 import ListingImage from "@/components/ListingImage";
 import Link from "next/link";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { getSellerIdFromUser, useListings } from "@/context/ListingsContext";
 import { ApiError, ensureValidAccessToken } from "@/lib/api";
@@ -37,11 +37,20 @@ export default function MyListingsContent() {
   const [confirmDelete, setConfirmDelete] = useState<UserCarListing | null>(
     null
   );
+  const [deleteError, setDeleteError] = useState("");
   const [toast, setToast] = useState<Toast>(null);
+  const toastTimerRef = useRef<number | null>(null);
 
   const flashToast = (kind: "success" | "error", text: string) => {
     setToast({ kind, text });
-    window.setTimeout(() => setToast(null), 3500);
+    if (toastTimerRef.current !== null) {
+      window.clearTimeout(toastTimerRef.current);
+    }
+    // Errors linger longer so the seller actually reads what failed.
+    toastTimerRef.current = window.setTimeout(
+      () => setToast(null),
+      kind === "error" ? 7000 : 3500
+    );
   };
 
   const friendlyError = (err: unknown) => {
@@ -51,7 +60,13 @@ export default function MyListingsContent() {
         setConfirmDelete(null);
         return "Your session has expired. Please log in again.";
       }
-      return err.message;
+      if (err.status === 403) {
+        return "You don't have permission to change this listing.";
+      }
+      if (err.status === 0) {
+        return "Couldn't reach the server. Check your internet and try again.";
+      }
+      return err.message || `Request failed (HTTP ${err.status}).`;
     }
     return err instanceof Error
       ? err.message
@@ -85,6 +100,7 @@ export default function MyListingsContent() {
           : `Re-listed "${car.title}".`
       );
     } catch (err) {
+      console.error("[OCB] mark-as-sold failed", err);
       flashToast("error", friendlyError(err));
     } finally {
       setBusyId(null);
@@ -94,6 +110,7 @@ export default function MyListingsContent() {
 
   const handleConfirmDelete = async () => {
     if (!confirmDelete) return;
+    setDeleteError("");
     if (!(await ensureSession())) return;
     const target = confirmDelete;
     setBusyId(target.id);
@@ -103,7 +120,10 @@ export default function MyListingsContent() {
       flashToast("success", `Deleted "${target.title}".`);
       setConfirmDelete(null);
     } catch (err) {
-      flashToast("error", friendlyError(err));
+      const message = friendlyError(err);
+      console.error("[OCB] delete failed", err);
+      setDeleteError(message);
+      flashToast("error", message);
     } finally {
       setBusyId(null);
       setBusyAction(null);
@@ -269,7 +289,10 @@ export default function MyListingsContent() {
                       <button
                         type="button"
                         disabled={isBusy}
-                        onClick={() => setConfirmDelete(car)}
+                        onClick={() => {
+                          setDeleteError("");
+                          setConfirmDelete(car);
+                        }}
                         className="rounded-lg border border-red-200 px-4 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         {isBusy && busyAction === "delete"
@@ -295,6 +318,7 @@ export default function MyListingsContent() {
           onClick={(e) => {
             if (e.target === e.currentTarget && busyAction !== "delete") {
               setConfirmDelete(null);
+              setDeleteError("");
             }
           }}
         >
@@ -311,11 +335,19 @@ export default function MyListingsContent() {
               </span>{" "}
               will be permanently removed. This action cannot be undone.
             </p>
+            {deleteError && (
+              <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-700">
+                {deleteError}
+              </p>
+            )}
             <div className="mt-5 flex gap-3">
               <button
                 type="button"
                 disabled={busyAction === "delete"}
-                onClick={() => setConfirmDelete(null)}
+                onClick={() => {
+                  setConfirmDelete(null);
+                  setDeleteError("");
+                }}
                 className="flex-1 rounded-lg border border-gray-200 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Cancel
@@ -338,13 +370,26 @@ export default function MyListingsContent() {
         <div
           role="status"
           aria-live="polite"
-          className={`fixed bottom-6 left-1/2 z-[120] -translate-x-1/2 rounded-full px-5 py-2.5 text-sm font-medium shadow-lg ${
+          className={`fixed bottom-6 left-1/2 z-[120] flex max-w-[90vw] -translate-x-1/2 items-center gap-3 rounded-full px-5 py-2.5 text-sm font-medium shadow-lg ${
             toast.kind === "success"
               ? "bg-emerald-600 text-white"
               : "bg-red-600 text-white"
           }`}
         >
-          {toast.text}
+          <span className="whitespace-normal text-left">{toast.text}</span>
+          <button
+            type="button"
+            onClick={() => {
+              if (toastTimerRef.current !== null) {
+                window.clearTimeout(toastTimerRef.current);
+              }
+              setToast(null);
+            }}
+            aria-label="Dismiss"
+            className="shrink-0 rounded-full bg-white/20 px-2 py-0.5 text-xs font-bold hover:bg-white/30"
+          >
+            ×
+          </button>
         </div>
       )}
     </div>

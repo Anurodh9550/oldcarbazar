@@ -347,6 +347,18 @@ function isPublicApiPath(path: string, method: string) {
   return false;
 }
 
+function logApiFailure(method: string, path: string, err: unknown) {
+  if (typeof console === "undefined") return;
+  if (err instanceof ApiError) {
+    console.error(
+      `[OCB API] ${method} ${path} → ${err.status} ${err.message}`,
+      err.data
+    );
+  } else {
+    console.error(`[OCB API] ${method} ${path} → network error`, err);
+  }
+}
+
 async function apiFetch<T>(
   path: string,
   init: RequestInit = {},
@@ -368,7 +380,9 @@ async function apiFetch<T>(
     if (isBrowser()) {
       window.dispatchEvent(new Event("ocb-auth-expired"));
     }
-    throw sessionExpiredError(null);
+    const err = sessionExpiredError(null);
+    logApiFailure(method, path, err);
+    throw err;
   }
 
   const headers = new Headers(init.headers);
@@ -378,20 +392,32 @@ async function apiFetch<T>(
   // Never attach a stale Bearer token to login/register — that caused 401 loops.
   if (token && !publicRoute) headers.set("Authorization", `Bearer ${token}`);
 
-  const res = await fetch(`${API_BASE}${path}`, {
-    method: init.method,
-    body: init.body,
-    signal: init.signal,
-    cache: init.cache,
-    credentials: init.credentials,
-    redirect: init.redirect,
-    referrer: init.referrer,
-    referrerPolicy: init.referrerPolicy,
-    integrity: init.integrity,
-    keepalive: init.keepalive,
-    mode: init.mode,
-    headers,
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}${path}`, {
+      method: init.method,
+      body: init.body,
+      signal: init.signal,
+      cache: init.cache,
+      credentials: init.credentials,
+      redirect: init.redirect,
+      referrer: init.referrer,
+      referrerPolicy: init.referrerPolicy,
+      integrity: init.integrity,
+      keepalive: init.keepalive,
+      mode: init.mode,
+      headers,
+    });
+  } catch (networkErr) {
+    // Browser CORS rejection, DNS failure, offline, etc. — surface a clear
+    // message so the seller knows the request never reached our backend.
+    logApiFailure(method, path, networkErr);
+    throw new ApiError(
+      0,
+      "Could not reach the server. Check your internet connection and try again.",
+      networkErr
+    );
+  }
 
   if (res.status === 401 && !publicRoute) {
     // Wrong password on /auth/login returns 400, not 401 — so 401 here means
@@ -410,7 +436,9 @@ async function apiFetch<T>(
     if (isBrowser()) {
       window.dispatchEvent(new Event("ocb-auth-expired"));
     }
-    throw sessionExpiredError(data);
+    const err = sessionExpiredError(data);
+    logApiFailure(method, path, err);
+    throw err;
   }
 
   if (res.status === 401 && publicRoute) {
@@ -418,16 +446,23 @@ async function apiFetch<T>(
     const data = contentType.includes("application/json")
       ? await res.json()
       : null;
-    throw new ApiError(
+    const err = new ApiError(
       401,
       typeof data === "object" && data !== null && "detail" in data
         ? String((data as { detail: unknown }).detail)
         : "Request failed.",
       data
     );
+    logApiFailure(method, path, err);
+    throw err;
   }
 
-  return parseResponse<T>(res);
+  try {
+    return await parseResponse<T>(res);
+  } catch (err) {
+    logApiFailure(method, path, err);
+    throw err;
+  }
 }
 
 async function adminApiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
