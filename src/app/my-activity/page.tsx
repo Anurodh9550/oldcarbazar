@@ -16,7 +16,7 @@ export default function MyActivityPage() {
     <>
       <Header />
       <ProfileHubShell badge={meta.badge} title={meta.title} subtitle={meta.subtitle}>
-        <AuthGate title="Login required" description="Activity history ke liye login karo.">
+        <AuthGate title="Login required" description="Please log in to view your activity history.">
           <MyActivityContent />
         </AuthGate>
       </ProfileHubShell>

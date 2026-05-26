@@ -16,7 +16,7 @@ export default function ShortlistedPage() {
     <>
       <Header />
       <ProfileHubShell badge={meta.badge} title={meta.title} subtitle={meta.subtitle}>
-        <AuthGate title="Login required" description="Shortlist dekhne ke liye login karo.">
+        <AuthGate title="Login required" description="Please log in to view your shortlist.">
           <ShortlistedContent />
         </AuthGate>
       </ProfileHubShell>

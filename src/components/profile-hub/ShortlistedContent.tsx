@@ -25,7 +25,7 @@ export default function ShortlistedContent() {
       <ProfileEmptyState
         icon="❤️"
         title="Shortlist is empty"
-        description="Explore page par heart icon dabakar cars save karo — woh yahan dikhengi."
+        description="Tap the heart icon on any car on the Explore page to save it — they'll show up here."
         actionLabel="Explore cars"
         actionHref="/used-cars"
       />

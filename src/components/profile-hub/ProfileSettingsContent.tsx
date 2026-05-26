@@ -24,7 +24,7 @@ export default function ProfileSettingsContent() {
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !email.trim() || !phone.trim()) {
-      setError("Name, email, aur phone required hain.");
+      setError("Name, email and phone are required.");
       return;
     }
     setError("");
@@ -43,8 +43,8 @@ export default function ProfileSettingsContent() {
   return (
     <form onSubmit={handleSave} className="mx-auto max-w-lg space-y-5">
       <p className="text-body-muted">
-        Account details yahan update karo. Backend profile API jald add hogi — abhi
-        display name browser mein save hota hai.
+        Update your account details here. A backend profile API is coming soon — for
+        now, the display name is saved in your browser.
       </p>
 
       <label className="block">
@@ -93,7 +93,7 @@ export default function ProfileSettingsContent() {
       )}
       {saved && (
         <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700">
-          Profile saved locally. Logout/login ke baad server se sync hoga.
+          Profile saved locally. It will sync with the server after the next login.
         </p>
       )}
 

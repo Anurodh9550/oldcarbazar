@@ -37,7 +37,7 @@ export default function MyActivityContent() {
       <ProfileEmptyState
         icon="🕐"
         title="No recent activity"
-        description="Jab aap cars search ya view karenge, recent activity yahan save hogi."
+        description="When you search or view cars, your recent activity will appear here."
         actionLabel="Search used cars"
         actionHref="/used-cars/search"
       />

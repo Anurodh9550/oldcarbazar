@@ -23,8 +23,8 @@ export default function InsuranceContent() {
   return (
     <div>
       <p className="text-body-muted">
-        Car bechne ya kharidne ke baad insurance renew karna zaroori hai. Compare
-        plans and choose the best cover.
+        Renewing your insurance after buying or selling a car is essential.
+        Compare plans and choose the best cover.
       </p>
       <ul className="mt-8 grid gap-4 md:grid-cols-3">
         {insurancePlans.map((plan, i) => (

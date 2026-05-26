@@ -22,11 +22,11 @@ export default function FeedbackContent() {
       <section className="rounded-2xl border border-gray-100 bg-white p-6">
         <h2 className="text-lg font-bold text-gray-900">Share Your Feedback</h2>
         <p className="mt-1 text-sm text-body-muted">
-          Aapki feedback se hum platform behtar banate hain. 30 seconds le ke batao.
+          Your feedback helps us make the platform better. It only takes 30 seconds.
         </p>
         {submitted ? (
           <div className="mt-6 rounded-xl bg-green-50 p-4 text-sm text-green-700">
-            Dhanyawaad! Aapka feedback hum tak pohonch gaya — team review karegi.
+            Thank you! Your feedback has reached us — our team will review it.
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="mt-5 space-y-4">
@@ -48,7 +48,7 @@ export default function FeedbackContent() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 rows={5}
-                placeholder="Apni baat likhein..."
+                placeholder="Write your message..."
                 className="mt-1.5 w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-[#f75d34] focus:outline-none"
               />
             </div>
@@ -73,8 +73,8 @@ export default function FeedbackContent() {
         <div className="rounded-2xl border border-gray-100 bg-white p-6">
           <h3 className="text-base font-bold text-gray-900">Common Questions</h3>
           <p className="mt-2 text-sm text-body-muted">
-            Jaldi answer chahiye? <a href="/help/faq" className="font-semibold text-[#f75d34]">FAQs</a> check
-            karein ya <a href="/contact" className="font-semibold text-[#f75d34]">Contact Us</a> par jaayein.
+            Need a quick answer? Check our <a href="/help/faq" className="font-semibold text-[#f75d34]">FAQs</a>
+            {" "}or head to <a href="/contact" className="font-semibold text-[#f75d34]">Contact Us</a>.
           </p>
         </div>
       </aside>

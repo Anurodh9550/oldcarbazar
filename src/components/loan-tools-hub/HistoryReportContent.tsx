@@ -57,8 +57,8 @@ export default function HistoryReportContent() {
         <div>
           <h2 className="section-title-lg">Get Instant Vehicle Report</h2>
           <p className="mt-2 text-body-muted">
-            Used car khareedne se pehle uski full history check karein. Hum
-            VAHAN, IRDAI aur insurer ke data se report banate hain.
+            Check the full history of a used car before buying. We build the
+            report from VAHAN, IRDAI and insurer data.
           </p>
           <form onSubmit={handleSubmit} className="mt-6 space-y-3">
             <label className="block">
@@ -165,7 +165,7 @@ export default function HistoryReportContent() {
                 Your report will appear here
               </p>
               <p className="mt-2 max-w-xs text-caption sm:text-sm">
-                Vehicle registration number daalein aur instant report paayein
+                Enter the vehicle registration number and get an instant report.
               </p>
             </div>
           )}

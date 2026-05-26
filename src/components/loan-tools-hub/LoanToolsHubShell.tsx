@@ -21,14 +21,16 @@ export default function LoanToolsHubShell({
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-[#f0f2f5]">
-      <div className="relative overflow-hidden border-b border-slate-700/40 bg-gradient-to-br from-[#0b1e3f] via-[#15294d] to-[#0b1e3f]">
+      {/* Hero banner — only this section uses the car image as background. */}
+      <div className="relative overflow-hidden border-b border-slate-700/40 bg-[#0b1e3f]">
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-30"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 20% 30%, #f75d34 0%, transparent 45%), radial-gradient(circle at 80% 70%, #3b82f6 0%, transparent 45%)",
-          }}
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/loan-hero.png')" }}
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-gradient-to-r from-[#0b1e3f]/95 via-[#0b1e3f]/70 to-[#0b1e3f]/30"
         />
         <div
           aria-hidden
@@ -41,7 +43,7 @@ export default function LoanToolsHubShell({
         <div className="relative mx-auto max-w-[1280px] px-4 py-12 sm:px-6 lg:py-16">
           <Link
             href="/"
-            className="inline-flex items-center gap-1 text-sm text-slate-400 hover:text-white"
+            className="inline-flex items-center gap-1 text-sm text-slate-300 hover:text-white"
           >
             ← Back to Home
           </Link>
@@ -51,6 +53,7 @@ export default function LoanToolsHubShell({
         </div>
       </div>
 
+      {/* Sticky sub-nav */}
       <div className="sticky top-0 z-30 border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur-md">
         <div className="mx-auto max-w-[1280px] px-4 sm:px-6">
           <div className="flex gap-4 overflow-x-auto py-3 scrollbar-hide sm:gap-6">

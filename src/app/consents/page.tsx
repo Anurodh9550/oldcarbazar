@@ -16,7 +16,7 @@ export default function ConsentsPage() {
     <>
       <Header />
       <ProfileHubShell badge={meta.badge} title={meta.title} subtitle={meta.subtitle}>
-        <AuthGate title="Login required" description="Consent settings ke liye login karo.">
+        <AuthGate title="Login required" description="Please log in to manage your consent settings.">
           <ConsentsContent />
         </AuthGate>
       </ProfileHubShell>

@@ -16,7 +16,7 @@ export default function MyVehiclesPage() {
     <>
       <Header />
       <ProfileHubShell badge={meta.badge} title={meta.title} subtitle={meta.subtitle}>
-        <AuthGate title="Login required" description="Apni vehicles dekhne ke liye login karo.">
+        <AuthGate title="Login required" description="Please log in to view your vehicles.">
           <MyVehiclesContent />
         </AuthGate>
       </ProfileHubShell>

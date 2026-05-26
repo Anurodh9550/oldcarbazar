@@ -9,7 +9,7 @@ const inputClass =
 const partnerTypes = [
   { icon: "🏪", title: "Dealers", desc: "Showroom listings, verified badge, lead dashboard." },
   { icon: "🛡", title: "Insurance", desc: "Used car insurance offers for our buyers." },
-  { icon: "🔧", title: "Service Partners", desc: "Inspection, servicing aur warranty tie-ups." },
+  { icon: "🔧", title: "Service Partners", desc: "Inspection, servicing and warranty tie-ups." },
 ];
 
 export default function PartnerContent() {

@@ -251,7 +251,7 @@ async function parseResponse<T>(res: Response): Promise<T> {
 function sessionExpiredError(data: unknown) {
   return new ApiError(
     401,
-    "Session expire ho gaya. Dubara login karein.",
+    "Your session has expired. Please log in again.",
     data
   );
 }

@@ -328,7 +328,7 @@ export default function Header() {
         isOpen={locationOpen}
         onClose={() => setLocationOpen(false)}
         mode="all-india"
-        subtitle="Apni city search karein — pure India ke liye"
+        subtitle="Search your city — anywhere across India."
       />
     </>
   );

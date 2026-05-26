@@ -236,7 +236,7 @@ export default function SellCarForm({ defaultContact, embedded }: SellCarFormPro
             {step === 1 && (
               <div className="space-y-6">
                 <p className="rounded-lg bg-[#f75d34]/5 px-3 py-2 text-caption text-gray-600">
-                  Car ki specs aur aapki contact info — buyer ko Overview tab par dikhegi.
+                  Your car's specs and contact info — buyers will see these on the Overview tab.
                 </p>
 
                 <div>
@@ -495,7 +495,7 @@ export default function SellCarForm({ defaultContact, embedded }: SellCarFormPro
             {step === 2 && (
               <div className="space-y-6">
                 <p className="rounded-lg bg-[#f75d34]/5 px-3 py-2 text-caption text-gray-600">
-                  Price, location, photos & features — sab kuch jo buyer search aur detail page par dekhega.
+                  Price, location, photos & features — everything a buyer sees in search and on the detail page.
                 </p>
 
                 <div>
@@ -542,7 +542,7 @@ export default function SellCarForm({ defaultContact, embedded }: SellCarFormPro
                         </span>
                       </button>
                       <p className="mt-1 text-caption">
-                        Apni city search karo ya GPS se detect karo
+                        Search your city or detect it via GPS.
                       </p>
                     </label>
                     <label className="block sm:col-span-2">
@@ -554,7 +554,7 @@ export default function SellCarForm({ defaultContact, embedded }: SellCarFormPro
                         className={inputClass}
                       />
                       <p className="mt-1 text-caption">
-                        Buyer ko card par area dikhega
+                        Buyers will see this area on the listing card.
                       </p>
                     </label>
                     <label className="block sm:col-span-2">
@@ -637,7 +637,7 @@ export default function SellCarForm({ defaultContact, embedded }: SellCarFormPro
                       rows={5}
                       value={form.description}
                       onChange={(e) => update("description", e.target.value)}
-                      placeholder="Condition, service history, accidents, new tyres, reason for selling — buyer Overview mein dikhega"
+                      placeholder="Condition, service history, accidents, new tyres, reason for selling — shown in the buyer's Overview."
                       className={inputClass}
                     />
                   </label>
@@ -757,7 +757,7 @@ export default function SellCarForm({ defaultContact, embedded }: SellCarFormPro
         currentValue={form.city}
         mode="all-india"
         title="Where is your car?"
-        subtitle="Any Indian city — search ya GPS se detect karein"
+        subtitle="Any Indian city — search or detect via GPS."
       />
     </motion.div>
   );

@@ -36,8 +36,8 @@ export default function AdvertiseContent() {
       <section className="rounded-2xl bg-slate-900 p-6 text-white">
         <h2 className="text-xl font-bold">Reach 50,000+ Used Car Buyers Every Month</h2>
         <p className="mt-2 text-sm text-slate-300">
-          Dealers, OEMs, insurance partners aur service brands ke liye targeted advertising. Pay only for
-          quality leads — city, budget aur brand level targeting.
+          Targeted advertising for dealers, OEMs, insurance partners and service brands. Pay only for
+          quality leads — with city, budget and brand level targeting.
         </p>
         <ul className="mt-6 grid gap-3 text-sm sm:grid-cols-3">
           {["Featured Listings", "Homepage Banners", "Sponsored Search"].map((f) => (
@@ -84,7 +84,7 @@ export default function AdvertiseContent() {
       <section className="rounded-2xl border border-gray-100 bg-white p-6">
         <h3 className="text-lg font-bold text-gray-900">Get Started</h3>
         <p className="mt-2 text-body-muted">
-          Hamari ads team aapko personalised plan aur estimated reach share karegi. Reach out kijiye:
+          Our ads team will share a personalised plan and estimated reach with you. Reach out:
         </p>
         <p className="mt-3 text-sm text-gray-700">
           Email: <span className="font-semibold">ads@oldcarbazar.in</span> · Phone:{" "}

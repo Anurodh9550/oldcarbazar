@@ -1,6 +1,6 @@
 /**
  * Brand logos in public/brands/
- * Sirf uploaded files yahan map hain — baaki brands par initials fallback dikhega.
+ * Only uploaded files are mapped here — other brands fall back to an initials avatar.
  */
 export const brandLogoFiles: Record<string, string> = {
   maruti: "maruti-suzuki.avif",

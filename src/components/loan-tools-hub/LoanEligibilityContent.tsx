@@ -49,8 +49,8 @@ export default function LoanEligibilityContent() {
       <div>
         <h2 className="section-title">Check Your Loan Eligibility</h2>
         <p className="mt-1 text-caption sm:text-sm">
-          Apni details fill karein — instant eligibility check, no documents
-          needed, no CIBIL impact
+          Fill in your details — instant eligibility check, no documents
+          needed, no CIBIL impact.
         </p>
 
         <div className="mt-6 space-y-5">
@@ -200,15 +200,15 @@ export default function LoanEligibilityContent() {
           <ul className="mt-3 space-y-2 text-sm text-gray-700">
             <li className="flex items-start gap-2">
               <span className="mt-0.5 text-green-600">✓</span>
-              Existing loans / credit card dues clear karein
+              Clear existing loans and credit card dues.
             </li>
             <li className="flex items-start gap-2">
               <span className="mt-0.5 text-green-600">✓</span>
-              Co-applicant (spouse / parent) add karein
+              Add a co-applicant (spouse / parent).
             </li>
             <li className="flex items-start gap-2">
               <span className="mt-0.5 text-green-600">✓</span>
-              Longer tenure choose karke EMI kam karein
+              Choose a longer tenure to reduce the EMI.
             </li>
           </ul>
         </div>

@@ -16,7 +16,7 @@ export default function MyGaragePage() {
     <>
       <Header />
       <ProfileHubShell badge={meta.badge} title={meta.title} subtitle={meta.subtitle}>
-        <AuthGate title="Login required" description="Garage access ke liye login karo.">
+        <AuthGate title="Login required" description="Please log in to access your garage.">
           <MyGarageContent />
         </AuthGate>
       </ProfileHubShell>

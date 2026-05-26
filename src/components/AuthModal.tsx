@@ -82,7 +82,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     if (view === "forgot") {
       // SMS gateway not configured yet — direct user to support.
       setError(
-        "Password reset abhi support team se hota hai. Mail karein: support@oldcarbazar.com"
+        "Password resets are currently handled by our support team. Please email support@oldcarbazar.com"
       );
       return;
     }
@@ -207,10 +207,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 <div className="space-y-4">
                   <div className="rounded-lg bg-orange-50 px-4 py-3 text-sm text-gray-700">
                     <p className="font-medium text-gray-900">
-                      Password reset abhi available nahi hai.
+                      Self-serve password reset isn't available yet.
                     </p>
                     <p className="mt-1 text-body-muted">
-                      Apna phone aur registered name bhejein:{" "}
+                      Email your phone and registered name to:{" "}
                       <a
                         href="mailto:support@oldcarbazar.com"
                         className="font-semibold text-[#f75d34] hover:underline"
@@ -218,7 +218,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                         support@oldcarbazar.com
                       </a>
                       <br />
-                      Team 24 ghante mein password reset kar degi.
+                      Our team will reset your password within 24 hours.
                     </p>
                   </div>
                   <button
@@ -265,7 +265,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                       value={form.email}
                       onChange={(v) => updateField("email", v)}
                       placeholder="you@email.com"
-                      hint="Account recovery ke liye useful."
+                      hint="Useful for account recovery."
                     />
                   )}
 

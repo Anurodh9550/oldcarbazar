@@ -32,22 +32,22 @@ const rows: { key: keyof Consents; title: string; desc: string }[] = [
   {
     key: "marketingEmail",
     title: "Email updates",
-    desc: "New listings, offers, aur platform news.",
+    desc: "New listings, offers and platform news.",
   },
   {
     key: "whatsappAlerts",
     title: "WhatsApp alerts",
-    desc: "Buyer/seller messages aur inquiry replies.",
+    desc: "Buyer/seller messages and inquiry replies.",
   },
   {
     key: "priceDropAlerts",
     title: "Price drop alerts",
-    desc: "Shortlisted cars par price kam hone par notify.",
+    desc: "Notify me when the price of a shortlisted car drops.",
   },
   {
     key: "shareWithPartners",
     title: "Partner offers",
-    desc: "Loan, insurance, aur RC services ke partner offers.",
+    desc: "Partner offers for loans, insurance and RC services.",
   },
 ];
 
@@ -72,7 +72,7 @@ export default function ConsentsContent() {
   return (
     <div>
       <p className="mb-6 text-body-muted">
-        Apni privacy control karo. Changes turant save hoti hain (browser mein).
+        Control your privacy preferences. Changes save instantly (in this browser).
       </p>
       <ul className="divide-y divide-gray-100 rounded-xl border border-gray-200">
         {rows.map((row) => (

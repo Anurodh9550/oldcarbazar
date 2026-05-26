@@ -37,56 +37,56 @@ export const sellHubPageMeta: Record<
     badge: "Instant Estimate",
     title: "Free Car Valuation",
     subtitle:
-      "Apni car ki fair market price jaano — brand, model, year aur condition ke basis par instant estimate.",
+      "Know your car's fair market price — an instant estimate based on brand, model, year and condition.",
     description: "Get free used car valuation in India on Old Car Bazar.",
   },
   "sell-guide": {
     badge: "Step by Step",
     title: "How Selling Works",
     subtitle:
-      "Old Car Bazar par car bechna simple hai — 3 steps mein listing live, buyers se direct baat.",
+      "Selling on Old Car Bazar is simple — your listing goes live in 3 steps and you talk to buyers directly.",
     description: "Learn how to sell your used car on Old Car Bazar.",
   },
   "sell-tips": {
     badge: "Expert Advice",
     title: "Tips to Sell Faster",
     subtitle:
-      "Pro tips se apni car jaldi aur achhi price par bechein — photos, pricing aur buyer response.",
+      "Sell your car faster and at a better price with pro tips on photos, pricing and buyer response.",
     description: "Tips to sell your used car faster on Old Car Bazar.",
   },
   dealer: {
     badge: "Partner Program",
     title: "Dealer / Partner Login",
     subtitle:
-      "Authorized dealers aur partners ke liye — bulk listings, leads aur verified seller badge.",
+      "For authorised dealers and partners — bulk listings, leads and a verified seller badge.",
     description: "Dealer and partner login for Old Car Bazar.",
   },
   dealers: {
     badge: "Verified Network",
     title: "Find Dealers",
     subtitle:
-      "Apne city ke trusted used car dealers dhundho — inspection, paperwork aur best deals.",
+      "Find trusted used car dealers in your city — inspections, paperwork and the best deals.",
     description: "Find verified used car dealers near you.",
   },
   "rc-guide": {
     badge: "Legal & Paperwork",
     title: "RC Transfer Guide",
     subtitle:
-      "Car bechne ke baad RC transfer ka complete process — documents, RTO steps aur timelines.",
+      "The complete RC transfer process after selling your car — documents, RTO steps and timelines.",
     description: "RC transfer guide for selling your car in India.",
   },
   insurance: {
     badge: "Stay Protected",
     title: "Insurance Renewal",
     subtitle:
-      "Nayi car ya transfer ke baad insurance renew karo — compare plans aur best rates paao.",
+      "Renew your insurance after buying or transferring a car — compare plans and get the best rates.",
     description: "Insurance renewal guide after selling or buying a car.",
   },
   messages: {
     badge: "Buyer Connect",
     title: "Chat with Buyers",
     subtitle:
-      "Interested buyers se directly chat karo — queries reply karo aur deal close karo faster.",
+      "Chat directly with interested buyers — reply to queries and close deals faster.",
     description: "Chat with buyers on Old Car Bazar.",
   },
 };
@@ -95,31 +95,31 @@ export const sellGuideSteps = [
   {
     step: 1,
     title: "Create Free Account",
-    desc: "Login with mobile number. Seller dashboard access instantly milega.",
+    desc: "Log in with your mobile number and get instant access to the seller dashboard.",
     icon: "👤",
   },
   {
     step: 2,
     title: "Post Your Listing",
-    desc: "Car details, photos, price aur city add karo — 2 minute mein ad live.",
+    desc: "Add car details, photos, price and city — your ad goes live in 2 minutes.",
     icon: "📝",
   },
   {
     step: 3,
     title: "Get Buyer Inquiries",
-    desc: "Buyers aapki listing dekhenge aur chat/call se contact karenge.",
+    desc: "Buyers browse your listing and reach out via chat or call.",
     icon: "📩",
   },
   {
     step: 4,
     title: "Inspect & Negotiate",
-    desc: "Test drive arrange karo, price finalize karo — transparent deal.",
+    desc: "Arrange a test drive and finalise the price — a transparent deal.",
     icon: "🤝",
   },
   {
     step: 5,
     title: "Complete Sale & RC",
-    desc: "Payment lo, RC transfer karo — hamara guide follow karo for paperwork.",
+    desc: "Collect payment and transfer the RC — follow our paperwork guide.",
     icon: "✅",
   },
 ];
@@ -127,32 +127,32 @@ export const sellGuideSteps = [
 export const sellTips = [
   {
     title: "Professional Photos",
-    desc: "Daylight mein front, back, interior aur odometer ki clear photos upload karo.",
+    desc: "Upload clear daylight photos of the front, back, interior and odometer.",
     tag: "2× more views",
   },
   {
     title: "Honest Description",
-    desc: "Service history, accidents aur repairs clearly likho — trust badhta hai.",
+    desc: "Write service history, accidents and repairs clearly — it builds trust.",
     tag: "Faster deals",
   },
   {
     title: "Competitive Pricing",
-    desc: "Pehle free valuation lo, phir market price se 2-3% kam rakho for quick sale.",
+    desc: "Get a free valuation first, then price it 2-3% below market for a quick sale.",
     tag: "Best price",
   },
   {
     title: "Quick Responses",
-    desc: "Buyer messages ka 1 hour ke andar jawab do — serious buyers wait nahi karte.",
+    desc: "Reply to buyer messages within an hour — serious buyers don't wait.",
     tag: "More leads",
   },
   {
     title: "Keep Car Ready",
-    desc: "Selling se pehle wash, minor repair aur PUC update karwa lo.",
+    desc: "Wash the car, fix minor issues and update the PUC before selling.",
     tag: "Better offers",
   },
   {
     title: "Complete Documents",
-    desc: "RC, insurance, service records ready rakho — deal same day close ho sakti hai.",
+    desc: "Keep the RC, insurance and service records ready — deals can close the same day.",
     tag: "No delays",
   },
 ];
@@ -160,36 +160,36 @@ export const sellTips = [
 export const rcTransferSteps = [
   {
     title: "Sale Agreement",
-    desc: "Buyer-seller ke beech sale agreement / Form 29 & 30 sign karo.",
+    desc: "Buyer and seller sign the sale agreement / Form 29 & 30.",
   },
   {
     title: "Clear Pending Dues",
-    desc: "Challan, loan (NOC) aur insurance transfer settle karo.",
+    desc: "Settle any challans, loan (NOC) and insurance transfer.",
   },
   {
     title: "Visit RTO",
-    desc: "Dono parties ke documents ke saath local RTO mein application submit karo.",
+    desc: "Submit the application at the local RTO with documents from both parties.",
   },
   {
     title: "New RC Issued",
-    desc: "7–15 working days mein buyer ke naam par naya RC issue hota hai.",
+    desc: "A new RC is issued in the buyer's name within 7–15 working days.",
   },
 ];
 
 export const insurancePlans = [
   {
     name: "Comprehensive",
-    desc: "Own damage + third party — full protection for new car.",
+    desc: "Own damage + third party — full protection for a new car.",
     from: "₹8,000/yr",
   },
   {
     name: "Third Party",
-    desc: "Mandatory legal cover — budget-friendly option.",
+    desc: "Mandatory legal cover — a budget-friendly option.",
     from: "₹2,100/yr",
   },
   {
     name: "Zero Depreciation",
-    desc: "Claim par full parts value — premium cars ke liye best.",
+    desc: "Full parts value on claims — best for premium cars.",
     from: "₹12,500/yr",
   },
 ];

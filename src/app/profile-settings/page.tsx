@@ -16,7 +16,7 @@ export default function ProfileSettingsPage() {
     <>
       <Header />
       <ProfileHubShell badge={meta.badge} title={meta.title} subtitle={meta.subtitle}>
-        <AuthGate title="Login required" description="Profile edit karne ke liye login karo.">
+        <AuthGate title="Login required" description="Please log in to edit your profile.">
           <ProfileSettingsContent />
         </AuthGate>
       </ProfileHubShell>

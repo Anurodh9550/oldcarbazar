@@ -26,9 +26,9 @@ export default function UsedCarLoanContent() {
         <div>
           <h2 className="section-title-lg">Used Car Loan — Easy & Fast</h2>
           <p className="mt-2 text-body-muted">
-            Top banks aur NBFCs ke saath partnered. Apni used car ke liye loan
-            paayein lowest interest rates par. Minimum docs, paperless process
-            aur quick disbursal.
+            Partnered with top banks and NBFCs. Get a loan for your used car at
+            the lowest interest rates — minimal documents, a paperless process
+            and quick disbursal.
           </p>
           <ul className="mt-6 grid gap-3 sm:grid-cols-2">
             {loanBenefits.map((b) => (
@@ -54,8 +54,8 @@ export default function UsedCarLoanContent() {
                 Application Received
               </h3>
               <p className="mt-2 max-w-xs text-body-muted">
-                Hamari loan team {name} ko 24 hours ke andar call karegi with
-                best offers from {amount ? `₹${amount} Lakh` : "selected"} loan
+                Our loan team will call {name} within 24 hours with the best
+                offers from {amount ? `₹${amount} Lakh` : "selected"} loan
                 partners.
               </p>
               <button
@@ -79,7 +79,7 @@ export default function UsedCarLoanContent() {
                   Get Pre-approved Offer
                 </h3>
                 <p className="mt-1 text-caption sm:text-sm">
-                  2 minute mein apply karein — no obligation, no impact on CIBIL
+                  Apply in 2 minutes — no obligation, no impact on CIBIL.
                 </p>
               </div>
               <label className="block">
@@ -152,8 +152,8 @@ export default function UsedCarLoanContent() {
           <div>
             <h2 className="section-title-lg">Compare Top Lenders</h2>
             <p className="mt-1 text-body-muted">
-              Live interest rates aur processing fee from leading banks &amp;
-              NBFCs
+              Live interest rates and processing fees from leading banks &amp;
+              NBFCs.
             </p>
           </div>
           <Link
@@ -208,7 +208,7 @@ export default function UsedCarLoanContent() {
       <section className="rounded-2xl bg-[#0f172a] p-6 text-white sm:p-8">
         <h2 className="text-xl font-bold sm:text-2xl">Documents Required</h2>
         <p className="mt-1 text-sm text-slate-300">
-          Bas itne hi docs chahiye — fully digital submission
+          That's all we need — fully digital submission.
         </p>
         <ul className="mt-5 grid gap-2 sm:grid-cols-2">
           {loanDocs.map((d) => (

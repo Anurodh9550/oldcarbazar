@@ -8,16 +8,16 @@ export default function MyGarageContent() {
       <ProfileEmptyState
         icon="🏠"
         title="Your garage is empty"
-        description="Yahan apni owned cars add kar sakte ho — service due dates, RC copy, aur insurance reminders ke liye."
+        description="Add the cars you own here — for service due dates, RC copies and insurance reminders."
         actionLabel="Add a vehicle"
         actionHref="/sell-car"
       />
       <p className="mt-6 rounded-xl bg-orange-50 px-4 py-3 text-sm text-gray-700">
-        <strong>Tip:</strong> Agar aap car bech rahe ho,{" "}
+        <strong>Tip:</strong> If you're selling a car, use{" "}
         <a href="/my-listings" className="font-semibold text-[#f75d34] hover:underline">
           My Listings
         </a>{" "}
-        use karo — wahan ads manage hoti hain.
+        — that's where your ads are managed.
       </p>
     </>
   );

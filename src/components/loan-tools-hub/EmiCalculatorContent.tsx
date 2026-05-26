@@ -38,7 +38,7 @@ export default function EmiCalculatorContent() {
       <div>
         <h2 className="section-title">Calculate Your Monthly EMI</h2>
         <p className="mt-1 text-caption sm:text-sm">
-          Loan amount, interest rate aur tenure adjust karke apni EMI dekhein
+          Adjust the loan amount, interest rate and tenure to see your EMI.
         </p>
 
         <div className="mt-6 space-y-6">

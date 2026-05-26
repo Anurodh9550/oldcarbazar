@@ -133,7 +133,7 @@ export default function CompareLoansContent() {
       <section>
         <h2 className="section-title-lg">All Lenders Side-by-Side</h2>
         <p className="mt-1 text-body-muted">
-          EMI, total interest aur tenure compare karke best choice select karein
+          Compare EMI, total interest and tenure to pick the best option.
         </p>
         <div className="mt-5 overflow-hidden rounded-2xl border border-gray-200">
           <div className="overflow-x-auto">

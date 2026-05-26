@@ -47,11 +47,13 @@ export default function MyListingsContent() {
   const friendlyError = (err: unknown) => {
     if (err instanceof ApiError) {
       if (err.status === 401) {
-        return "Session expire ho gaya. Dubara login karein.";
+        return "Your session has expired. Please log in again.";
       }
       return err.message;
     }
-    return err instanceof Error ? err.message : "Kuch galat ho gaya. Phir try karein.";
+    return err instanceof Error
+      ? err.message
+      : "Something went wrong. Please try again.";
   };
 
   const ensureSession = () => {
@@ -152,7 +154,7 @@ export default function MyListingsContent() {
           <span className="text-6xl">🚗</span>
           <h2 className="mt-4 text-xl font-bold text-gray-900">No listings yet</h2>
           <p className="mx-auto mt-2 max-w-md text-body-muted">
-            Apni pehli car free mein list karo — sirf 2 minute mein ad live ho jayegi.
+            List your first car for free — your ad goes live in just 2 minutes.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link

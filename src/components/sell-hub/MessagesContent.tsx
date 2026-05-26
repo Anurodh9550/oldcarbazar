@@ -50,7 +50,7 @@ export default function MessagesContent() {
           <WhatsAppIcon size={56} className="mx-auto" />
           <h2 className="mt-4 text-xl font-bold text-gray-900">Login to Chat</h2>
           <p className="mx-auto mt-2 max-w-md text-body-muted">
-            Buyer messages sirf logged-in sellers ko dikhte hain.
+            Buyer messages are visible only to logged-in sellers.
           </p>
           <button
             type="button"

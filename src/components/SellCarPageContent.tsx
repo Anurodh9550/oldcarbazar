@@ -29,8 +29,8 @@ export default function SellCarPageContent({ embedded }: { embedded?: boolean })
             Login Required to Sell Your Car
           </h2>
           <p className="mx-auto mt-2 max-w-md text-body-muted">
-            Pehle account banao ya login karo. Uske baad hi aap free listing post
-            kar sakte ho Old Car Bazar par.
+            Create an account or log in first. Only then can you post a free
+            listing on Old Car Bazar.
           </p>
           <ul className="mx-auto mt-6 max-w-sm space-y-2 text-left text-body-muted">
             <li className="flex gap-2">

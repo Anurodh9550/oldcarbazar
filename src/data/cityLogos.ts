@@ -1,9 +1,9 @@
 import type { CityName } from "@/data/locations";
 
 /**
- * Apne city logos yahan file naam se map karo.
+ * Map city logos by file name here.
  * Files folder: public/cities/
- * Delhi jaisa: 80×80, round/circular icon (SVG ya PNG dono chalega).
+ * Like Delhi: 80×80, round/circular icon (SVG or PNG, both work).
  */
 export const cityLogoFiles: Partial<Record<CityName, string>> = {
   Ahmedabad: "ahmedabad.svg",

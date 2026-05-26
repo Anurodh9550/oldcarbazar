@@ -15,11 +15,11 @@ export default function MyListingsPage() {
       <SellerPageShell
         badge="Seller Hub"
         title="My Listings"
-        subtitle="Apni saari posted cars ek jagah se manage karo — status update, delete, ya nayi ad post karo."
+        subtitle="Manage all your posted cars in one place — update status, delete, or post a new ad."
       >
         <AuthGate
           title="Login to View Your Listings"
-          description="Apni posted cars dekhne aur manage karne ke liye login karo."
+          description="Please log in to view and manage your posted cars."
           features={[
             "View all your active ads",
             "Mark cars as sold",

@@ -15,11 +15,11 @@ export default function SellerDashboardPage() {
       <SellerPageShell
         badge="Seller Hub"
         title="Seller Dashboard"
-        subtitle="Apne ads ka performance track karo — views, inquiries aur active listings sab ek dashboard par."
+        subtitle="Track your ads' performance — views, inquiries and active listings, all in one dashboard."
       >
         <AuthGate
           title="Login to Access Seller Dashboard"
-          description="Seller dashboard sirf logged-in users ke liye hai."
+          description="The seller dashboard is available only to logged-in users."
           features={[
             "Listing performance stats",
             "Views & inquiry tracking",

@@ -21,7 +21,7 @@ export default function MyVehiclesContent() {
       <ProfileEmptyState
         icon="🚗"
         title="No vehicles listed"
-        description="Apni car bechna hai? Free ad post karo — buyers directly contact karenge."
+        description="Want to sell your car? Post a free ad — buyers will contact you directly."
         actionLabel="Sell your car"
         actionHref="/sell-car"
       />

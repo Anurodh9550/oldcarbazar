@@ -29,28 +29,28 @@ export const helpHubNavGroups = [
 ];
 
 export const buySteps = [
-  { step: 1, title: "Search & Filter", desc: "City, budget, brand aur fuel type se cars dhundho.", icon: "🔍" },
-  { step: 2, title: "Compare Listings", desc: "Photos, specs aur price compare karo — shortlisted karo.", icon: "📋" },
-  { step: 3, title: "Contact Seller", desc: "Chat ya call se seller se baat karo, test drive fix karo.", icon: "💬" },
-  { step: 4, title: "Inspect the Car", desc: "Mechanic ke saath inspection — documents verify karo.", icon: "🔧" },
-  { step: 5, title: "Close the Deal", desc: "Payment, RC transfer aur insurance complete karo.", icon: "✅" },
+  { step: 1, title: "Search & Filter", desc: "Find cars by city, budget, brand and fuel type.", icon: "🔍" },
+  { step: 2, title: "Compare Listings", desc: "Compare photos, specs and prices — then shortlist your favourites.", icon: "📋" },
+  { step: 3, title: "Contact Seller", desc: "Talk to the seller via chat or call and schedule a test drive.", icon: "💬" },
+  { step: 4, title: "Inspect the Car", desc: "Inspect with a mechanic and verify all documents.", icon: "🔧" },
+  { step: 5, title: "Close the Deal", desc: "Complete payment, RC transfer and insurance.", icon: "✅" },
 ];
 
 export const helpSellSteps = [
-  { step: 1, title: "Free Login", desc: "Account banao — seller dashboard access milega.", icon: "👤" },
-  { step: 2, title: "Post Listing", desc: "2 minute mein car details aur photos upload karo.", icon: "📝" },
-  { step: 3, title: "Get Inquiries", desc: "Buyers directly contact karenge.", icon: "📩" },
-  { step: 4, title: "Negotiate", desc: "Fair price par deal finalize karo.", icon: "🤝" },
-  { step: 5, title: "Transfer RC", desc: "Hamara RC guide follow karke sale complete karo.", icon: "📄" },
+  { step: 1, title: "Free Login", desc: "Create an account and unlock the seller dashboard.", icon: "👤" },
+  { step: 2, title: "Post Listing", desc: "Upload car details and photos in 2 minutes.", icon: "📝" },
+  { step: 3, title: "Get Inquiries", desc: "Buyers will contact you directly.", icon: "📩" },
+  { step: 4, title: "Negotiate", desc: "Finalise the deal at a fair price.", icon: "🤝" },
+  { step: 5, title: "Transfer RC", desc: "Follow our RC guide to complete the sale.", icon: "📄" },
 ];
 
 export const safetyTips = [
-  { title: "Meet in Public", desc: "Test drive aur meeting public place par karo — dealer showroom best.", icon: "📍" },
-  { title: "Verify Documents", desc: "RC, insurance, service history aur seller ID check karo.", icon: "📄" },
-  { title: "Avoid Advance Payment", desc: "Car dekhne aur papers verify karne se pehle paisa mat do.", icon: "💳" },
-  { title: "Use Platform Chat", desc: "Old Car Bazar chat use karo — record rehta hai.", icon: "💬" },
-  { title: "Professional Inspection", desc: "Trusted mechanic se pre-purchase inspection karwao.", icon: "🔧" },
-  { title: "Report Suspicious Ads", desc: "Fake ya scam listing turant report karo.", icon: "🚨" },
+  { title: "Meet in Public", desc: "Always meet and test drive in a public place — a dealer showroom is best.", icon: "📍" },
+  { title: "Verify Documents", desc: "Check the RC, insurance, service history and seller ID.", icon: "📄" },
+  { title: "Avoid Advance Payment", desc: "Don't pay anything before inspecting the car and verifying papers.", icon: "💳" },
+  { title: "Use Platform Chat", desc: "Use Old Car Bazar chat — a record is always maintained.", icon: "💬" },
+  { title: "Professional Inspection", desc: "Get a pre-purchase inspection done by a trusted mechanic.", icon: "🔧" },
+  { title: "Report Suspicious Ads", desc: "Report any fake or scam listing immediately.", icon: "🚨" },
 ];
 
 export const faqs = [
@@ -177,25 +177,25 @@ export const helpPageConfig: Record<string, HelpPageConfig> = {
   "/help/buy": {
     badge: "Buyer Guide",
     title: "How to Buy",
-    subtitle: "Used car khareedne ka complete step-by-step guide — safe, smart aur stress-free.",
+    subtitle: "A complete step-by-step guide to buying a used car — safe, smart and stress-free.",
     description: "Learn how to buy used cars on Old Car Bazar.",
   },
   "/help/sell": {
     badge: "Seller Guide",
     title: "How to Sell",
-    subtitle: "Apni car online bechna seekho — free listing se deal tak poora process.",
+    subtitle: "Learn to sell your car online — the entire process from free listing to deal.",
     description: "Learn how to sell your car on Old Car Bazar.",
   },
   "/help/safety": {
     badge: "Stay Safe",
     title: "Safety Tips",
-    subtitle: "Buy aur sell karte waqt safe raho — scams se bacho, secure deals karo.",
+    subtitle: "Stay safe while buying and selling — avoid scams and close secure deals.",
     description: "Safety tips for buying and selling used cars.",
   },
   "/help/faq": {
     badge: "Help Center",
     title: "Frequently Asked Questions",
-    subtitle: "Common questions ke jawab — buying, selling, payments aur paperwork.",
+    subtitle: "Answers to common questions — buying, selling, payments and paperwork.",
     description: "FAQs for Old Car Bazar users.",
     showLanguageToggle: true,
     badgeHi: "सहायता केंद्र",
@@ -205,7 +205,7 @@ export const helpPageConfig: Record<string, HelpPageConfig> = {
   "/about": {
     badge: "Our Story",
     title: "About Old Car Bazar",
-    subtitle: "India ka trusted used car marketplace — buyers aur sellers ko direct connect karte hain.",
+    subtitle: "India's trusted used car marketplace — connecting buyers and sellers directly.",
     description: "About Old Car Bazar — India's used car marketplace.",
     backHref: "/",
     backLabel: "Back to Home",
@@ -217,13 +217,13 @@ export const helpPageConfig: Record<string, HelpPageConfig> = {
   "/contact": {
     badge: "Get in Touch",
     title: "Contact Us",
-    subtitle: "Questions, feedback ya support — hum yahan hain help ke liye.",
+    subtitle: "Questions, feedback or support — we're here to help.",
     description: "Contact Old Car Bazar support team.",
   },
   "/careers": {
     badge: "Join Us",
     title: "Careers With Us",
-    subtitle: "Old Car Bazar team mein shamil ho — passionate logon ke liye exciting roles.",
+    subtitle: "Join the Old Car Bazar team — exciting roles for passionate people.",
     description: "Careers at Old Car Bazar.",
     showLanguageToggle: true,
     badgeHi: "हमसे जुड़ें",
@@ -233,37 +233,37 @@ export const helpPageConfig: Record<string, HelpPageConfig> = {
   "/partner": {
     badge: "Grow Together",
     title: "Partner with Us",
-    subtitle: "Dealers, insurers aur service partners — saath milkar grow karo.",
+    subtitle: "Dealers, insurers and service partners — let's grow together.",
     description: "Partner with Old Car Bazar.",
   },
   "/reviews": {
     badge: "Community",
     title: "Car Reviews",
-    subtitle: "Real buyers ki reviews — popular used cars par honest feedback.",
+    subtitle: "Real buyer reviews — honest feedback on popular used cars.",
     description: "Used car reviews on Old Car Bazar.",
   },
   "/news": {
     badge: "Latest",
     title: "News & Updates",
-    subtitle: "Used car market news, buying guides aur industry updates.",
+    subtitle: "Used car market news, buying guides and industry updates.",
     description: "News and updates from Old Car Bazar.",
   },
   "/videos": {
     badge: "Watch & Learn",
     title: "Videos",
-    subtitle: "Buying, selling aur maintenance tips — video guides dekho.",
+    subtitle: "Buying, selling and maintenance tips — watch our video guides.",
     description: "Video guides for used car buyers and sellers.",
   },
   "/sitemap": {
     badge: "Navigation",
     title: "Sitemap",
-    subtitle: "Old Car Bazar ki saari pages — ek jagah se access karo.",
+    subtitle: "All Old Car Bazar pages — accessible from one place.",
     description: "Sitemap for Old Car Bazar website.",
   },
   "/help/terms": {
     badge: "Legal",
     title: "Terms & Conditions",
-    subtitle: "Old Car Bazar use karne ke terms aur conditions — buyers aur sellers ke liye.",
+    subtitle: "Terms and conditions for using Old Car Bazar — for buyers and sellers.",
     description: "Terms & Conditions for Old Car Bazar users.",
     showLanguageToggle: true,
     badgeHi: "कानूनी",
@@ -273,7 +273,7 @@ export const helpPageConfig: Record<string, HelpPageConfig> = {
   "/help/privacy": {
     badge: "Privacy",
     title: "Privacy Policy",
-    subtitle: "Hum aapka data kaise collect, use aur protect karte hain.",
+    subtitle: "How we collect, use and protect your data.",
     description: "Privacy Policy of Old Car Bazar.",
     showLanguageToggle: true,
     badgeHi: "गोपनीयता",
@@ -283,7 +283,7 @@ export const helpPageConfig: Record<string, HelpPageConfig> = {
   "/help/policies": {
     badge: "Compliance",
     title: "Corporate Policies",
-    subtitle: "Anti-fraud, refund, content aur dealer policies — transparent rules.",
+    subtitle: "Anti-fraud, refund, content and dealer policies — transparent rules.",
     description: "Corporate policies of Old Car Bazar.",
     showLanguageToggle: true,
     badgeHi: "अनुपालन",
@@ -293,7 +293,7 @@ export const helpPageConfig: Record<string, HelpPageConfig> = {
   "/investors": {
     badge: "Investor Relations",
     title: "Investors",
-    subtitle: "Old Car Bazar ki growth, financials aur leadership team ke baare mein.",
+    subtitle: "Learn about Old Car Bazar's growth, financials and leadership team.",
     description: "Investor relations page for Old Car Bazar.",
     showLanguageToggle: true,
     badgeHi: "इन्वेस्टर रिलेशंस",
@@ -303,13 +303,13 @@ export const helpPageConfig: Record<string, HelpPageConfig> = {
   "/feedback": {
     badge: "We're Listening",
     title: "Feedback",
-    subtitle: "Suggestion ya complaint hai? Apni baat hum tak pohonchao.",
+    subtitle: "Got a suggestion or complaint? Let us know — we're listening.",
     description: "Send feedback to Old Car Bazar team.",
   },
   "/advertise": {
     badge: "Reach Buyers",
     title: "Advertise with Us",
-    subtitle: "Dealers aur brands ke liye targeted advertising solutions — buyer audience reach karein.",
+    subtitle: "Targeted advertising solutions for dealers and brands — reach the right buyer audience.",
     description: "Advertise on Old Car Bazar.",
   },
 };

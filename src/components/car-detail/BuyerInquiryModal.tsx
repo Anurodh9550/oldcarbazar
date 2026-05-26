@@ -40,11 +40,11 @@ export default function BuyerInquiryModal({
     if (submitting) return;
 
     if (!name.trim()) {
-      setError("Apna naam likhein.");
+      setError("Please enter your name.");
       return;
     }
     if (!/^[6-9]\d{9}$/.test(phone)) {
-      setError("10-digit mobile number daalein (6-9 se start).");
+      setError("Enter a 10-digit mobile number starting with 6-9.");
       return;
     }
 
@@ -61,7 +61,9 @@ export default function BuyerInquiryModal({
       onSubmitted();
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Inquiry bhejne mein dikkat aayi."
+        err instanceof Error
+          ? err.message
+          : "Couldn't send your inquiry. Please try again."
       );
     } finally {
       setSubmitting(false);

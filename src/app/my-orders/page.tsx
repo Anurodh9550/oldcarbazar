@@ -16,7 +16,7 @@ export default function MyOrdersPage() {
     <>
       <Header />
       <ProfileHubShell badge={meta.badge} title={meta.title} subtitle={meta.subtitle}>
-        <AuthGate title="Login required" description="Orders dekhne ke liye login karo.">
+        <AuthGate title="Login required" description="Please log in to view your orders.">
           <MyOrdersContent />
         </AuthGate>
       </ProfileHubShell>

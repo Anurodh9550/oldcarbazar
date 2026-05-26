@@ -7,7 +7,7 @@ export default function MyOrdersContent() {
     <ProfileEmptyState
       icon="📦"
       title="No orders yet"
-      description="Jab aap kisi car ki booking, inspection, ya purchase request karenge, woh yahan dikhegi."
+      description="When you book, inspect or request to purchase a car, it will appear here."
       actionLabel="Browse used cars"
       actionHref="/used-cars"
     />

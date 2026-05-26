@@ -20,7 +20,7 @@ export default function SellCarPage() {
       <SellerPageShell
         badge="100% Free"
         title="Sell Your Car Free"
-        subtitle="3 simple steps mein apni car list karo. Koi commission nahi — seedha buyers se connect ho."
+        subtitle="List your car in 3 simple steps. Zero commission — connect with buyers directly."
         variant="sell"
       >
         <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-3">

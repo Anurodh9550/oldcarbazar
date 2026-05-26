@@ -35,7 +35,7 @@ export const loanToolsPageMeta: Record<
     badge: "Pre-approved Offers",
     title: "Used Car Loan",
     subtitle:
-      "Easy car loan paayein 2 minute mein — top banks aur NBFCs ke best offers ek hi jagah par.",
+      "Get an easy car loan in 2 minutes — best offers from top banks and NBFCs, all in one place.",
     description:
       "Apply for used car loan online at best interest rates on Old Car Bazar.",
   },
@@ -43,7 +43,7 @@ export const loanToolsPageMeta: Record<
     badge: "Smart Planner",
     title: "EMI Calculator",
     subtitle:
-      "Apni monthly EMI seconds mein calculate karein — loan amount, tenure aur interest rate ke hisaab se.",
+      "Calculate your monthly EMI in seconds — based on loan amount, tenure and interest rate.",
     description:
       "Free EMI calculator for used car loan with interest, principal and tenure breakdown.",
   },
@@ -51,7 +51,7 @@ export const loanToolsPageMeta: Record<
     badge: "Instant Check",
     title: "Loan Eligibility Check",
     subtitle:
-      "Apni salary aur expenses ke basis par maximum loan amount turant pata karein — 100% free, no CIBIL impact.",
+      "Instantly find out your maximum loan amount based on your salary and expenses — 100% free, no CIBIL impact.",
     description:
       "Check your used car loan eligibility based on salary and obligations.",
   },
@@ -59,7 +59,7 @@ export const loanToolsPageMeta: Record<
     badge: "Best Deals",
     title: "Compare Interest Rates",
     subtitle:
-      "India ke top banks aur NBFCs ki interest rates compare karein — lowest EMI ke saath best lender choose karein.",
+      "Compare interest rates from India's top banks and NBFCs — pick the best lender with the lowest EMI.",
     description:
       "Compare used car loan interest rates from top banks and NBFCs in India.",
   },
@@ -67,7 +67,7 @@ export const loanToolsPageMeta: Record<
     badge: "Side-by-Side",
     title: "Compare Cars",
     subtitle:
-      "Do ya teen used cars ko ek saath compare karein — price, specs, mileage aur features par.",
+      "Compare two or three used cars side by side — on price, specs, mileage and features.",
     description:
       "Compare used cars side-by-side on Old Car Bazar — price, mileage and specs.",
   },
@@ -75,7 +75,7 @@ export const loanToolsPageMeta: Record<
     badge: "Verified Data",
     title: "Vehicle History Report",
     subtitle:
-      "Registration number daalein aur car ki full history dekhein — RC, insurance, challan aur ownership.",
+      "Enter the registration number and view the car's full history — RC, insurance, challans and ownership.",
     description:
       "Get vehicle history report for used car — RC, insurance, challan and accident history.",
   },
@@ -83,7 +83,7 @@ export const loanToolsPageMeta: Record<
     badge: "200-Point Inspection",
     title: "Assured Cars",
     subtitle:
-      "Hand-picked, inspected aur warranty-backed used cars — no haggling, no surprises.",
+      "Hand-picked, inspected and warranty-backed used cars — no haggling, no surprises.",
     description:
       "Browse assured and certified used cars with warranty on Old Car Bazar.",
   },
@@ -141,10 +141,10 @@ export const loanBanks: LoanBank[] = [
 ];
 
 export const loanBenefits = [
-  { icon: "⚡", title: "Quick Approval", desc: "Loan sanction within 24-48 hours after docs verification." },
-  { icon: "💯", title: "Up to 100% Funding", desc: "On-road price ka 90-100% tak finance available." },
-  { icon: "🧾", title: "Minimal Documentation", desc: "Sirf Aadhaar, PAN, salary slip aur bank statement chahiye." },
-  { icon: "📈", title: "Flexible Tenure", desc: "12 se 84 months tak ka tenure — apni EMI plan karein." },
+  { icon: "⚡", title: "Quick Approval", desc: "Loan sanction within 24-48 hours after document verification." },
+  { icon: "💯", title: "Up to 100% Funding", desc: "Finance up to 90-100% of the on-road price." },
+  { icon: "🧾", title: "Minimal Documentation", desc: "Only Aadhaar, PAN, salary slip and bank statement required." },
+  { icon: "📈", title: "Flexible Tenure", desc: "Tenure from 12 to 84 months — plan your EMI your way." },
 ];
 
 export const loanDocs = [
@@ -157,28 +157,28 @@ export const loanDocs = [
 ];
 
 export const assuredFeatures = [
-  { icon: "🔧", title: "200+ Point Inspection", desc: "Engine, transmission, electricals aur body — sab kuch check." },
-  { icon: "🛡", title: "6 Month Warranty", desc: "Engine aur gearbox par included warranty — extendable up to 24 months." },
-  { icon: "🔁", title: "5-Day Money Back", desc: "Pasand nahi aayi? 5 din mein return karo — no questions asked." },
-  { icon: "📄", title: "Clean Documentation", desc: "RC, insurance, NOC aur service records — all verified & transferred." },
+  { icon: "🔧", title: "200+ Point Inspection", desc: "Engine, transmission, electricals and body — everything checked." },
+  { icon: "🛡", title: "6 Month Warranty", desc: "Included warranty on engine and gearbox — extendable up to 24 months." },
+  { icon: "🔁", title: "5-Day Money Back", desc: "Didn't like the car? Return it within 5 days — no questions asked." },
+  { icon: "📄", title: "Clean Documentation", desc: "RC, insurance, NOC and service records — all verified & transferred." },
   { icon: "💰", title: "Fair Fixed Price", desc: "No haggling — transparent on-road price, no hidden charges." },
-  { icon: "🚗", title: "Free Home Test Drive", desc: "Apne ghar par test drive — convenient aur safe." },
+  { icon: "🚗", title: "Free Home Test Drive", desc: "Test drive at your doorstep — convenient and safe." },
 ];
 
 export const historyReportSections = [
-  { icon: "📄", title: "RC Details", desc: "Registration number, owner name, RTO aur registration date." },
-  { icon: "🛡", title: "Insurance Status", desc: "Active policy details, expiry date aur insurer information." },
-  { icon: "⚠️", title: "Challan / E-Challan", desc: "Pending traffic violations aur unpaid fines across India." },
-  { icon: "👥", title: "Ownership History", desc: "Pichhle owners ka count aur last transfer date." },
-  { icon: "🛠", title: "Accident / Damage", desc: "Reported accidents, major repairs aur structural damage (if any)." },
-  { icon: "✅", title: "PUC & Hypothecation", desc: "Pollution certificate validity aur loan hypothecation status." },
+  { icon: "📄", title: "RC Details", desc: "Registration number, owner name, RTO and registration date." },
+  { icon: "🛡", title: "Insurance Status", desc: "Active policy details, expiry date and insurer information." },
+  { icon: "⚠️", title: "Challan / E-Challan", desc: "Pending traffic violations and unpaid fines across India." },
+  { icon: "👥", title: "Ownership History", desc: "Number of previous owners and last transfer date." },
+  { icon: "🛠", title: "Accident / Damage", desc: "Reported accidents, major repairs and structural damage (if any)." },
+  { icon: "✅", title: "PUC & Hypothecation", desc: "Pollution certificate validity and loan hypothecation status." },
 ];
 
 export const compareTips = [
-  "2-3 cars ko ek saath compare karna best practice hai — overload mat karo.",
-  "Price ke alawa mileage, service cost aur resale value bhi check karein.",
-  "Always look at on-road price (RTO + insurance + accessories) not ex-showroom.",
-  "Used car compare karte waqt year of manufacture aur KMs important hain.",
+  "Comparing 2-3 cars at a time is best practice — don't overload yourself.",
+  "Besides price, also check mileage, service cost and resale value.",
+  "Always look at on-road price (RTO + insurance + accessories), not ex-showroom.",
+  "When comparing used cars, year of manufacture and kilometres driven matter.",
 ];
 
 export const sampleAssuredCars = [
