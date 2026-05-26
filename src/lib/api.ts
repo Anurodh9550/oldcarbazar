@@ -329,22 +329,39 @@ async function refreshAccessToken() {
   return data.access;
 }
 
+/** Routes that must work without a stored JWT (login, register, public GETs). */
+function isPublicApiPath(path: string, method: string) {
+  const p = path.split("?")[0];
+  const m = method.toUpperCase();
+  if (
+    p.startsWith("/auth/login") ||
+    p.startsWith("/auth/register") ||
+    p.startsWith("/auth/otp/")
+  ) {
+    return true;
+  }
+  if (m === "GET" || m === "HEAD") {
+    if (p === "/listings/" || p.startsWith("/listings/?")) return true;
+    if (/^\/listings\/[^/]+\/$/.test(p)) return true;
+  }
+  return false;
+}
+
 async function apiFetch<T>(
   path: string,
   init: RequestInit = {},
   retry = true,
   requireAuth = false
 ): Promise<T> {
-  // Refresh *before* the request when the access token is expired so DELETE /
-  // PATCH never hit the server with a dead JWT (which returns 401).
-  let token = getAccessToken();
-  if (token && isAccessTokenExpired(token) && retry) {
+  const method = (init.method ?? "GET").toUpperCase();
+  const publicRoute = isPublicApiPath(path, method);
+  const needsAuth = requireAuth && !publicRoute;
+
+  // Refresh *before* protected calls when the access token is expired.
+  let token = !publicRoute ? getAccessToken() : null;
+  if (token && isAccessTokenExpired(token) && retry && needsAuth) {
     token = (await refreshAccessToken()) ?? null;
   }
-
-  const method = (init.method ?? "GET").toUpperCase();
-  const needsAuth =
-    requireAuth || (method !== "GET" && method !== "HEAD" && method !== "OPTIONS");
 
   if (needsAuth && !token) {
     clearTokens();
@@ -358,7 +375,8 @@ async function apiFetch<T>(
   if (!(init.body instanceof FormData) && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
   }
-  if (token) headers.set("Authorization", `Bearer ${token}`);
+  // Never attach a stale Bearer token to login/register — that caused 401 loops.
+  if (token && !publicRoute) headers.set("Authorization", `Bearer ${token}`);
 
   const res = await fetch(`${API_BASE}${path}`, {
     method: init.method,
@@ -375,13 +393,10 @@ async function apiFetch<T>(
     headers,
   });
 
-  if (res.status === 401) {
-    // The token was sent but the server rejected it (expired access *and*
-    // refresh, account deleted, or signing key changed on redeploy). We
-    // already attempted a silent refresh once via the `retry` flag — if that
-    // also failed, treat the session as dead and clean everything so the UI
-    // immediately reflects "logged out".
-    if (retry) {
+  if (res.status === 401 && !publicRoute) {
+    // Wrong password on /auth/login returns 400, not 401 — so 401 here means
+    // the stored JWT is dead. Try refresh once, then force re-login.
+    if (retry && needsAuth) {
       const nextToken = await refreshAccessToken();
       if (nextToken) {
         return apiFetch<T>(path, init, false, requireAuth);
@@ -396,6 +411,20 @@ async function apiFetch<T>(
       window.dispatchEvent(new Event("ocb-auth-expired"));
     }
     throw sessionExpiredError(data);
+  }
+
+  if (res.status === 401 && publicRoute) {
+    const contentType = res.headers.get("content-type") ?? "";
+    const data = contentType.includes("application/json")
+      ? await res.json()
+      : null;
+    throw new ApiError(
+      401,
+      typeof data === "object" && data !== null && "detail" in data
+        ? String((data as { detail: unknown }).detail)
+        : "Request failed.",
+      data
+    );
   }
 
   return parseResponse<T>(res);
@@ -597,6 +626,7 @@ export const api = {
     if (payload.email && payload.email.trim()) body.email = payload.email.trim();
     if (payload.city && payload.city.trim()) body.city = payload.city.trim();
 
+    clearTokens();
     const data = await apiFetch<AuthResponse>("/auth/register/", {
       method: "POST",
       body: JSON.stringify(body),
@@ -606,6 +636,7 @@ export const api = {
   },
 
   async login(identifier: string, password: string) {
+    clearTokens();
     const data = await apiFetch<AuthResponse>("/auth/login/", {
       method: "POST",
       body: JSON.stringify({ identifier, password }),
