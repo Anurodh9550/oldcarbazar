@@ -12,7 +12,7 @@ import { useAdmin } from "@/context/AdminContext";
 import { useAuth } from "@/context/AuthContext";
 import { carListings, type CarListing } from "@/data/cars";
 import type { SellCarFormData } from "@/data/sellCarForm";
-import { api } from "@/lib/api";
+import { ApiError, api, getAccessToken } from "@/lib/api";
 import { DEFAULT_LISTING_IMAGE } from "@/lib/listingImages";
 import type {
   ListingModeration,
@@ -105,9 +105,16 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not load listings.");
-      // Keep static demo listings as a graceful fallback if the backend sleeps.
       setApiListings([]);
-      if (!isLoggedIn) setUserListings([]);
+      if (
+        err instanceof ApiError &&
+        err.status === 401
+      ) {
+        setUserListings([]);
+        localStorage.removeItem(STORAGE_KEY);
+      } else if (!isLoggedIn) {
+        setUserListings([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -125,11 +132,15 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    // Only restore cached rows when a JWT is present — otherwise stale listings
+    // make the seller think they are logged in while DELETE returns 401.
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved) as UserCarListing[];
-        setUserListings(parsed.map(normalizeStoredListing));
+      if (getAccessToken()) {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved) as UserCarListing[];
+          setUserListings(parsed.map(normalizeStoredListing));
+        }
       }
     } catch {
       /* ignore */

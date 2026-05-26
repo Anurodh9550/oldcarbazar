@@ -178,15 +178,47 @@ function isBrowser() {
   return typeof window !== "undefined";
 }
 
+/** JWT must look like header.payload.signature (not "undefined" from a bad save). */
+function isJwtShape(token: string) {
+  const parts = token.split(".");
+  return parts.length === 3 && parts.every((p) => p.length > 0);
+}
+
+function getTokenExpiryMs(token: string): number | null {
+  try {
+    const payload = JSON.parse(
+      atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))
+    ) as { exp?: number };
+    return typeof payload.exp === "number" ? payload.exp * 1000 : null;
+  } catch {
+    return null;
+  }
+}
+
+function isAccessTokenExpired(token: string, skewMs = 30_000) {
+  const exp = getTokenExpiryMs(token);
+  if (!exp) return true;
+  return Date.now() >= exp - skewMs;
+}
+
 export function getAccessToken() {
   if (!isBrowser()) return null;
-  const token = localStorage.getItem(ACCESS_TOKEN_KEY);
-  return token?.trim() ? token : null;
+  const token = localStorage.getItem(ACCESS_TOKEN_KEY)?.trim();
+  if (!token || !isJwtShape(token)) return null;
+  return token;
 }
 
 /** True when a non-empty user JWT is stored (seller/buyer session). */
 export function hasAccessToken() {
   return Boolean(getAccessToken());
+}
+
+/** Refresh the access token when it is missing or expired. */
+export async function ensureValidAccessToken(): Promise<boolean> {
+  const token = getAccessToken();
+  if (token && !isAccessTokenExpired(token)) return true;
+  const next = await refreshAccessToken();
+  return Boolean(next);
 }
 
 function notifyAuthChanged() {
@@ -197,6 +229,7 @@ function notifyAuthChanged() {
 
 export function saveTokens(access: string, refresh: string) {
   if (!isBrowser()) return;
+  if (!isJwtShape(access) || !refresh?.trim()) return;
   localStorage.setItem(ACCESS_TOKEN_KEY, access);
   localStorage.setItem(REFRESH_TOKEN_KEY, refresh);
   notifyAuthChanged();
@@ -293,7 +326,13 @@ async function apiFetch<T>(
   init: RequestInit = {},
   retry = true
 ): Promise<T> {
-  const token = getAccessToken();
+  // Refresh *before* the request when the access token is expired so DELETE /
+  // PATCH never hit the server with a dead JWT (which returns 401).
+  let token = getAccessToken();
+  if (token && isAccessTokenExpired(token) && retry) {
+    token = (await refreshAccessToken()) ?? null;
+  }
+
   const headers = new Headers(init.headers);
   if (!(init.body instanceof FormData) && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");

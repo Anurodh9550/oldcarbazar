@@ -6,7 +6,7 @@ import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { useMemo, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { getSellerIdFromUser, useListings } from "@/context/ListingsContext";
-import { ApiError, hasAccessToken } from "@/lib/api";
+import { ApiError, ensureValidAccessToken } from "@/lib/api";
 import type { ListingStatus, UserCarListing } from "@/types/listing";
 
 const statusStyles: Record<ListingStatus, string> = {
@@ -58,9 +58,12 @@ export default function MyListingsContent() {
       : "Something went wrong. Please try again.";
   };
 
-  const ensureSession = () => {
-    if (hasAccessToken()) return true;
-    flashToast("error", "Please login again to continue.");
+  const ensureSession = async () => {
+    const ok = await ensureValidAccessToken();
+    if (ok) return true;
+    flashToast("error", "Your session has expired. Please log in again.");
+    logout();
+    setConfirmDelete(null);
     window.dispatchEvent(new Event("ocb-auth-expired"));
     return false;
   };
@@ -70,7 +73,7 @@ export default function MyListingsContent() {
     next: ListingStatus
   ) => {
     if (busyId) return;
-    if (!ensureSession()) return;
+    if (!(await ensureSession())) return;
     setBusyId(car.id);
     setBusyAction(next === "sold" ? "sold" : "relist");
     try {
@@ -91,7 +94,7 @@ export default function MyListingsContent() {
 
   const handleConfirmDelete = async () => {
     if (!confirmDelete) return;
-    if (!ensureSession()) return;
+    if (!(await ensureSession())) return;
     const target = confirmDelete;
     setBusyId(target.id);
     setBusyAction("delete");

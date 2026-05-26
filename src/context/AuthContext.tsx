@@ -14,6 +14,7 @@ import {
   apiUserToRegisteredUser,
   apiUserToUser,
   clearTokens,
+  ensureValidAccessToken,
   getAccessToken,
   hasAccessToken,
 } from "@/lib/api";
@@ -90,6 +91,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [hydrated, setHydrated] = useState(false);
   const [tokenReady, setTokenReady] = useState(false);
+  /** True only after /auth/me succeeds in this session (not just cached name). */
+  const [sessionValid, setSessionValid] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -100,6 +103,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (!alive) return;
           setUser(null);
           setTokenReady(false);
+          setSessionValid(false);
+          localStorage.removeItem(STORAGE_KEY);
+          return;
+        }
+
+        const tokenOk = await ensureValidAccessToken();
+        if (!tokenOk) {
+          if (!alive) return;
+          setUser(null);
+          setTokenReady(false);
+          setSessionValid(false);
           localStorage.removeItem(STORAGE_KEY);
           return;
         }
@@ -109,6 +123,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const nextUser = apiUserToUser(apiUser);
         setUser(nextUser);
         setTokenReady(true);
+        setSessionValid(true);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(nextUser));
         setRegisteredUsers((prev) => {
           const apiRegistered = apiUserToRegisteredUser(apiUser);
@@ -122,6 +137,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (alive) {
           setUser(null);
           setTokenReady(false);
+          setSessionValid(false);
           localStorage.removeItem(STORAGE_KEY);
         }
       } finally {
@@ -168,12 +184,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       clearTokens();
       setUser(null);
       setTokenReady(false);
+      setSessionValid(false);
       localStorage.removeItem(STORAGE_KEY);
       // Wipe any cached listings so MyListings can't keep showing stale rows.
       localStorage.removeItem("oldCarBazar_user_listings");
     };
     window.addEventListener("ocb-auth-expired", onSessionExpired);
     return () => window.removeEventListener("ocb-auth-expired", onSessionExpired);
+  }, []);
+
+  // When the tab becomes visible again, refresh an expired access token or log out.
+  useEffect(() => {
+    const onVisible = async () => {
+      if (document.visibilityState !== "visible" || !getAccessToken()) return;
+      const ok = await ensureValidAccessToken();
+      if (!ok) {
+        setUser(null);
+        setTokenReady(false);
+        setSessionValid(false);
+        window.dispatchEvent(new Event("ocb-auth-expired"));
+      }
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
   }, []);
 
   useEffect(() => {
@@ -231,6 +264,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const nextUser = apiUserToUser(data.user);
       setUser(nextUser);
       setTokenReady(true);
+      setSessionValid(true);
       upsertRegisteredUser(nextUser, data.user.role);
       return nextUser;
     },
@@ -249,6 +283,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const nextUser = apiUserToUser(data.user);
       setUser(nextUser);
       setTokenReady(true);
+      setSessionValid(true);
       upsertRegisteredUser(nextUser, data.user.role);
       return nextUser;
     },
@@ -259,6 +294,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     clearTokens();
     setUser(null);
     setTokenReady(false);
+    setSessionValid(false);
   }, []);
 
   const promoteToSeller = useCallback((idOrEmail: string) => {
@@ -298,7 +334,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo(
     () => ({
       user,
-      isLoggedIn: Boolean(user) && tokenReady,
+      isLoggedIn: Boolean(user) && tokenReady && sessionValid,
       loading,
       login,
       register,
@@ -313,6 +349,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [
       user,
       tokenReady,
+      sessionValid,
       loading,
       login,
       register,
