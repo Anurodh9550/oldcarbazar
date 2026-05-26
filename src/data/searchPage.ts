@@ -88,6 +88,7 @@ export const sortOptions = [
 export type SortOptionId = (typeof sortOptions)[number]["id"];
 
 export type SearchFilterParams = {
+  q: string | null;
   city: string | null;
   brand: string | null;
   fuel: string | null;
@@ -105,6 +106,7 @@ export type SearchFilterParams = {
 };
 
 export const FILTER_PARAM_KEYS = [
+  "q",
   "city",
   "brand",
   "fuel",

@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useLocation } from "@/context/LocationContext";
 import {
@@ -11,10 +13,38 @@ import {
   staggerContainerSlow,
 } from "@/lib/motion";
 
-const quickLinks = ["Swift", "Creta", "Harrier", "Innova", "Thar", "City"];
+const quickLinks: { label: string; query: string }[] = [
+  { label: "Swift", query: "q=swift" },
+  { label: "Creta", query: "q=creta" },
+  { label: "Harrier", query: "q=harrier" },
+  { label: "Innova", query: "q=innova" },
+  { label: "Thar", query: "q=thar" },
+  { label: "City", query: "q=city" },
+];
+
+const budgetOptions: { label: string; value: string }[] = [
+  { label: "Any Budget", value: "" },
+  { label: "Under ₹2 Lakh", value: "under-2" },
+  { label: "₹2 - ₹5 Lakh", value: "3-5" },
+  { label: "₹5 - ₹10 Lakh", value: "5-10" },
+  { label: "Above ₹10 Lakh", value: "10-15" },
+];
 
 export default function HeroSection() {
+  const router = useRouter();
   const { selectedCity, totalCarsInCity } = useLocation();
+  const [brand, setBrand] = useState("");
+  const [budget, setBudget] = useState("");
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (brand.trim()) params.set("q", brand.trim());
+    if (budget) params.set("budget", budget);
+    if (selectedCity) params.set("city", selectedCity);
+    const qs = params.toString();
+    router.push(qs ? `/used-cars/search?${qs}` : "/used-cars/search");
+  };
 
   const stats = [
     { value: `${totalCarsInCity}+`, label: "Used Cars" },
@@ -86,6 +116,7 @@ export default function HeroSection() {
           <motion.form
             variants={fadeInUp}
             whileHover={{ scale: 1.01 }}
+            onSubmit={handleSearch}
             className="mt-8 flex flex-col gap-3 rounded-xl bg-white/10 p-4 backdrop-blur-sm sm:flex-row sm:items-end sm:gap-2 sm:p-3"
           >
             <label className="flex-1">
@@ -94,6 +125,8 @@ export default function HeroSection() {
               </span>
               <input
                 type="text"
+                value={brand}
+                onChange={(e) => setBrand(e.target.value)}
                 placeholder="e.g. Swift, Creta, Harrier"
                 className="w-full rounded-lg border border-white/20 bg-white/95 px-4 py-2.5 text-sm text-gray-900 outline-none placeholder:text-gray-400 focus:border-[#f75d34] focus:ring-2 focus:ring-[#f75d34]/30"
               />
@@ -102,12 +135,16 @@ export default function HeroSection() {
               <span className="mb-1 block text-xs font-medium text-gray-300">
                 Budget
               </span>
-              <select className="w-full rounded-lg border border-white/20 bg-white/95 px-4 py-2.5 text-sm text-gray-900 outline-none focus:border-[#f75d34] focus:ring-2 focus:ring-[#f75d34]/30">
-                <option>Any Budget</option>
-                <option>Under ₹2 Lakh</option>
-                <option>₹2 - ₹5 Lakh</option>
-                <option>₹5 - ₹10 Lakh</option>
-                <option>Above ₹10 Lakh</option>
+              <select
+                value={budget}
+                onChange={(e) => setBudget(e.target.value)}
+                className="w-full rounded-lg border border-white/20 bg-white/95 px-4 py-2.5 text-sm text-gray-900 outline-none focus:border-[#f75d34] focus:ring-2 focus:ring-[#f75d34]/30"
+              >
+                {budgetOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
               </select>
             </label>
             <motion.button
@@ -126,12 +163,12 @@ export default function HeroSection() {
           >
             <span className="text-caption">Popular:</span>
             {quickLinks.map((car) => (
-              <motion.div key={car} variants={fadeInUp}>
+              <motion.div key={car.label} variants={fadeInUp}>
                 <Link
-                  href="/used-cars"
+                  href={`/used-cars/search?${car.query}`}
                   className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white transition hover:border-[#f75d34] hover:bg-[#f75d34]/20"
                 >
-                  {car}
+                  {car.label}
                 </Link>
               </motion.div>
             ))}

@@ -46,6 +46,7 @@ function ActiveFilterChip({
 function readFilters(searchParams: URLSearchParams): SearchFilterParams {
   const get = (key: keyof SearchFilterParams) => searchParams.get(key);
   return {
+    q: get("q"),
     city: get("city"),
     brand: get("brand"),
     fuel: get("fuel"),

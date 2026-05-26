@@ -2,10 +2,12 @@
 
 import ListingImage from "@/components/ListingImage";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import type { CarListing } from "@/data/cars";
 import { getCarDetailPath } from "@/lib/carDetail";
 import { fadeInUp, viewportOnce } from "@/lib/motion";
+import { isShortlisted, toggleShortlist } from "@/lib/shortlist";
 import { HeartIcon } from "./icons";
 import WhatsAppIcon from "./WhatsAppIcon";
 
@@ -17,6 +19,21 @@ type CarCardProps = {
 export default function CarCard({ car, index = 0 }: CarCardProps) {
   const detailHref = getCarDetailPath(car.id);
   const whatsappHref = `https://wa.me/919876543210?text=${encodeURIComponent(`Hi, I'm interested in ${car.title} on Old Car Bazar.`)}`;
+
+  const [saved, setSaved] = useState(false);
+  useEffect(() => {
+    setSaved(isShortlisted(car.id));
+    const onChange = () => setSaved(isShortlisted(car.id));
+    window.addEventListener("ocb-shortlist-changed", onChange);
+    return () => window.removeEventListener("ocb-shortlist-changed", onChange);
+  }, [car.id]);
+
+  const handleSaveToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleShortlist(car.id);
+    setSaved((prev) => !prev);
+  };
 
   return (
     <motion.article
@@ -59,14 +76,22 @@ export default function CarCard({ car, index = 0 }: CarCardProps) {
 
           <motion.div className="mt-2 flex items-center justify-between">
             <p className="text-base font-bold text-gray-900">{car.price}</p>
-            <span
-              role="presentation"
-              onClick={(e) => e.preventDefault()}
-              className="flex items-center gap-1 text-caption"
+            <button
+              type="button"
+              aria-pressed={saved}
+              aria-label={saved ? "Remove from saved cars" : "Save this car"}
+              onClick={handleSaveToggle}
+              className={`flex items-center gap-1 text-caption transition ${
+                saved
+                  ? "text-[#f75d34]"
+                  : "text-gray-500 hover:text-[#f75d34]"
+              }`}
             >
-              <HeartIcon className="h-4 w-4" />
-              Save
-            </span>
+              <HeartIcon
+                className={`h-4 w-4 ${saved ? "fill-current" : ""}`}
+              />
+              {saved ? "Saved" : "Save"}
+            </button>
           </motion.div>
 
           <p className="mt-2 text-caption">{car.location}</p>

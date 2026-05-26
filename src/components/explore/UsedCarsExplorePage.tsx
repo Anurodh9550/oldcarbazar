@@ -299,6 +299,7 @@ export default function UsedCarsExplorePage() {
               <CarCarousel
                 cars={bodyCars.length ? bodyCars : enriched.slice(0, 6)}
                 viewAllLabel={`View All ${bodyType} Cars`}
+                viewAllHref={`/used-cars/search?bodyType=${encodeURIComponent(bodyType)}`}
               />
             </div>
           </section>
@@ -356,6 +357,7 @@ export default function UsedCarsExplorePage() {
               <CarCarousel
                 cars={budgetCars.length ? budgetCars : cityCars.slice(0, 6)}
                 viewAllLabel={`View All Used Cars ${budgetTabs.find((b) => b.id === budget)?.label}`}
+                viewAllHref={`/used-cars/search?budget=${encodeURIComponent(budget)}`}
               />
             </div>
           </section>

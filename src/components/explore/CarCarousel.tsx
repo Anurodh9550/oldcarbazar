@@ -1,5 +1,6 @@
 ﻿"use client";
 
+import Link from "next/link";
 import { useRef } from "react";
 import type { EnrichedCar } from "@/lib/carMeta";
 import ExploreCarCard from "./ExploreCarCard";
@@ -7,7 +8,10 @@ import ExploreCarCard from "./ExploreCarCard";
 type CarCarouselProps = {
   cars: EnrichedCar[];
   viewAllLabel?: string;
+  /** Click handler for the "View All" link. Ignored if `viewAllHref` is set. */
   onViewAll?: () => void;
+  /** Render the "View All" CTA as a real navigation link. Preferred over `onViewAll`. */
+  viewAllHref?: string;
   showDiscount?: boolean;
   showActions?: boolean;
   partnerLabel?: string;
@@ -17,6 +21,7 @@ export default function CarCarousel({
   cars,
   viewAllLabel,
   onViewAll,
+  viewAllHref,
   showDiscount,
   showActions,
   partnerLabel,
@@ -70,15 +75,23 @@ export default function CarCarousel({
       >
         ›
       </button>
-      {viewAllLabel && (
-        <button
-          type="button"
-          onClick={onViewAll}
-          className="mt-4 text-sm font-semibold text-[#f75d34] hover:underline"
-        >
-          {viewAllLabel}
-        </button>
-      )}
+      {viewAllLabel &&
+        (viewAllHref ? (
+          <Link
+            href={viewAllHref}
+            className="mt-4 inline-block text-sm font-semibold text-[#f75d34] hover:underline"
+          >
+            {viewAllLabel} →
+          </Link>
+        ) : onViewAll ? (
+          <button
+            type="button"
+            onClick={onViewAll}
+            className="mt-4 text-sm font-semibold text-[#f75d34] hover:underline"
+          >
+            {viewAllLabel} →
+          </button>
+        ) : null)}
     </div>
   );
 }

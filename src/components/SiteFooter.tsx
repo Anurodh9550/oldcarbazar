@@ -75,12 +75,24 @@ export default function SiteFooter() {
               across India.
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
-              <span className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-gray-900 px-3 py-2 text-xs font-semibold text-white">
+              <a
+                href="https://apps.apple.com/in/app/old-car-bazar"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Download Old Car Bazar on the App Store"
+                className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-gray-900 px-3 py-2 text-xs font-semibold text-white transition hover:bg-black"
+              >
                 <span aria-hidden>🍎</span> App Store
-              </span>
-              <span className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-gray-900 px-3 py-2 text-xs font-semibold text-white">
+              </a>
+              <a
+                href="https://play.google.com/store/apps/details?id=com.oldcarbazar"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Get Old Car Bazar on Google Play"
+                className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-gray-900 px-3 py-2 text-xs font-semibold text-white transition hover:bg-black"
+              >
                 <span aria-hidden>▶</span> Google Play
-              </span>
+              </a>
             </div>
             <Link href="/used-cars" className="mt-5 inline-flex items-center gap-2">
               <Image

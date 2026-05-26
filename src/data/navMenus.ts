@@ -14,18 +14,21 @@ export const getBuyCarsMenu = (city: string): MenuColumn[] => [
     title: "Buy Used Cars",
     links: [
       { label: "Explore All Cars", href: "/used-cars" },
-      { label: `Cars in ${city}`, href: "/used-cars" },
+      {
+        label: `Cars in ${city}`,
+        href: `/used-cars/search?city=${encodeURIComponent(city)}`,
+      },
       { label: "Assured / Verified Cars", href: "/assured" },
-      { label: "New Arrivals", href: "/used-cars" },
+      { label: "New Arrivals", href: "/used-cars/search?sort=newest" },
     ],
   },
   {
     title: "Shop by Budget",
     links: [
-      { label: "Under ₹2 Lakh", href: "/used-cars" },
-      { label: "₹2 – ₹5 Lakh", href: "/used-cars" },
-      { label: "₹5 – ₹10 Lakh", href: "/used-cars" },
-      { label: "Luxury Cars", href: "/used-cars" },
+      { label: "Under ₹2 Lakh", href: "/used-cars/search?budget=under-2" },
+      { label: "₹2 – ₹5 Lakh", href: "/used-cars/search?budget=3-5" },
+      { label: "₹5 – ₹10 Lakh", href: "/used-cars/search?budget=5-10" },
+      { label: "Luxury Cars", href: "/used-cars/search?budget=15-plus" },
     ],
   },
   {
@@ -94,7 +97,7 @@ export const loanToolsMenu: MenuColumn[] = [
       { label: "Assured Cars", href: "/assured" },
       { label: "Find Dealers", href: "/dealers" },
       { label: "Popular Cities", href: "#cities", hasSubmenu: true },
-      { label: "Best Deals Today", href: "/used-cars" },
+      { label: "Best Deals Today", href: "/used-cars/search?discount=discounted" },
     ],
   },
 ];

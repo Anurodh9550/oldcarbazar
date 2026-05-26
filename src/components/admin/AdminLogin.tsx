@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAdmin } from "@/context/AdminContext";
 import { seedAdmins } from "@/data/admin";
+import { clearAdminTokens } from "@/lib/api";
 import { ShieldIcon } from "./icons";
+
+const KEEP_SIGNED_IN_KEY = "oldCarBazar_admin_keep_signed_in";
 
 export default function AdminLogin() {
   const router = useRouter();
@@ -15,6 +18,17 @@ export default function AdminLogin() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [keepSignedIn, setKeepSignedIn] = useState(true);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const saved = window.localStorage.getItem(KEEP_SIGNED_IN_KEY);
+      if (saved === "false") setKeepSignedIn(false);
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   useEffect(() => {
     if (hydrated && admin) router.replace("/admin");
@@ -34,6 +48,21 @@ export default function AdminLogin() {
         setError(result.error ?? "Login failed.");
         setLoading(false);
         return;
+      }
+      // Persist preference. When the operator opts out of "keep me signed
+      // in", admin tokens are cleared on tab close so the next visitor on
+      // a shared machine has to re-authenticate.
+      try {
+        window.localStorage.setItem(
+          KEEP_SIGNED_IN_KEY,
+          keepSignedIn ? "true" : "false"
+        );
+      } catch {
+        /* ignore */
+      }
+      if (!keepSignedIn) {
+        const onUnload = () => clearAdminTokens();
+        window.addEventListener("pagehide", onUnload, { once: true });
       }
       router.replace("/admin");
     } finally {
@@ -208,8 +237,9 @@ export default function AdminLogin() {
               <label className="flex items-center gap-2 text-slate-600">
                 <input
                   type="checkbox"
+                  checked={keepSignedIn}
+                  onChange={(e) => setKeepSignedIn(e.target.checked)}
                   className="h-4 w-4 rounded border-slate-300 text-[#f75d34] focus:ring-[#f75d34]"
-                  defaultChecked
                 />
                 Keep me signed in
               </label>

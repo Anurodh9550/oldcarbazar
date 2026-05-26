@@ -8,6 +8,10 @@ import { getCarDetailPath } from "@/lib/carDetail";
 import type { EnrichedCar } from "@/lib/carMeta";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { HeartIcon } from "@/components/icons";
+import {
+  getShortlistedIds,
+  toggleShortlist,
+} from "@/lib/shortlist";
 
 type SellerDetailsModalProps = {
   detail: CarDetail;
@@ -29,7 +33,7 @@ export default function SellerDetailsModal({
   onClose,
 }: SellerDetailsModalProps) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [saved, setSaved] = useState(false);
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
 
   const specLine = `${detail.kms.toLocaleString("en-IN")} km • ${detail.fuel} • ${detail.transmission} • ${detail.ownership}`;
 
@@ -38,10 +42,34 @@ export default function SellerDetailsModal({
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
+    setSavedIds(new Set(getShortlistedIds()));
+    const refresh = () => setSavedIds(new Set(getShortlistedIds()));
+    window.addEventListener("ocb-shortlist-changed", refresh);
     return () => {
       document.body.style.overflow = "";
+      window.removeEventListener("ocb-shortlist-changed", refresh);
     };
   }, []);
+
+  const toggleRecommendedSave = (id: string) => {
+    toggleShortlist(id);
+    setSavedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleReportAd = () => {
+    const subject = encodeURIComponent(`Report listing — ${detail.title}`);
+    const body = encodeURIComponent(
+      `Hi Old Car Bazar team,\n\nI'd like to report a problem with this listing:\n${
+        typeof window !== "undefined" ? window.location.href : ""
+      }\n\nReason:\n\n— Sent from Old Car Bazar`
+    );
+    window.location.href = `mailto:support@oldcarbazar.com?subject=${subject}&body=${body}`;
+  };
 
   const toggleAll = () => {
     if (allSelected) setSelected(new Set());
@@ -101,11 +129,22 @@ export default function SellerDetailsModal({
                 <h3 className="font-bold text-gray-900">{shortTitle(detail.title)}</h3>
                 <button
                   type="button"
-                  onClick={() => setSaved((v) => !v)}
-                  aria-label="Save"
-                  className={saved ? "text-[#f75d34]" : "text-gray-400"}
+                  onClick={() => toggleRecommendedSave(detail.id)}
+                  aria-label={
+                    savedIds.has(detail.id) ? "Remove from saved" : "Save"
+                  }
+                  aria-pressed={savedIds.has(detail.id)}
+                  className={
+                    savedIds.has(detail.id)
+                      ? "text-[#f75d34]"
+                      : "text-gray-400 hover:text-[#f75d34]"
+                  }
                 >
-                  <HeartIcon className="h-5 w-5" />
+                  <HeartIcon
+                    className={`h-5 w-5 ${
+                      savedIds.has(detail.id) ? "fill-current" : ""
+                    }`}
+                  />
                 </button>
               </div>
               <p className="text-caption mt-0.5">{specLine}</p>
@@ -158,7 +197,11 @@ export default function SellerDetailsModal({
           {/* Report */}
           <div className="border-y border-gray-100 bg-gray-50 px-5 py-3 text-center text-sm text-gray-600">
             Have issues with this listing?{" "}
-            <button type="button" className="font-semibold text-gray-900 underline hover:text-[#f75d34]">
+            <button
+              type="button"
+              onClick={handleReportAd}
+              className="font-semibold text-gray-900 underline hover:text-[#f75d34]"
+            >
               Report Ad
             </button>
           </div>
@@ -208,8 +251,24 @@ export default function SellerDetailsModal({
                       <p className="text-caption mt-0.5">{car.specs}</p>
                       <p className="mt-1 text-sm font-bold text-gray-900">{car.price}</p>
                     </div>
-                    <button type="button" aria-label="Save" className="shrink-0 text-gray-300">
-                      <HeartIcon className="h-4 w-4" />
+                    <button
+                      type="button"
+                      aria-label={
+                        savedIds.has(car.id) ? "Remove from saved" : "Save"
+                      }
+                      aria-pressed={savedIds.has(car.id)}
+                      onClick={() => toggleRecommendedSave(car.id)}
+                      className={`shrink-0 transition ${
+                        savedIds.has(car.id)
+                          ? "text-[#f75d34]"
+                          : "text-gray-300 hover:text-[#f75d34]"
+                      }`}
+                    >
+                      <HeartIcon
+                        className={`h-4 w-4 ${
+                          savedIds.has(car.id) ? "fill-current" : ""
+                        }`}
+                      />
                     </button>
                   </li>
                 ))}

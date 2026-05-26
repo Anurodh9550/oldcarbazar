@@ -106,6 +106,22 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [globalQuery, setGlobalQuery] = useState("");
+
+  const handleGlobalSearch = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const q = globalQuery.trim();
+    if (!q) return;
+    // Route to whichever admin section the operator is in (or All Listings
+    // as a sensible default), with the query carried as `?q=`.
+    let target = "/admin/listings";
+    if (pathname.startsWith("/admin/users")) target = "/admin/users";
+    else if (pathname.startsWith("/admin/buyers")) target = "/admin/buyers";
+    else if (pathname.startsWith("/admin/sellers")) target = "/admin/sellers";
+    else if (pathname.startsWith("/admin/inquiries"))
+      target = "/admin/inquiries";
+    router.push(`${target}?q=${encodeURIComponent(q)}`);
+  };
 
   const pendingCount = userListings.filter(
     (l) => (l.moderation ?? "approved") === "pending"
@@ -315,19 +331,31 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
               </p>
             </div>
 
-            <div className="hidden flex-1 max-w-md md:block">
+            <form
+              onSubmit={handleGlobalSearch}
+              role="search"
+              className="hidden flex-1 max-w-md md:block"
+            >
               <label className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-sm focus-within:border-[#f75d34] focus-within:ring-2 focus-within:ring-[#f75d34]/20">
-                <SearchIcon className="h-4 w-4 text-slate-400" />
+                <button
+                  type="submit"
+                  aria-label="Search admin records"
+                  className="text-slate-400 hover:text-[#f75d34]"
+                >
+                  <SearchIcon className="h-4 w-4" />
+                </button>
                 <input
                   type="search"
+                  value={globalQuery}
+                  onChange={(e) => setGlobalQuery(e.target.value)}
                   placeholder="Search listings, users, inquiries…"
                   className="w-full bg-transparent text-sm outline-none placeholder:text-slate-400"
                 />
                 <span className="hidden rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 font-mono text-[10px] text-slate-500 sm:inline">
-                  ⌘K
+                  ↵
                 </span>
               </label>
-            </div>
+            </form>
 
             <div className="flex items-center gap-1 sm:gap-2">
               {/* Notifications */}

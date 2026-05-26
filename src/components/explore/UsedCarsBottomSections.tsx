@@ -51,6 +51,7 @@ export default function UsedCarsBottomSections({
             showActions
             partnerLabel="Old Car Bazar"
             viewAllLabel={`View All Cars in ${selectedCity}`}
+            viewAllHref={`/used-cars/search?city=${encodeURIComponent(selectedCity)}`}
           />
         </div>
       </section>
@@ -82,6 +83,7 @@ export default function UsedCarsBottomSections({
             cars={recentCars.slice(0, 10)}
             showDiscount
             viewAllLabel="View All Recently Added"
+            viewAllHref="/used-cars/search?sort=newest"
           />
         </div>
       </section>

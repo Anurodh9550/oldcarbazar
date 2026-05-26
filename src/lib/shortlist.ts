@@ -21,6 +21,9 @@ export function toggleShortlist(id: string): string[] {
     ? current.filter((x) => x !== id)
     : [...current, id];
   setShortlistedIds(next);
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("ocb-shortlist-changed"));
+  }
   return next;
 }
 

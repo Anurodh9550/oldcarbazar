@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useAdmin } from "@/context/AdminContext";
 import type { Inquiry, InquiryStatus } from "@/types/admin";
@@ -25,9 +26,16 @@ export default function InquiriesContent() {
   const { inquiries, setInquiryStatus, removeInquiry, logActivity, addInquiry } =
     useAdmin();
 
-  const [query, setQuery] = useState("");
+  const searchParams = useSearchParams();
+  const initialQuery = searchParams?.get("q") ?? "";
+  const [query, setQuery] = useState(initialQuery);
   const [status, setStatus] = useState<"all" | InquiryStatus>("all");
   const [channel, setChannel] = useState<"all" | Inquiry["channel"]>("all");
+
+  useEffect(() => {
+    const q = searchParams?.get("q") ?? "";
+    if (q) setQuery(q);
+  }, [searchParams]);
 
   const filtered = useMemo(() => {
     let list = inquiries;

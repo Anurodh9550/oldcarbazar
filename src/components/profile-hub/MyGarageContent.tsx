@@ -9,7 +9,7 @@ export default function MyGarageContent() {
         icon="🏠"
         title="Your garage is empty"
         description="Yahan apni owned cars add kar sakte ho — service due dates, RC copy, aur insurance reminders ke liye."
-        actionLabel="Add a vehicle (coming soon)"
+        actionLabel="Add a vehicle"
         actionHref="/sell-car"
       />
       <p className="mt-6 rounded-xl bg-orange-50 px-4 py-3 text-sm text-gray-700">

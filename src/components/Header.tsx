@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { fadeInDown } from "@/lib/motion";
@@ -36,12 +37,24 @@ const navItems: { id: OpenMenu; label: string }[] = [
 ];
 
 export default function Header() {
+  const router = useRouter();
   const [authOpen, setAuthOpen] = useState(false);
   const [locationOpen, setLocationOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<OpenMenu>(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { selectedCity } = useLocation();
   const { isLoggedIn } = useAuth();
+
+  const submitSearch = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const q = searchQuery.trim();
+    if (!q) {
+      router.push("/used-cars/search");
+      return;
+    }
+    router.push(`/used-cars/search?q=${encodeURIComponent(q)}`);
+  };
 
   const buyCarsMenu = useMemo(
     () => getBuyCarsMenu(selectedCity),
@@ -127,11 +140,23 @@ export default function Header() {
           </motion.div>
 
           {/* Search */}
-          <motion.form className="hidden flex-1 md:flex">
+          <motion.form
+            className="hidden flex-1 md:flex"
+            onSubmit={submitSearch}
+            role="search"
+          >
             <label className="flex w-full max-w-2xl items-center gap-2 overflow-hidden rounded-full border border-gray-300 bg-white px-4 py-2 shadow-sm focus-within:border-[#f75d34] focus-within:ring-2 focus-within:ring-[#f75d34]/20">
-              <SearchIcon className="h-4 w-4 shrink-0 text-gray-400" />
+              <button
+                type="submit"
+                aria-label="Search cars"
+                className="text-gray-400 hover:text-[#f75d34]"
+              >
+                <SearchIcon className="h-4 w-4 shrink-0" />
+              </button>
               <input
                 type="search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search used cars — Swift, Creta, Maruti..."
                 className="w-full bg-transparent text-sm text-gray-800 outline-none placeholder:text-gray-400"
               />
@@ -165,6 +190,7 @@ export default function Header() {
               type="button"
               aria-label="Saved cars"
               whileHover={{ scale: 1.1, color: "#f75d34" }}
+              onClick={() => router.push("/shortlisted")}
               className="hidden text-gray-600 sm:block"
             >
               <HeartIcon className="h-5 w-5" />
@@ -189,10 +215,22 @@ export default function Header() {
 
         {/* Mobile search + sell */}
         <motion.div className="flex items-center gap-2 border-t border-gray-100 px-4 pb-3 md:hidden">
-          <form className="flex flex-1 overflow-hidden rounded-full border border-gray-300">
-            <SearchIcon className="ml-3 h-4 w-4 self-center text-gray-400" />
+          <form
+            className="flex flex-1 overflow-hidden rounded-full border border-gray-300"
+            onSubmit={submitSearch}
+            role="search"
+          >
+            <button
+              type="submit"
+              aria-label="Search cars"
+              className="pl-3 text-gray-400 hover:text-[#f75d34]"
+            >
+              <SearchIcon className="h-4 w-4 self-center" />
+            </button>
             <input
               type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search used cars..."
               className="flex-1 px-2 py-2 text-sm outline-none"
             />

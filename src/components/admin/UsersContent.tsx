@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useAdmin } from "@/context/AdminContext";
 import type { RegisteredUser } from "@/context/AuthContext";
@@ -21,9 +22,15 @@ export default function UsersContent({ mode = "all" }: { mode?: Mode }) {
   const { userListings } = useListings();
   const { logActivity, inquiries, users, blockUser, unblockUser } = useAdmin();
 
-  const [query, setQuery] = useState("");
+  const searchParams = useSearchParams();
+  const [query, setQuery] = useState(searchParams?.get("q") ?? "");
   const [status, setStatus] = useState<"all" | "active" | "blocked">("all");
   const [sort, setSort] = useState<"newest" | "name" | "activity">("newest");
+
+  useEffect(() => {
+    const q = searchParams?.get("q") ?? "";
+    if (q) setQuery(q);
+  }, [searchParams]);
 
   // Build enriched user list:
   // 1) registered users from the auth registry

@@ -1,5 +1,6 @@
 ﻿"use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { sampleDealers } from "@/data/sellHubPages";
 import { cities } from "@/data/locations";
@@ -55,12 +56,12 @@ export default function DealersListContent() {
               <span>⭐ {dealer.rating}</span>
               <span>{dealer.cars}+ cars</span>
             </div>
-            <button
-              type="button"
-              className="mt-4 w-full rounded-lg border border-[#f75d34] py-2 text-sm font-semibold text-[#f75d34] hover:bg-orange-50"
+            <Link
+              href={`/used-cars/search?city=${encodeURIComponent(dealer.city)}`}
+              className="mt-4 block w-full rounded-lg border border-[#f75d34] py-2 text-center text-sm font-semibold text-[#f75d34] hover:bg-orange-50"
             >
               View Inventory
-            </button>
+            </Link>
           </li>
         ))}
       </ul>

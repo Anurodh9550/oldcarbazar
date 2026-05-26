@@ -2,7 +2,8 @@
 
 import ListingImage from "@/components/ListingImage";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { useListings } from "@/context/ListingsContext";
 import {
   buildCarDetail,
@@ -17,6 +18,8 @@ import SellerDetailsModal from "@/components/car-detail/SellerDetailsModal";
 import BuyerInquiryModal from "@/components/car-detail/BuyerInquiryModal";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { HeartIcon } from "@/components/icons";
+import { isShortlisted, toggleShortlist } from "@/lib/shortlist";
+import { isInCompare, toggleCompare } from "@/lib/compareList";
 
 const TABS: { id: CarDetailTab; label: string }[] = [
   { id: "overview", label: "OVERVIEW" },
@@ -31,6 +34,7 @@ type CarDetailPageProps = {
 };
 
 export default function CarDetailPage({ carId }: CarDetailPageProps) {
+  const router = useRouter();
   const { allListings } = useListings();
   const [activeTab, setActiveTab] = useState<CarDetailTab>("overview");
   const [imageIndex, setImageIndex] = useState(0);
@@ -40,9 +44,74 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
   const [showSeller, setShowSeller] = useState(false);
   const [showInquiry, setShowInquiry] = useState(false);
   const [inquirySubmitted, setInquirySubmitted] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [compared, setCompared] = useState(false);
+  const [shareToast, setShareToast] = useState("");
+
+  useEffect(() => {
+    setSaved(isShortlisted(carId));
+    setCompared(isInCompare(carId));
+    const refreshSaved = () => setSaved(isShortlisted(carId));
+    window.addEventListener("ocb-shortlist-changed", refreshSaved);
+    return () =>
+      window.removeEventListener("ocb-shortlist-changed", refreshSaved);
+  }, [carId]);
+
+  const handleSaveToggle = () => {
+    toggleShortlist(carId);
+    setSaved((v) => !v);
+  };
+
+  const handleCompareToggle = () => {
+    const { added, full } = toggleCompare(carId);
+    if (full) {
+      setShareToast("Compare list full (max 4). Remove a car first.");
+      setTimeout(() => setShareToast(""), 2500);
+      return;
+    }
+    setCompared(added);
+    setShareToast(added ? "Added to compare" : "Removed from compare");
+    setTimeout(() => setShareToast(""), 2000);
+  };
+
+  const handleShare = async () => {
+    if (typeof window === "undefined") return;
+    const url = window.location.href;
+    const shareData = {
+      title: detail?.title ?? "Old Car Bazar",
+      text: detail ? `Check out this ${detail.title} on Old Car Bazar` : "",
+      url,
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+    } catch {
+      /* user cancelled — fall through to clipboard */
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setShareToast("Link copied to clipboard");
+      setTimeout(() => setShareToast(""), 2000);
+    } catch {
+      setShareToast("Could not share — please copy URL manually");
+      setTimeout(() => setShareToast(""), 2500);
+    }
+  };
+
+  const handleReportAd = () => {
+    if (!detail) return;
+    const subject = encodeURIComponent(`Report listing — ${detail.title}`);
+    const body = encodeURIComponent(
+      `Hi Old Car Bazar team,\n\nI'd like to report a problem with this listing:\n${
+        typeof window !== "undefined" ? window.location.href : ""
+      }\n\nReason:\n\n— Sent from Old Car Bazar`
+    );
+    window.location.href = `mailto:support@oldcarbazar.com?subject=${subject}&body=${body}`;
+  };
 
   const handleViewSellerClick = () => {
-    // First-time buyers must submit Name + Phone before seller info is revealed.
     if (!inquirySubmitted) {
       setShowInquiry(true);
       return;
@@ -55,6 +124,20 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
     setShowInquiry(false);
     setShowSeller(true);
   };
+
+  const goToRtoReport = () => {
+    if (!detail) return;
+    router.push(`/history-report?carId=${encodeURIComponent(detail.id)}`);
+  };
+
+  const goToLoan = () => {
+    if (!detail) return;
+    router.push(
+      `/used-car-loan?carId=${encodeURIComponent(detail.id)}&price=${detail.priceLakh}`
+    );
+  };
+
+  const openBundleInquiry = () => setShowInquiry(true);
 
   const listing = findCarById(carId, allListings);
   const detail = useMemo(
@@ -165,8 +248,20 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
                   <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">{detail.title}</h1>
                   <p className="text-body-muted mt-0.5">{detail.variant}</p>
                 </div>
-                <button type="button" aria-label="Save" className="text-gray-400 hover:text-[#f75d34]">
-                  <HeartIcon className="h-6 w-6" />
+                <button
+                  type="button"
+                  aria-label={saved ? "Remove from saved" : "Save this car"}
+                  aria-pressed={saved}
+                  onClick={handleSaveToggle}
+                  className={`transition ${
+                    saved
+                      ? "text-[#f75d34]"
+                      : "text-gray-400 hover:text-[#f75d34]"
+                  }`}
+                >
+                  <HeartIcon
+                    className={`h-6 w-6 ${saved ? "fill-current" : ""}`}
+                  />
                 </button>
               </div>
               <p className="text-caption mt-3">{quickLine}</p>
@@ -191,7 +286,11 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
                 {detail.area}
               </p>
               <div className="mt-4 flex flex-wrap items-center gap-4 border-t border-gray-100 pt-4 text-xs text-gray-600">
-                <button type="button" className="hover:text-[#f75d34]">
+                <button
+                  type="button"
+                  onClick={handleReportAd}
+                  className="hover:text-[#f75d34]"
+                >
                   Report Ad
                 </button>
                 <a
@@ -203,14 +302,28 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
                   <WhatsAppIcon size={18} />
                   Chat with Seller
                 </a>
-                <button type="button" className="hover:text-[#f75d34]">
+                <button
+                  type="button"
+                  onClick={handleShare}
+                  className="hover:text-[#f75d34]"
+                >
                   Share
                 </button>
-                <label className="ml-auto flex items-center gap-1.5">
-                  <input type="checkbox" className="accent-[#f75d34]" />
+                <label className="ml-auto flex items-center gap-1.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={compared}
+                    onChange={handleCompareToggle}
+                    className="accent-[#f75d34]"
+                  />
                   Compare
                 </label>
               </div>
+              {shareToast && (
+                <p className="mt-3 rounded-lg bg-gray-900 px-3 py-2 text-center text-xs font-medium text-white">
+                  {shareToast}
+                </p>
+              )}
             </div>
           </aside>
         </div>
@@ -310,6 +423,7 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
                   </p>
                   <button
                     type="button"
+                    onClick={goToRtoReport}
                     className="text-btn mt-4 rounded-xl border-2 border-[#f75d34] px-6 py-2.5 text-[#f75d34] hover:bg-orange-50"
                   >
                     Get Full RTO Report — Free
@@ -339,14 +453,15 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
                     </span>
                   </div>
                   <div className="mt-4 flex gap-3">
-                    <button
-                      type="button"
+                    <Link
+                      href="/help/faq"
                       className="rounded-xl border-2 border-[#f75d34] px-5 py-2 text-sm font-semibold text-[#f75d34]"
                     >
                       More Details
-                    </button>
+                    </Link>
                     <button
                       type="button"
+                      onClick={openBundleInquiry}
                       className="rounded-xl bg-[#f75d34] px-5 py-2 text-sm font-semibold text-white"
                     >
                       Buy Bundle Now
@@ -407,6 +522,7 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
                   </div>
                   <button
                     type="button"
+                    onClick={goToLoan}
                     className="rounded-xl border-2 border-[#f75d34] px-6 py-2.5 text-sm font-semibold text-[#f75d34]"
                   >
                     Interested in Loan

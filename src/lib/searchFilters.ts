@@ -189,11 +189,28 @@ function filterByCity(
   return cars.filter((c) => c.location === city);
 }
 
+function filterByQuery(
+  cars: SearchEnrichedCar[],
+  q: string | null
+): SearchEnrichedCar[] {
+  if (!q) return cars;
+  const needle = q.trim().toLowerCase();
+  if (!needle) return cars;
+  return cars.filter((c) => {
+    const haystack = [c.title, c.brand, c.location, c.fuel, c.bodyType]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+    return haystack.includes(needle);
+  });
+}
+
 export function applySearchFilters(
   cars: SearchEnrichedCar[],
   params: SearchFilterParams
 ): SearchEnrichedCar[] {
   let list = cars;
+  list = filterByQuery(list, params.q);
   list = filterByCity(list, params.city);
   list = filterByBrand(list, params.brand);
   if (params.fuel) list = list.filter((c) => c.fuel === params.fuel);

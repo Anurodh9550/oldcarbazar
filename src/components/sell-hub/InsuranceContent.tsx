@@ -5,6 +5,20 @@ import { insurancePlans } from "@/data/sellHubPages";
 
 export default function InsuranceContent() {
   const [selected, setSelected] = useState(0);
+  const [regNumber, setRegNumber] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleGetQuote = () => {
+    const cleaned = regNumber.trim().toUpperCase();
+    if (cleaned.length < 4) {
+      setError("Enter a valid car registration number (e.g. DL10AB1234).");
+      return;
+    }
+    setError("");
+    setSubmitted(true);
+    setTimeout(() => setSubmitted(false), 4000);
+  };
 
   return (
     <div>
@@ -38,16 +52,35 @@ export default function InsuranceContent() {
         </p>
         <div className="mt-4 flex flex-col gap-3 sm:flex-row">
           <input
-            placeholder="Car registration number"
-            className="flex-1 rounded-lg border-0 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-gray-400"
+            value={regNumber}
+            onChange={(e) => {
+              setRegNumber(e.target.value.toUpperCase());
+              setError("");
+            }}
+            placeholder="Car registration number (e.g. DL10AB1234)"
+            className="flex-1 rounded-lg border-0 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-gray-400 focus:bg-white/20 focus:outline-none"
           />
           <button
             type="button"
+            onClick={handleGetQuote}
             className="rounded-lg bg-[#f75d34] px-6 py-3 text-sm font-bold hover:bg-[#e54d24]"
           >
             Get Quote
           </button>
         </div>
+        {error && (
+          <p className="mt-3 rounded-lg bg-red-500/20 px-3 py-2 text-sm text-red-200">
+            {error}
+          </p>
+        )}
+        {submitted && (
+          <p className="mt-3 rounded-lg bg-emerald-500/20 px-3 py-2 text-sm text-emerald-100">
+            Thanks! We&apos;ll reach out shortly with the best quote for{" "}
+            <span className="font-semibold">{regNumber}</span> ({
+              insurancePlans[selected].name
+            }).
+          </p>
+        )}
       </div>
     </div>
   );
