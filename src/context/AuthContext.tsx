@@ -261,6 +261,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = useCallback(
     async (identifier: string, password: string) => {
       const data = await api.login(identifier.trim(), password);
+      if (!hasAccessToken()) {
+        throw new Error("Login succeeded but session was not saved. Please try again.");
+      }
       const nextUser = apiUserToUser(data.user);
       setUser(nextUser);
       setTokenReady(true);
@@ -280,6 +283,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         password: payload.password,
         city: payload.city,
       });
+      if (!hasAccessToken()) {
+        throw new Error(
+          "Registration succeeded but session was not saved. Please log in."
+        );
+      }
       const nextUser = apiUserToUser(data.user);
       setUser(nextUser);
       setTokenReady(true);

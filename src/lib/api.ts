@@ -197,7 +197,9 @@ function getTokenExpiryMs(token: string): number | null {
 
 function isAccessTokenExpired(token: string, skewMs = 30_000) {
   const exp = getTokenExpiryMs(token);
-  if (!exp) return true;
+  // If we cannot read exp, still send the token — forcing refresh often
+  // blacklists a valid refresh token and leaves DELETE without a header.
+  if (!exp) return false;
   return Date.now() >= exp - skewMs;
 }
 
@@ -228,10 +230,16 @@ function notifyAuthChanged() {
 }
 
 export function saveTokens(access: string, refresh: string) {
-  if (!isBrowser()) return;
-  if (!isJwtShape(access) || !refresh?.trim()) return;
-  localStorage.setItem(ACCESS_TOKEN_KEY, access);
-  localStorage.setItem(REFRESH_TOKEN_KEY, refresh);
+  if (!isBrowser()) {
+    throw new Error("Cannot save session outside the browser.");
+  }
+  const cleanAccess = access?.trim().replace(/^"|"$/g, "");
+  const cleanRefresh = refresh?.trim().replace(/^"|"$/g, "");
+  if (!isJwtShape(cleanAccess) || !cleanRefresh) {
+    throw new Error("Login response did not include valid session tokens.");
+  }
+  localStorage.setItem(ACCESS_TOKEN_KEY, cleanAccess);
+  localStorage.setItem(REFRESH_TOKEN_KEY, cleanRefresh);
   notifyAuthChanged();
 }
 
@@ -324,13 +332,26 @@ async function refreshAccessToken() {
 async function apiFetch<T>(
   path: string,
   init: RequestInit = {},
-  retry = true
+  retry = true,
+  requireAuth = false
 ): Promise<T> {
   // Refresh *before* the request when the access token is expired so DELETE /
   // PATCH never hit the server with a dead JWT (which returns 401).
   let token = getAccessToken();
   if (token && isAccessTokenExpired(token) && retry) {
     token = (await refreshAccessToken()) ?? null;
+  }
+
+  const method = (init.method ?? "GET").toUpperCase();
+  const needsAuth =
+    requireAuth || (method !== "GET" && method !== "HEAD" && method !== "OPTIONS");
+
+  if (needsAuth && !token) {
+    clearTokens();
+    if (isBrowser()) {
+      window.dispatchEvent(new Event("ocb-auth-expired"));
+    }
+    throw sessionExpiredError(null);
   }
 
   const headers = new Headers(init.headers);
@@ -340,7 +361,17 @@ async function apiFetch<T>(
   if (token) headers.set("Authorization", `Bearer ${token}`);
 
   const res = await fetch(`${API_BASE}${path}`, {
-    ...init,
+    method: init.method,
+    body: init.body,
+    signal: init.signal,
+    cache: init.cache,
+    credentials: init.credentials,
+    redirect: init.redirect,
+    referrer: init.referrer,
+    referrerPolicy: init.referrerPolicy,
+    integrity: init.integrity,
+    keepalive: init.keepalive,
+    mode: init.mode,
     headers,
   });
 
@@ -353,7 +384,7 @@ async function apiFetch<T>(
     if (retry) {
       const nextToken = await refreshAccessToken();
       if (nextToken) {
-        return apiFetch<T>(path, init, false);
+        return apiFetch<T>(path, init, false, requireAuth);
       }
     }
     const contentType = res.headers.get("content-type") ?? "";
@@ -584,7 +615,7 @@ export const api = {
   },
 
   async me() {
-    return apiFetch<ApiUser>("/auth/me/");
+    return apiFetch<ApiUser>("/auth/me/", {}, true, true);
   },
 
   async listListings() {
@@ -596,7 +627,10 @@ export const api = {
 
   async myListings() {
     const data = await apiFetch<ApiListing[] | Paginated<ApiListing>>(
-      "/listings/mine/?limit=100"
+      "/listings/mine/?limit=100",
+      {},
+      true,
+      true
     );
     return unwrapList(data).map(apiListingToCarListing);
   },
@@ -610,15 +644,25 @@ export const api = {
   },
 
   async updateListingStatus(id: string, status: ListingStatus) {
-    const data = await apiFetch<ApiListing>(`/listings/${id}/status/`, {
-      method: "POST",
-      body: JSON.stringify({ status }),
-    });
+    const data = await apiFetch<ApiListing>(
+      `/listings/${id}/status/`,
+      {
+        method: "POST",
+        body: JSON.stringify({ status }),
+      },
+      true,
+      true
+    );
     return apiListingToCarListing(data);
   },
 
   async deleteListing(id: string) {
-    await apiFetch<unknown>(`/listings/${id}/`, { method: "DELETE" });
+    await apiFetch<unknown>(
+      `/listings/${id}/`,
+      { method: "DELETE" },
+      true,
+      true
+    );
   },
 
   async uploadMedia(file: File, folder = "old-car-bazar/listings") {
