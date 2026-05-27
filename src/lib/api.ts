@@ -15,6 +15,7 @@ import type {
   Inquiry,
   InquiryStatus,
 } from "@/types/admin";
+import type { LoanToolsContent } from "@/data/loanToolsAdmin";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
@@ -102,6 +103,7 @@ type ApiSettings = {
   support_email: string;
   support_phone: string;
   brand_color: string;
+  loan_tools_content?: Partial<LoanToolsContent> | null;
 };
 
 type ApiPhoto = {
@@ -354,6 +356,7 @@ function isPublicApiPath(path: string, method: string) {
     ) {
       return true;
     }
+    if (p.startsWith("/loan-tools/content")) return true;
   }
   return false;
 }
@@ -895,7 +898,22 @@ export const api = {
       supportEmail: data.support_email,
       supportPhone: data.support_phone,
       brandColor: data.brand_color,
+      loanToolsContent: data.loan_tools_content ?? null,
     };
+  },
+
+  async fetchLoanToolsContent() {
+    const data = await apiFetch<{ content: Partial<LoanToolsContent> | null }>(
+      "/loan-tools/content/"
+    );
+    return data.content;
+  },
+
+  async updateLoanToolsContent(content: LoanToolsContent) {
+    await adminApiFetch<ApiSettings>("/admin-panel/settings/", {
+      method: "PATCH",
+      body: JSON.stringify({ loan_tools_content: content }),
+    });
   },
 
   async updateAdminSettings(patch: Record<string, unknown>) {

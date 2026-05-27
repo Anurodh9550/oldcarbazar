@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { loanBanks, loanBenefits, loanDocs } from "@/data/loanToolsPages";
+import { useLoanToolsContent } from "@/hooks/useLoanToolsContent";
 
 const inputClass =
   "w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none focus:border-[#f75d34] focus:ring-2 focus:ring-[#f75d34]/20";
 
 export default function UsedCarLoanContent() {
+  const content = useLoanToolsContent();
+  const { banks: loanBanks, benefits: loanBenefits, docs: loanDocs } = content;
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [amount, setAmount] = useState("");

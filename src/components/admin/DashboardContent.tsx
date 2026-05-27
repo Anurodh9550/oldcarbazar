@@ -12,6 +12,7 @@ import {
   ArrowUpRightIcon,
   BuyerIcon,
   CarsIcon,
+  LoanToolsIcon,
   CheckIcon,
   CitiesIcon,
   EyeIcon,
@@ -192,6 +193,34 @@ export default function DashboardContent() {
           accent="violet"
         />
       </div>
+
+      <Link
+        href="/admin/loan-tools"
+        className="group flex flex-wrap items-center justify-between gap-4 overflow-hidden rounded-2xl border border-indigo-200/80 bg-gradient-to-r from-[#0f172a] via-[#1e1b4b] to-[#312e81] p-5 text-white shadow-sm transition hover:shadow-md sm:p-6"
+      >
+        <div className="flex min-w-0 items-start gap-4">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/10">
+            <LoanToolsIcon className="h-6 w-6 text-orange-300" />
+          </span>
+          <div className="min-w-0">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-orange-300">
+              Loan &amp; Tools
+            </p>
+            <h2 className="mt-0.5 text-lg font-bold sm:text-xl">
+              Option by Features
+            </h2>
+            <p className="mt-1 max-w-xl text-sm text-slate-300">
+              Edit Car Loan, EMI Calculator, Eligibility, Compare Rates, Compare
+              Cars, History Report and Assured Cars — titles, bank offers and
+              feature blocks from one place.
+            </p>
+          </div>
+        </div>
+        <span className="inline-flex shrink-0 items-center gap-1 rounded-xl bg-[#f75d34] px-4 py-2.5 text-sm font-semibold text-white shadow group-hover:bg-[#e54d24]">
+          Manage features
+          <ArrowUpRightIcon className="h-4 w-4" />
+        </span>
+      </Link>
 
       <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

@@ -21,10 +21,17 @@ import type {
   Inquiry,
   InquiryStatus,
 } from "@/types/admin";
+import {
+  cloneLoanToolsContent,
+  defaultLoanToolsContent,
+  mergeLoanToolsContent,
+  type LoanToolsContent,
+} from "@/data/loanToolsAdmin";
 const ADMIN_SESSION_KEY = "oldCarBazar_admin_session";
 const ADMIN_ACTIVITY_KEY = "oldCarBazar_admin_activity";
 const ADMIN_INQUIRIES_KEY = "oldCarBazar_admin_inquiries";
 const ADMIN_SETTINGS_KEY = "oldCarBazar_admin_settings";
+const ADMIN_LOAN_TOOLS_KEY = "oldCarBazar_admin_loan_tools";
 
 export type AdminSettings = {
   autoApproveListings: boolean;
@@ -78,6 +85,9 @@ type AdminContextValue = {
   resetSettings: () => void;
   blockUser: (id: string) => void;
   unblockUser: (id: string) => void;
+  loanToolsContent: LoanToolsContent;
+  updateLoanToolsContent: (patch: Partial<LoanToolsContent>) => void;
+  resetLoanToolsContent: () => void;
 };
 
 const AdminContext = createContext<AdminContextValue | null>(null);
@@ -87,6 +97,9 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const [activity, setActivity] = useState<AdminActivity[]>([]);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [settings, setSettings] = useState<AdminSettings>(defaultSettings);
+  const [loanToolsContent, setLoanToolsContent] = useState<LoanToolsContent>(
+    () => cloneLoanToolsContent()
+  );
   const [users, setUsers] = useState<RegisteredUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [hydrated, setHydrated] = useState(false);
@@ -108,6 +121,11 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       ]);
       setAdmin(me);
       setSettings((prev) => ({ ...prev, ...remoteSettings }));
+      if (remoteSettings.loanToolsContent) {
+        setLoanToolsContent(
+          mergeLoanToolsContent(remoteSettings.loanToolsContent)
+        );
+      }
       setActivity(remoteActivity);
       setUsers(remoteUsers);
       localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(me));
@@ -161,6 +179,14 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     } catch {
       /* ignore */
     }
+    try {
+      const lt = localStorage.getItem(ADMIN_LOAN_TOOLS_KEY);
+      if (lt) {
+        setLoanToolsContent(mergeLoanToolsContent(JSON.parse(lt)));
+      }
+    } catch {
+      /* ignore */
+    }
     setHydrated(true);
     refreshAdminData();
   }, []);
@@ -187,6 +213,23 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     if (!hydrated) return;
     localStorage.setItem(ADMIN_SETTINGS_KEY, JSON.stringify(settings));
   }, [settings, hydrated]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      localStorage.setItem(
+        ADMIN_LOAN_TOOLS_KEY,
+        JSON.stringify(loanToolsContent)
+      );
+      // Notify other tabs / the public hub mounted in the same tab so the
+      // visitor-facing pages refresh without a full reload.
+      window.dispatchEvent(
+        new CustomEvent("oldCarBazar:loanToolsContentChanged")
+      );
+    } catch {
+      /* ignore quota / serialization errors */
+    }
+  }, [loanToolsContent, hydrated]);
 
   const logActivity = useCallback(
     (type: AdminActivityType, message: string, target?: string) => {
@@ -289,6 +332,25 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
   const resetSettings = useCallback(() => setSettings(defaultSettings), []);
 
+  const updateLoanToolsContent = useCallback(
+    (patch: Partial<LoanToolsContent>) => {
+      setLoanToolsContent((prev) => {
+        const next = mergeLoanToolsContent({ ...prev, ...patch });
+        if (getAdminAccessToken()) {
+          api.updateLoanToolsContent(next).catch(() => {
+            /* keep optimistic UI; localStorage still has a copy */
+          });
+        }
+        return next;
+      });
+    },
+    []
+  );
+
+  const resetLoanToolsContent = useCallback(() => {
+    setLoanToolsContent(cloneLoanToolsContent());
+  }, []);
+
   const blockUser = useCallback((id: string) => {
     setUsers((prev) =>
       prev.map((u) => (u.id === id ? { ...u, status: "blocked" } : u))
@@ -325,6 +387,9 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       resetSettings,
       blockUser,
       unblockUser,
+      loanToolsContent,
+      updateLoanToolsContent,
+      resetLoanToolsContent,
     }),
     [
       admin,
@@ -346,6 +411,9 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       resetSettings,
       blockUser,
       unblockUser,
+      loanToolsContent,
+      updateLoanToolsContent,
+      resetLoanToolsContent,
     ]
   );
 

@@ -2,13 +2,27 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { loanToolsNavGroups } from "@/data/loanToolsPages";
+import {
+  loanToolsNavGroups,
+  type LoanToolsPageId,
+} from "@/data/loanToolsPages";
+import { useLoanToolsContent } from "@/hooks/useLoanToolsContent";
 
 type LoanToolsHubShellProps = {
   badge: string;
   title: string;
   subtitle: string;
   children: React.ReactNode;
+};
+
+const pathToPageId: Record<string, LoanToolsPageId> = {
+  "/used-car-loan": "used-car-loan",
+  "/emi-calculator": "emi-calculator",
+  "/loan-eligibility": "loan-eligibility",
+  "/compare-loans": "compare-loans",
+  "/compare": "compare",
+  "/history-report": "history-report",
+  "/assured": "assured",
 };
 
 export default function LoanToolsHubShell({
@@ -18,6 +32,16 @@ export default function LoanToolsHubShell({
   children,
 }: LoanToolsHubShellProps) {
   const pathname = usePathname();
+  const adminContent = useLoanToolsContent();
+
+  // If the admin has customised this page's hero copy, prefer it. Otherwise fall
+  // back to the bundled meta passed in by the server component (so SSR/SEO
+  // stays correct).
+  const pageId = pathname ? pathToPageId[pathname] : undefined;
+  const override = pageId ? adminContent.heroes[pageId] : undefined;
+  const effectiveBadge = override?.badge ?? badge;
+  const effectiveTitle = override?.title ?? title;
+  const effectiveSubtitle = override?.subtitle ?? subtitle;
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-[#f0f2f5]">
@@ -47,9 +71,9 @@ export default function LoanToolsHubShell({
           >
             ← Back to Home
           </Link>
-          <span className="mt-4 eyebrow-dark">{badge}</span>
-          <h1 className="shell-title">{title}</h1>
-          <p className="shell-subtitle">{subtitle}</p>
+          <span className="mt-4 eyebrow-dark">{effectiveBadge}</span>
+          <h1 className="shell-title">{effectiveTitle}</h1>
+          <p className="shell-subtitle">{effectiveSubtitle}</p>
         </div>
       </div>
 

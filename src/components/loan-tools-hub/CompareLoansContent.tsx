@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { loanBanks } from "@/data/loanToolsPages";
+import { useLoanToolsContent } from "@/hooks/useLoanToolsContent";
 
 const inputClass =
   "w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none focus:border-[#f75d34] focus:ring-2 focus:ring-[#f75d34]/20";
@@ -30,6 +30,7 @@ function calcEMI(principal: number, annualRate: number, months: number) {
 }
 
 export default function CompareLoansContent() {
+  const { banks: loanBanks } = useLoanToolsContent();
   const [amount, setAmount] = useState(500000);
   const [tenure, setTenure] = useState(48);
 
@@ -42,7 +43,7 @@ export default function CompareLoansContent() {
         const interest = total - amount;
         return { ...b, rate, emi, total, interest };
       }),
-    [amount, tenure]
+    [amount, tenure, loanBanks]
   );
 
   const cheapest = useMemo(

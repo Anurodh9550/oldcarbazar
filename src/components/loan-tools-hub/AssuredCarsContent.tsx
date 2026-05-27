@@ -2,9 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { assuredFeatures, sampleAssuredCars } from "@/data/loanToolsPages";
+import { sampleAssuredCars } from "@/data/loanToolsPages";
+import { useLoanToolsContent } from "@/hooks/useLoanToolsContent";
 
 export default function AssuredCarsContent() {
+  const { assuredFeatures } = useLoanToolsContent();
   return (
     <div className="space-y-12">
       <section>

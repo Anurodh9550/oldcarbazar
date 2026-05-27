@@ -19,6 +19,7 @@ import {
   CloseIcon,
   DashboardIcon,
   InquiriesIcon,
+  LoanToolsIcon,
   LogoutIcon,
   MenuIcon,
   SearchIcon,
@@ -41,6 +42,7 @@ const navItems: NavItem[] = [
   { href: "/admin/buyers", label: "Buyers", Icon: BuyerIcon },
   { href: "/admin/sellers", label: "Sellers", Icon: SellerIcon },
   { href: "/admin/inquiries", label: "Inquiries", Icon: InquiriesIcon, badgeKey: "new-inquiries" },
+  { href: "/admin/loan-tools", label: "Loan & Tools", Icon: LoanToolsIcon },
   { href: "/admin/analytics", label: "Analytics", Icon: AnalyticsIcon },
   { href: "/admin/cities", label: "Cities", Icon: CitiesIcon },
   { href: "/admin/settings", label: "Settings", Icon: SettingsIcon },
@@ -70,6 +72,11 @@ const titleMap: Record<string, { title: string; subtitle: string }> = {
   "/admin/inquiries": {
     title: "Inquiries",
     subtitle: "All buyer ↔ seller messages",
+  },
+  "/admin/loan-tools": {
+    title: "Loan & Tools — Option by Features",
+    subtitle:
+      "Manage loan pages, bank offers, eligibility copy and car-tool features",
   },
   "/admin/analytics": {
     title: "Analytics",
