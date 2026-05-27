@@ -3,6 +3,7 @@ export type LoanToolsPageId =
   | "emi-calculator"
   | "loan-eligibility"
   | "compare-loans"
+  | "cost-of-ownership"
   | "compare"
   | "history-report"
   | "assured";
@@ -15,6 +16,7 @@ export const loanToolsNavGroups = [
       { id: "emi-calculator" as const, href: "/emi-calculator", label: "EMI Calculator", icon: "🧮" },
       { id: "loan-eligibility" as const, href: "/loan-eligibility", label: "Eligibility", icon: "✅" },
       { id: "compare-loans" as const, href: "/compare-loans", label: "Compare Rates", icon: "📊" },
+      { id: "cost-of-ownership" as const, href: "/cost-of-ownership", label: "Cost of Ownership", icon: "🧾" },
     ],
   },
   {
@@ -62,6 +64,14 @@ export const loanToolsPageMeta: Record<
       "Compare interest rates from India's top banks and NBFCs — pick the best lender with the lowest EMI.",
     description:
       "Compare used car loan interest rates from top banks and NBFCs in India.",
+  },
+  "cost-of-ownership": {
+    badge: "True 5-year cost",
+    title: "Cost of Ownership Calculator",
+    subtitle:
+      "See the real per-month cost of a car — fuel, insurance, service, parking and depreciation, all in one place.",
+    description:
+      "Calculate the true cost of owning a used car over 5 years — fuel, insurance, service, depreciation.",
   },
   compare: {
     badge: "Side-by-Side",

@@ -20,6 +20,7 @@ const pathToPageId: Record<string, LoanToolsPageId> = {
   "/emi-calculator": "emi-calculator",
   "/loan-eligibility": "loan-eligibility",
   "/compare-loans": "compare-loans",
+  "/cost-of-ownership": "cost-of-ownership",
   "/compare": "compare",
   "/history-report": "history-report",
   "/assured": "assured",

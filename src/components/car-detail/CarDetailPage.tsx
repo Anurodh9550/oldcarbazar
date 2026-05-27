@@ -9,7 +9,6 @@ import PageLoader from "@/components/ui/PageLoader";
 import {
   buildCarDetail,
   findCarById,
-  getCarDetailPath,
   getSimilarCars,
   REVIEW_SAMPLES,
   type CarDetailTab,
@@ -17,10 +16,14 @@ import {
 import ExploreCarCard from "@/components/explore/ExploreCarCard";
 import SellerDetailsModal from "@/components/car-detail/SellerDetailsModal";
 import BuyerInquiryModal from "@/components/car-detail/BuyerInquiryModal";
+import TestDriveModal from "@/components/car-detail/TestDriveModal";
+import MakeOfferModal from "@/components/car-detail/MakeOfferModal";
+import RecentlyViewedWidget from "@/components/car-detail/RecentlyViewedWidget";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { HeartIcon } from "@/components/icons";
 import { isShortlisted, toggleShortlist } from "@/lib/shortlist";
 import { isInCompare, toggleCompare } from "@/lib/compareList";
+import { trackRecentlyViewed } from "@/lib/recentlyViewed";
 
 const TABS: { id: CarDetailTab; label: string }[] = [
   { id: "overview", label: "OVERVIEW" },
@@ -44,6 +47,8 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
   const [showAllFeatures, setShowAllFeatures] = useState(false);
   const [showSeller, setShowSeller] = useState(false);
   const [showInquiry, setShowInquiry] = useState(false);
+  const [showTestDrive, setShowTestDrive] = useState(false);
+  const [showOffer, setShowOffer] = useState(false);
   const [inquirySubmitted, setInquirySubmitted] = useState(false);
   const [saved, setSaved] = useState(false);
   const [compared, setCompared] = useState(false);
@@ -52,10 +57,15 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
   useEffect(() => {
     setSaved(isShortlisted(carId));
     setCompared(isInCompare(carId));
+    trackRecentlyViewed(carId);
     const refreshSaved = () => setSaved(isShortlisted(carId));
+    const refreshCompared = () => setCompared(isInCompare(carId));
     window.addEventListener("ocb-shortlist-changed", refreshSaved);
-    return () =>
+    window.addEventListener("ocb-compare-changed", refreshCompared);
+    return () => {
       window.removeEventListener("ocb-shortlist-changed", refreshSaved);
+      window.removeEventListener("ocb-compare-changed", refreshCompared);
+    };
   }, [carId]);
 
   const handleSaveToggle = () => {
@@ -289,6 +299,22 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
               >
                 {inquirySubmitted ? "View Seller Details" : "Get Seller Contact"}
               </button>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowTestDrive(true)}
+                  className="rounded-xl border border-[#f75d34] py-2.5 text-sm font-semibold text-[#f75d34] hover:bg-orange-50"
+                >
+                  🚗 Test Drive
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowOffer(true)}
+                  className="rounded-xl border border-[#f75d34] py-2.5 text-sm font-semibold text-[#f75d34] hover:bg-orange-50"
+                >
+                  💸 Make Offer
+                </button>
+              </div>
               <p className="text-caption mt-3 flex items-center gap-1">
                 <span aria-hidden>📍</span>
                 {detail.area}
@@ -582,7 +608,13 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
             )}
           </div>
 
-          <div className="hidden lg:block" />
+          <aside className="hidden space-y-5 lg:block">
+            <RecentlyViewedWidget excludeId={detail.id} />
+          </aside>
+        </div>
+
+        <div className="mt-8 lg:hidden">
+          <RecentlyViewedWidget excludeId={detail.id} />
         </div>
       </div>
 
@@ -601,6 +633,30 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
           recommended={similar}
           whatsappHref={whatsappHref}
           onClose={() => setShowSeller(false)}
+        />
+      )}
+
+      {showTestDrive && (
+        <TestDriveModal
+          listingId={detail.id}
+          listingTitle={detail.title}
+          defaultLocation={detail.area}
+          onClose={() => setShowTestDrive(false)}
+          onSubmitted={() => {
+            /* keep modal open to show success state */
+          }}
+        />
+      )}
+
+      {showOffer && (
+        <MakeOfferModal
+          listingId={detail.id}
+          listingTitle={detail.title}
+          askingPriceInr={Math.round(detail.priceLakh * 100000)}
+          onClose={() => setShowOffer(false)}
+          onSubmitted={() => {
+            /* keep modal open to show success state */
+          }}
         />
       )}
     </main>

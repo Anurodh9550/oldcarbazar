@@ -14,6 +14,21 @@ export function getCompareIds(): string[] {
 
 export function setCompareIds(ids: string[]) {
   localStorage.setItem(COMPARE_KEY, JSON.stringify(ids));
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("ocb-compare-changed"));
+  }
+}
+
+/** Remove a single car from the compare list (used by floating widget chips). */
+export function removeFromCompare(id: string): string[] {
+  const next = getCompareIds().filter((x) => x !== id);
+  setCompareIds(next);
+  return next;
+}
+
+/** Clear all cars from the compare list. */
+export function clearCompare(): void {
+  setCompareIds([]);
 }
 
 export function isInCompare(id: string): boolean {

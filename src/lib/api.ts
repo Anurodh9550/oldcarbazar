@@ -16,6 +16,12 @@ import type {
   InquiryStatus,
 } from "@/types/admin";
 import type { LoanToolsContent } from "@/data/loanToolsAdmin";
+import type {
+  Offer,
+  OfferStatus,
+  TestDriveBooking,
+  TestDriveStatus,
+} from "@/types/engagement";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
@@ -357,6 +363,12 @@ function isPublicApiPath(path: string, method: string) {
       return true;
     }
     if (p.startsWith("/loan-tools/content")) return true;
+  }
+  // Public POST endpoints — anyone may submit, login enriches the FK only.
+  if (m === "POST") {
+    if (p === "/inquiries/") return true;
+    if (p === "/test-drives/") return true;
+    if (p === "/offers/") return true;
   }
   return false;
 }
@@ -1045,6 +1057,195 @@ export const api = {
   async adminDeleteInquiry(id: string) {
     await adminApiFetch<unknown>(`/inquiries/${id}/`, { method: "DELETE" });
   },
+
+  // ---------------- Test drive bookings ---------------- //
+
+  async createTestDrive(payload: {
+    listing: string;
+    buyer_name: string;
+    buyer_phone: string;
+    buyer_email?: string;
+    scheduled_at: string;
+    location_note?: string;
+    message?: string;
+  }) {
+    const body: Record<string, string> = {
+      listing: payload.listing,
+      buyer_name: payload.buyer_name.trim(),
+      buyer_phone: payload.buyer_phone,
+      scheduled_at: payload.scheduled_at,
+    };
+    if (payload.buyer_email?.trim()) body.buyer_email = payload.buyer_email.trim();
+    if (payload.location_note?.trim()) body.location_note = payload.location_note.trim();
+    if (payload.message?.trim()) body.message = payload.message.trim();
+    const data = await apiFetch<ApiTestDrive>("/test-drives/", {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+    return apiTestDriveToTestDrive(data);
+  },
+
+  async myTestDrives() {
+    const data = await apiFetch<ApiTestDrive[] | Paginated<ApiTestDrive>>(
+      "/test-drives/mine/?limit=100"
+    );
+    return unwrapList(data).map(apiTestDriveToTestDrive);
+  },
+
+  async updateTestDriveStatus(
+    id: string,
+    status: TestDriveStatus,
+    sellerResponse?: string
+  ) {
+    const body: Record<string, string> = { status };
+    if (sellerResponse) body.seller_response = sellerResponse;
+    const data = await apiFetch<ApiTestDrive>(`/test-drives/${id}/status/`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+    return apiTestDriveToTestDrive(data);
+  },
+
+  // ---------------- Offers ---------------- //
+
+  async createOffer(payload: {
+    listing: string;
+    buyer_name: string;
+    buyer_phone: string;
+    buyer_email?: string;
+    amount: number;
+    message?: string;
+  }) {
+    const body: Record<string, string | number> = {
+      listing: payload.listing,
+      buyer_name: payload.buyer_name.trim(),
+      buyer_phone: payload.buyer_phone,
+      amount: payload.amount,
+    };
+    if (payload.buyer_email?.trim()) body.buyer_email = payload.buyer_email.trim();
+    if (payload.message?.trim()) body.message = payload.message.trim();
+    const data = await apiFetch<ApiOffer>("/offers/", {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+    return apiOfferToOffer(data);
+  },
+
+  async myOffers() {
+    const data = await apiFetch<ApiOffer[] | Paginated<ApiOffer>>(
+      "/offers/mine/?limit=100"
+    );
+    return unwrapList(data).map(apiOfferToOffer);
+  },
+
+  async respondToOffer(
+    id: string,
+    payload: {
+      status: "accepted" | "rejected" | "countered";
+      counter_amount?: number;
+      seller_response?: string;
+    }
+  ) {
+    const body: Record<string, string | number> = { status: payload.status };
+    if (payload.counter_amount !== undefined) {
+      body.counter_amount = payload.counter_amount;
+    }
+    if (payload.seller_response) body.seller_response = payload.seller_response;
+    const data = await apiFetch<ApiOffer>(`/offers/${id}/respond/`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+    return apiOfferToOffer(data);
+  },
+
+  async withdrawOffer(id: string) {
+    const data = await apiFetch<ApiOffer>(`/offers/${id}/withdraw/`, {
+      method: "POST",
+    });
+    return apiOfferToOffer(data);
+  },
 };
+
+// --------------------------------------------------------------------------- //
+// Engagement API shapes (snake_case from Django) and converters
+// --------------------------------------------------------------------------- //
+
+type ApiTestDrive = {
+  id: string;
+  listing: string;
+  listing_title: string;
+  buyer: string | null;
+  buyer_name: string;
+  buyer_phone: string;
+  buyer_email?: string | null;
+  seller: string | null;
+  scheduled_at: string;
+  location_note: string;
+  message: string;
+  status: TestDriveStatus;
+  seller_response: string;
+  created_at: string;
+  updated_at: string;
+};
+
+type ApiOffer = {
+  id: string;
+  listing: string;
+  listing_title: string;
+  listing_price_inr: string | null;
+  buyer: string | null;
+  buyer_name: string;
+  buyer_phone: string;
+  buyer_email?: string | null;
+  seller: string | null;
+  amount: string;
+  counter_amount: string | null;
+  message: string;
+  seller_response: string;
+  status: OfferStatus;
+  created_at: string;
+  updated_at: string;
+};
+
+function apiTestDriveToTestDrive(data: ApiTestDrive): TestDriveBooking {
+  return {
+    id: data.id,
+    listingId: data.listing,
+    listingTitle: data.listing_title,
+    buyerId: data.buyer,
+    buyerName: data.buyer_name,
+    buyerPhone: data.buyer_phone,
+    buyerEmail: data.buyer_email,
+    sellerId: data.seller,
+    scheduledAt: data.scheduled_at,
+    locationNote: data.location_note,
+    message: data.message,
+    status: data.status,
+    sellerResponse: data.seller_response,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
+  };
+}
+
+function apiOfferToOffer(data: ApiOffer): Offer {
+  return {
+    id: data.id,
+    listingId: data.listing,
+    listingTitle: data.listing_title,
+    listingPriceInr: data.listing_price_inr,
+    buyerId: data.buyer,
+    buyerName: data.buyer_name,
+    buyerPhone: data.buyer_phone,
+    buyerEmail: data.buyer_email,
+    sellerId: data.seller,
+    amount: data.amount,
+    counterAmount: data.counter_amount,
+    message: data.message,
+    sellerResponse: data.seller_response,
+    status: data.status,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
+  };
+}
 
 export type { CarListing };
