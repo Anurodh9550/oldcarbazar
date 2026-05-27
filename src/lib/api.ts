@@ -482,11 +482,19 @@ async function apiFetch<T>(
   }
 }
 
-async function adminApiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
+async function adminApiFetch<T>(
+  path: string,
+  init: RequestInit = {},
+  requireToken = true
+): Promise<T> {
   const token = getAdminAccessToken();
-  if (!token) {
+  if (requireToken && !token) {
     clearAdminTokens();
-    throw new ApiError(401, "Admin session has expired. Please log in again.", null);
+    throw new ApiError(
+      401,
+      "Admin session has expired. Please log in again.",
+      null
+    );
   }
   const headers = new Headers(init.headers);
   if (!(init.body instanceof FormData) && !headers.has("Content-Type")) {
@@ -494,16 +502,31 @@ async function adminApiFetch<T>(path: string, init: RequestInit = {}): Promise<T
   }
   if (token) headers.set("Authorization", `Bearer ${token}`);
 
-  const res = await fetch(`${API_BASE}${path}`, {
-    ...init,
-    headers,
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}${path}`, {
+      ...init,
+      headers,
+    });
+  } catch (networkErr) {
+    logApiFailure((init.method ?? "GET").toUpperCase(), path, networkErr);
+    throw new ApiError(
+      0,
+      "Could not reach the server. Check your internet connection and try again.",
+      networkErr
+    );
+  }
 
-  if (res.status === 401) {
+  if (res.status === 401 && requireToken) {
     clearAdminTokens();
   }
 
-  return parseResponse<T>(res);
+  try {
+    return await parseResponse<T>(res);
+  } catch (err) {
+    logApiFailure((init.method ?? "GET").toUpperCase(), path, err);
+    throw err;
+  }
 }
 
 function unwrapList<T>(data: T[] | Paginated<T>): T[] {
@@ -832,10 +855,22 @@ export const api = {
   },
 
   async adminLogin(email: string, password: string) {
-    const data = await adminApiFetch<AdminAuthResponse>("/admin-panel/login/", {
-      method: "POST",
-      body: JSON.stringify({ email, password }),
-    });
+    clearAdminTokens();
+    const data = await adminApiFetch<AdminAuthResponse>(
+      "/admin-panel/login/",
+      {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      },
+      false
+    );
+    if (!data.access || !data.refresh) {
+      throw new ApiError(
+        502,
+        "Login succeeded but the server did not return session tokens.",
+        data
+      );
+    }
     saveAdminTokens(data.access, data.refresh);
     return apiAdminToAdmin(data.admin);
   },
