@@ -375,6 +375,12 @@ async function apiFetch<T>(
     token = (await refreshAccessToken()) ?? null;
   }
 
+  if (!token && retry && needsAuth) {
+    // Some sessions may lose the access token while still having a valid refresh
+    // token (tab restore/localStorage race). Try refresh once before logout.
+    token = (await refreshAccessToken()) ?? null;
+  }
+
   if (needsAuth && !token) {
     clearTokens();
     if (isBrowser()) {
