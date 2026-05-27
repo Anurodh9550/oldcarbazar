@@ -84,7 +84,7 @@ function normalizeStoredListing(raw: UserCarListing): UserCarListing {
 }
 
 export function ListingsProvider({ children }: { children: React.ReactNode }) {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, loading: authLoading } = useAuth();
   const { admin } = useAdmin();
   const hasAdminSession = Boolean(admin && getAdminAccessToken());
   const [apiListings, setApiListings] = useState<UserCarListing[]>([]);
@@ -102,6 +102,9 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
       if (hasAdminSession) {
         const adminListings = await api.adminListings();
         setUserListings(adminListings);
+      } else if (authLoading) {
+        // Wait until AuthProvider finishes token refresh + /auth/me.
+        return;
       } else if (isLoggedIn) {
         const mine = await api.myListings();
         setUserListings(mine);
@@ -124,7 +127,7 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLoading(false);
     }
-  }, [hasAdminSession, isLoggedIn]);
+  }, [hasAdminSession, isLoggedIn, authLoading]);
 
   // When the auth session is invalidated (event from api.ts on a 401),
   // drop the cached "my listings" immediately so the UI does not keep showing

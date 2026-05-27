@@ -342,7 +342,18 @@ function isPublicApiPath(path: string, method: string) {
   }
   if (m === "GET" || m === "HEAD") {
     if (p === "/listings/" || p.startsWith("/listings/?")) return true;
-    if (/^\/listings\/[^/]+\/$/.test(p)) return true;
+    // Seller-only routes must stay authenticated (were wrongly matched as
+    // public detail URLs because "mine" fit /listings/[id]/).
+    if (p === "/listings/mine/" || p.startsWith("/listings/mine/")) return false;
+    if (p.startsWith("/listings/media-config")) return true;
+    // Public car detail pages use UUID primary keys.
+    if (
+      /^\/listings\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/$/i.test(
+        p
+      )
+    ) {
+      return true;
+    }
   }
   return false;
 }
