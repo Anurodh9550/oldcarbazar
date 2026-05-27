@@ -93,6 +93,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
   const refreshAdminData = useCallback(async () => {
     if (!getAdminAccessToken()) {
+      setAdmin(null);
+      localStorage.removeItem(ADMIN_SESSION_KEY);
       setLoading(false);
       return;
     }
@@ -129,7 +131,11 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     try {
       const saved = localStorage.getItem(ADMIN_SESSION_KEY);
-      if (saved) setAdmin(JSON.parse(saved));
+      if (saved && getAdminAccessToken()) {
+        setAdmin(JSON.parse(saved));
+      } else {
+        localStorage.removeItem(ADMIN_SESSION_KEY);
+      }
     } catch {
       /* ignore */
     }

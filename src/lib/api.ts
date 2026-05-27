@@ -473,6 +473,10 @@ async function apiFetch<T>(
 
 async function adminApiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   const token = getAdminAccessToken();
+  if (!token) {
+    clearAdminTokens();
+    throw new ApiError(401, "Admin session has expired. Please log in again.", null);
+  }
   const headers = new Headers(init.headers);
   if (!(init.body instanceof FormData) && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");

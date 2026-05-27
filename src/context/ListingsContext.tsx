@@ -12,7 +12,7 @@ import { useAdmin } from "@/context/AdminContext";
 import { useAuth } from "@/context/AuthContext";
 import { carListings, type CarListing } from "@/data/cars";
 import type { SellCarFormData } from "@/data/sellCarForm";
-import { ApiError, api, getAccessToken } from "@/lib/api";
+import { ApiError, api, getAccessToken, getAdminAccessToken } from "@/lib/api";
 import { DEFAULT_LISTING_IMAGE } from "@/lib/listingImages";
 import type {
   ListingModeration,
@@ -86,6 +86,7 @@ function normalizeStoredListing(raw: UserCarListing): UserCarListing {
 export function ListingsProvider({ children }: { children: React.ReactNode }) {
   const { isLoggedIn } = useAuth();
   const { admin } = useAdmin();
+  const hasAdminSession = Boolean(admin && getAdminAccessToken());
   const [apiListings, setApiListings] = useState<UserCarListing[]>([]);
   const [userListings, setUserListings] = useState<UserCarListing[]>([]);
   const [loading, setLoading] = useState(true);
@@ -98,7 +99,7 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
     try {
       const publicListings = await api.listListings();
       setApiListings(publicListings);
-      if (admin) {
+      if (hasAdminSession) {
         const adminListings = await api.adminListings();
         setUserListings(adminListings);
       } else if (isLoggedIn) {
@@ -123,7 +124,7 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLoading(false);
     }
-  }, [admin, isLoggedIn]);
+  }, [hasAdminSession, isLoggedIn]);
 
   // When the auth session is invalidated (event from api.ts on a 401),
   // drop the cached "my listings" immediately so the UI does not keep showing
@@ -200,7 +201,7 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
       // "magically came back" after refresh, which is exactly the confusion
       // sellers reported.
       try {
-        if (admin) {
+        if (hasAdminSession) {
           await api.adminDeleteListing(id);
         } else {
           await api.deleteListing(id);
@@ -216,12 +217,12 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
       // Defensive sync so two tabs / cached localStorage can't resurrect it.
       refreshListings().catch(() => undefined);
     },
-    [admin, refreshListings]
+    [hasAdminSession, refreshListings]
   );
 
   const updateListingStatus = useCallback(
     async (id: string, status: ListingStatus): Promise<void> => {
-      if (admin) {
+      if (hasAdminSession) {
         // Admin tokens don't have a per-seller status endpoint; just reflect
         // the change locally so the moderation UI updates instantly.
         setUserListings((prev) =>
@@ -252,7 +253,7 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
       // new status immediately.
       refreshListings().catch(() => undefined);
     },
-    [admin, refreshListings]
+    [hasAdminSession, refreshListings]
   );
 
   const setListingModeration = useCallback(
@@ -271,14 +272,14 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
             : l
         )
       );
-      if (admin) {
+      if (hasAdminSession) {
         api.adminModerateListing(id, moderation, reason ?? "").catch((err) => {
           setError(err instanceof Error ? err.message : "Could not moderate listing.");
           refreshListings();
         });
       }
     },
-    [admin, refreshListings]
+    [hasAdminSession, refreshListings]
   );
 
   const toggleFeatured = useCallback((id: string, featured?: boolean) => {
@@ -293,13 +294,13 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
     setApiListings((prev) =>
       prev.map((l) => (l.id === id ? { ...l, featured: nextFeatured } : l))
     );
-    if (admin) {
+    if (hasAdminSession) {
       api.adminFeatureListing(id, nextFeatured).catch((err) => {
         setError(err instanceof Error ? err.message : "Could not feature listing.");
         refreshListings();
       });
     }
-  }, [admin, refreshListings]);
+  }, [hasAdminSession, refreshListings]);
 
   const flagListing = useCallback((id: string, reason: string) => {
     setUserListings((prev) =>
@@ -307,13 +308,13 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
         l.id === id ? { ...l, flagged: true, flagReason: reason } : l
       )
     );
-    if (admin) {
+    if (hasAdminSession) {
       api.adminFlagListing(id, reason).catch((err) => {
         setError(err instanceof Error ? err.message : "Could not flag listing.");
         refreshListings();
       });
     }
-  }, [admin, refreshListings]);
+  }, [hasAdminSession, refreshListings]);
 
   const clearFlag = useCallback((id: string) => {
     setUserListings((prev) =>
@@ -321,13 +322,13 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
         l.id === id ? { ...l, flagged: false, flagReason: undefined } : l
       )
     );
-    if (admin) {
+    if (hasAdminSession) {
       api.adminClearFlag(id).catch((err) => {
         setError(err instanceof Error ? err.message : "Could not clear flag.");
         refreshListings();
       });
     }
-  }, [admin, refreshListings]);
+  }, [hasAdminSession, refreshListings]);
 
   const getMyListings = useCallback(
     (sellerId: string) => {
@@ -335,7 +336,7 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
       // /listings/mine/, which is already scoped to their account. Returning it
       // directly avoids issues when the form's phone/email differ from the
       // logged-in user's record (which broke the previous string-match filter).
-      if (!admin) return userListings;
+      if (!hasAdminSession) return userListings;
 
       const key = sellerId.trim().toLowerCase();
       return userListings.filter(
@@ -346,7 +347,7 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
           (l.email && l.email.toLowerCase() === key)
       );
     },
-    [admin, userListings]
+    [hasAdminSession, userListings]
   );
 
   const getSellerStats = useCallback(
