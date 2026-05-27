@@ -44,7 +44,7 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { selectedCity } = useLocation();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, loading: authLoading } = useAuth();
 
   const submitSearch = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -196,7 +196,15 @@ export default function Header() {
               <HeartIcon className="h-5 w-5" />
             </motion.button>
 
-            {isLoggedIn ? (
+            {authLoading ? (
+              <span
+                aria-label="Checking session"
+                role="status"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full text-gray-500"
+              >
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-gray-200 border-t-[#f75d34]" />
+              </span>
+            ) : isLoggedIn ? (
               <ProfileDropdown />
             ) : (
               <motion.button

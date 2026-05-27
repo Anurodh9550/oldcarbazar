@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { scaleIn } from "@/lib/motion";
+import Spinner from "@/components/ui/Spinner";
 
 type AuthModalProps = {
   isOpen: boolean;
@@ -333,10 +334,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   disabled={loading}
                   whileHover={{ scale: 1.02, backgroundColor: "#e54d24" }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full rounded-lg bg-[#f75d34] py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#f75d34] py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"
                 >
+                  {loading && <Spinner size="sm" tone="white" />}
                   {loading
-                    ? "Please wait..."
+                    ? tab === "register"
+                      ? "Creating account…"
+                      : "Signing in…"
                     : tab === "register"
                       ? "Create Account"
                       : "Login"}

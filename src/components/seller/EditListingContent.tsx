@@ -7,6 +7,7 @@ import SellCarForm from "@/components/SellCarForm";
 import { useAuth } from "@/context/AuthContext";
 import { useListings } from "@/context/ListingsContext";
 import { initialSellForm, type SellCarFormData } from "@/data/sellCarForm";
+import PageLoader from "@/components/ui/PageLoader";
 import type { UserCarListing } from "@/types/listing";
 
 type EditListingContentProps = {
@@ -63,11 +64,7 @@ export default function EditListingContent({
   );
 
   if (loading && !listing) {
-    return (
-      <div className="flex min-h-[300px] items-center justify-center text-sm text-gray-500">
-        Loading listing…
-      </div>
-    );
+    return <PageLoader message="Loading your listing…" />;
   }
 
   if (!listing) {

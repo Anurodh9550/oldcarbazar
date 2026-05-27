@@ -110,6 +110,7 @@ export default function ListingsContent() {
     flagListing,
     clearFlag,
     removeListing,
+    loading: listingsLoading,
   } = useListings();
   const { logActivity } = useAdmin();
 
@@ -463,7 +464,18 @@ export default function ListingsContent() {
               </tr>
             </thead>
             <tbody>
-              {filtered.length === 0 ? (
+              {listingsLoading && filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-4 py-16 text-center">
+                    <div className="flex flex-col items-center gap-3 text-slate-500">
+                      <span className="h-8 w-8 animate-spin rounded-full border-[3px] border-orange-200 border-t-[#f75d34]" />
+                      <p className="text-sm font-medium">
+                        Loading listings from server…
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              ) : filtered.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-4 py-16 text-center">
                     <div className="flex flex-col items-center gap-2 text-slate-400">

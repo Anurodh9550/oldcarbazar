@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useListings } from "@/context/ListingsContext";
+import PageLoader from "@/components/ui/PageLoader";
 import {
   buildCarDetail,
   findCarById,
@@ -35,7 +36,7 @@ type CarDetailPageProps = {
 
 export default function CarDetailPage({ carId }: CarDetailPageProps) {
   const router = useRouter();
-  const { allListings } = useListings();
+  const { allListings, loading: listingsLoading } = useListings();
   const [activeTab, setActiveTab] = useState<CarDetailTab>("overview");
   const [imageIndex, setImageIndex] = useState(0);
   const [loanYears, setLoanYears] = useState(3);
@@ -151,6 +152,13 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
   );
 
   if (!detail) {
+    if (listingsLoading) {
+      return (
+        <main className="mx-auto max-w-[1280px] px-4 py-16">
+          <PageLoader message="Loading car details…" />
+        </main>
+      );
+    }
     return (
       <main className="mx-auto max-w-[1280px] px-4 py-16 text-center">
         <h1 className="section-title-lg">Car not found</h1>

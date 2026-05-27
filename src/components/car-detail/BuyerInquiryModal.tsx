@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 import { api } from "@/lib/api";
+import Spinner from "@/components/ui/Spinner";
 
 type BuyerInquiryModalProps = {
   listingId: string;
@@ -157,9 +158,10 @@ export default function BuyerInquiryModal({
             disabled={submitting}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="w-full rounded-lg bg-[#f75d34] py-3 text-sm font-semibold text-white shadow-md hover:bg-[#e54d24] disabled:cursor-not-allowed disabled:opacity-70"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#f75d34] py-3 text-sm font-semibold text-white shadow-md hover:bg-[#e54d24] disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {submitting ? "Sending..." : "Send & Get Seller Details"}
+            {submitting && <Spinner size="sm" tone="white" />}
+            {submitting ? "Sending…" : "Send & Get Seller Details"}
           </motion.button>
         </form>
       </motion.div>

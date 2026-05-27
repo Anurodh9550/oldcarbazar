@@ -3,8 +3,10 @@
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "@/context/LocationContext";
+import { useListings } from "@/context/ListingsContext";
 import { fadeInRight, staggerContainer } from "@/lib/motion";
 import CarCard from "./CarCard";
+import CarCardSkeleton from "./ui/CarCardSkeleton";
 import { parseKms } from "@/lib/carMeta";
 
 type SortKey = "relevance" | "price-asc" | "price-desc" | "kms-asc";
@@ -27,6 +29,7 @@ function parsePriceToLakh(price: string): number {
 
 export default function CarListingGrid() {
   const { filteredCars, selectedCity } = useLocation();
+  const { loading: listingsLoading } = useListings();
   const [sort, setSort] = useState<SortKey>("relevance");
 
   const sortedCars = useMemo(() => {
@@ -81,7 +84,16 @@ export default function CarListingGrid() {
       </motion.div>
 
       <AnimatePresence mode="wait">
-        {sortedCars.length === 0 ? (
+        {listingsLoading && sortedCars.length === 0 ? (
+          <motion.div
+            key="loading"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <CarCardSkeleton count={6} />
+          </motion.div>
+        ) : sortedCars.length === 0 ? (
           <motion.div
             key="empty"
             initial={{ opacity: 0, y: 20 }}

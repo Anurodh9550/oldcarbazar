@@ -26,6 +26,7 @@ import {
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import ListingPhotoUpload from "@/components/seller/ListingPhotoUpload";
 import LocationModal from "@/components/LocationModal";
+import Spinner from "@/components/ui/Spinner";
 import { validatePhotoCount } from "@/lib/listingPhotos";
 import { PinIcon } from "@/components/icons";
 
@@ -780,12 +781,13 @@ export default function SellCarForm({
           <button
             type="submit"
             disabled={submitting}
-            className="rounded-lg bg-[#f75d34] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#e54d24] disabled:cursor-not-allowed disabled:opacity-70"
+            className="inline-flex items-center gap-2 rounded-lg bg-[#f75d34] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#e54d24] disabled:cursor-not-allowed disabled:opacity-70"
           >
+            {submitting && <Spinner size="sm" tone="white" />}
             {submitting
               ? isEdit
-                ? "Saving..."
-                : "Publishing..."
+                ? "Saving…"
+                : "Publishing…"
               : step < TOTAL_STEPS
                 ? "Continue"
                 : isEdit

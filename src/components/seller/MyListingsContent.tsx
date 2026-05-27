@@ -7,6 +7,8 @@ import { useMemo, useRef, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { getSellerIdFromUser, useListings } from "@/context/ListingsContext";
 import { ApiError, ensureValidAccessToken } from "@/lib/api";
+import Spinner from "@/components/ui/Spinner";
+import PageLoader from "@/components/ui/PageLoader";
 import type { ListingStatus, UserCarListing } from "@/types/listing";
 
 const statusStyles: Record<ListingStatus, string> = {
@@ -19,7 +21,12 @@ type Toast = { kind: "success" | "error"; text: string } | null;
 
 export default function MyListingsContent() {
   const { user, logout } = useAuth();
-  const { getMyListings, removeListing, updateListingStatus } = useListings();
+  const {
+    getMyListings,
+    removeListing,
+    updateListingStatus,
+    loading: listingsLoading,
+  } = useListings();
 
   const sellerId = user ? getSellerIdFromUser(user) : "";
   const listings = useMemo(
@@ -174,7 +181,9 @@ export default function MyListingsContent() {
         </div>
       </div>
 
-      {listings.length === 0 ? (
+      {listingsLoading && listings.length === 0 ? (
+        <PageLoader message="Loading your listings…" />
+      ) : listings.length === 0 ? (
         <div className="rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 py-20 text-center">
           <span className="text-6xl">🚗</span>
           <h2 className="mt-4 text-xl font-bold text-gray-900">No listings yet</h2>
@@ -258,8 +267,11 @@ export default function MyListingsContent() {
                           type="button"
                           disabled={isBusy}
                           onClick={() => handleStatusChange(car, "sold")}
-                          className="rounded-lg bg-gray-900 px-4 py-2 text-xs font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
+                          className="inline-flex items-center gap-1.5 rounded-lg bg-gray-900 px-4 py-2 text-xs font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
                         >
+                          {isBusy && busyAction === "sold" && (
+                            <Spinner size="xs" tone="white" />
+                          )}
                           {isBusy && busyAction === "sold"
                             ? "Marking…"
                             : "Mark as Sold"}
@@ -270,8 +282,11 @@ export default function MyListingsContent() {
                           type="button"
                           disabled={isBusy}
                           onClick={() => handleStatusChange(car, "active")}
-                          className="rounded-lg border border-gray-200 px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
                         >
+                          {isBusy && busyAction === "relist" && (
+                            <Spinner size="xs" tone="muted" />
+                          )}
                           {isBusy && busyAction === "relist"
                             ? "Re-listing…"
                             : "Relist"}
@@ -293,8 +308,11 @@ export default function MyListingsContent() {
                           setDeleteError("");
                           setConfirmDelete(car);
                         }}
-                        className="rounded-lg border border-red-200 px-4 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 px-4 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
                       >
+                        {isBusy && busyAction === "delete" && (
+                          <Spinner size="xs" tone="muted" />
+                        )}
                         {isBusy && busyAction === "delete"
                           ? "Deleting…"
                           : "Delete"}
@@ -356,8 +374,11 @@ export default function MyListingsContent() {
                 type="button"
                 disabled={busyAction === "delete"}
                 onClick={handleConfirmDelete}
-                className="flex-1 rounded-lg bg-red-600 py-2.5 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-red-600 py-2.5 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
+                {busyAction === "delete" && (
+                  <Spinner size="sm" tone="white" />
+                )}
                 {busyAction === "delete" ? "Deleting…" : "Yes, delete"}
               </button>
             </div>
