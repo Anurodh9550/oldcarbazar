@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAdmin } from "@/context/AdminContext";
-import { seedAdmins } from "@/data/admin";
 import { clearAdminTokens } from "@/lib/api";
 import { ShieldIcon } from "./icons";
 
@@ -68,13 +67,6 @@ export default function AdminLogin() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const fillDemo = (idx: number) => {
-    const a = seedAdmins[idx];
-    setEmail(a.email);
-    setPassword(a.password);
-    setError("");
   };
 
   return (
@@ -268,44 +260,16 @@ export default function AdminLogin() {
             </motion.button>
           </form>
 
-          <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <div className="flex items-center justify-between">
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                Demo accounts
-              </p>
-              <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-700">
-                Pre-loaded
-              </span>
-            </div>
-            <ul className="mt-3 space-y-2">
-              {seedAdmins.map((a, i) => (
-                <li key={a.id}>
-                  <button
-                    type="button"
-                    onClick={() => fillDemo(i)}
-                    className="flex w-full items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-3 py-2.5 text-left text-xs transition hover:border-[#f75d34]/40 hover:bg-orange-50"
-                  >
-                    <div className="min-w-0">
-                      <p className="truncate font-semibold text-slate-800">
-                        {a.email}
-                      </p>
-                      <p className="truncate text-[11px] text-slate-500">
-                        {a.name} • {a.role}
-                      </p>
-                    </div>
-                    <span className="rounded-md bg-white px-2 py-1 font-mono text-[10px] text-slate-600 ring-1 ring-slate-200">
-                      {a.password}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-            <p className="mt-3 text-[10px] leading-relaxed text-slate-500">
-              These demo credentials are stored locally for the prototype. In
-              production, wire this to a real auth backend with hashed
-              passwords and MFA.
-            </p>
-          </div>
+          <p className="mt-8 text-center text-[11px] leading-relaxed text-slate-400">
+            Authorized admins only. Contact{" "}
+            <a
+              href="mailto:support@oldcarbazar.com"
+              className="font-semibold text-[#f75d34] hover:underline"
+            >
+              support@oldcarbazar.com
+            </a>{" "}
+            for access.
+          </p>
         </motion.div>
       </div>
     </div>
