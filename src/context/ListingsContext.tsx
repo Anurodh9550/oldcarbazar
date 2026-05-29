@@ -10,7 +10,7 @@ import {
 } from "react";
 import { useAdmin } from "@/context/AdminContext";
 import { useAuth } from "@/context/AuthContext";
-import { carListings, type CarListing } from "@/data/cars";
+import type { CarListing } from "@/data/cars";
 import type { SellCarFormData } from "@/data/sellCarForm";
 import { ApiError, api, getAccessToken, getAdminAccessToken } from "@/lib/api";
 import { DEFAULT_LISTING_IMAGE } from "@/lib/listingImages";
@@ -379,9 +379,10 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
     const publicApiListings = apiListings.filter(
       (listing) => !publicUserIds.has(listing.id)
     );
-    return apiListings.length > 0
-      ? [...publicUserListings, ...publicApiListings]
-      : [...publicUserListings, ...carListings];
+    // No seed/demo fallback: while the backend fetch is in flight the list
+    // is empty (consumers use `loading` to render skeletons). This is what
+    // stops the "demo cars flash before real cars" bug on production.
+    return [...publicUserListings, ...publicApiListings];
   }, [apiListings, userListings]);
 
   const value = useMemo(

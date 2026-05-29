@@ -2,23 +2,34 @@
 
 import ListingImage from "@/components/ListingImage";
 import ProfileEmptyState from "@/components/profile-hub/ProfileEmptyState";
-import { carListings } from "@/data/cars";
+import { useListings } from "@/context/ListingsContext";
 import { getCarDetailPath } from "@/lib/carDetail";
 import { getShortlistedIds, toggleShortlist } from "@/lib/shortlist";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 export default function ShortlistedContent() {
+  const { allListings, loading } = useListings();
   const [ids, setIds] = useState<string[]>([]);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     setIds(getShortlistedIds());
+    setHydrated(true);
   }, []);
 
   const cars = useMemo(
-    () => carListings.filter((c) => ids.includes(c.id)),
-    [ids]
+    () => allListings.filter((c) => ids.includes(c.id)),
+    [allListings, ids]
   );
+
+  if (!hydrated || (loading && cars.length === 0)) {
+    return (
+      <div className="rounded-2xl border border-dashed border-gray-200 bg-white py-16 text-center text-sm text-gray-500">
+        Loading your shortlist…
+      </div>
+    );
+  }
 
   if (cars.length === 0) {
     return (

@@ -1,25 +1,19 @@
 import Header from "@/components/Header";
 import CarDetailPage from "@/components/car-detail/CarDetailPage";
-import { carListings } from "@/data/cars";
-import { findCarById } from "@/lib/carDetail";
 
 type PageProps = {
   params: Promise<{ id: string }>;
 };
 
-export function generateStaticParams() {
-  return carListings.map((car) => ({ id: car.id }));
-}
+// Listings are loaded dynamically from the backend on the client. We don't
+// pre-render specific IDs at build time anymore — the demo seed list is gone.
+export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params }: PageProps) {
-  const { id } = await params;
-  const car = findCarById(id);
-  if (!car) return { title: "Car Not Found | Old Car Bazar" };
-  return {
-    title: `${car.title} — ${car.price} | Old Car Bazar`,
-    description: `Buy ${car.title} in ${car.location}. ${car.specs}. View photos, specs, features and contact seller.`,
-  };
-}
+export const metadata = {
+  title: "Used Car Details | Old Car Bazar",
+  description:
+    "View photos, specs, features and contact the seller of this used car listing on Old Car Bazar.",
+};
 
 export default async function UsedCarDetailPage({ params }: PageProps) {
   const { id } = await params;

@@ -3,7 +3,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useMemo, useState } from "react";
-import { carListings } from "@/data/cars";
+import { useListings } from "@/context/ListingsContext";
+import type { CarListing } from "@/data/cars";
 import { compareTips } from "@/data/loanToolsPages";
 
 const MAX_SLOTS = 3;
@@ -18,9 +19,10 @@ function priceToNumber(price: string) {
 }
 
 export default function CompareCarsContent() {
+  const { allListings, loading } = useListings();
   const [slots, setSlots] = useState<Slot[]>([
-    { id: "3" },
-    { id: "7" },
+    { id: null },
+    { id: null },
     { id: null },
   ]);
   const [openPicker, setOpenPicker] = useState<number | null>(null);
@@ -29,17 +31,17 @@ export default function CompareCarsContent() {
   const selectedCars = useMemo(
     () =>
       slots.map((s) =>
-        s.id ? carListings.find((c) => c.id === s.id) ?? null : null
+        s.id ? allListings.find((c) => c.id === s.id) ?? null : null
       ),
-    [slots]
+    [slots, allListings]
   );
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return carListings.filter((c) =>
+    return allListings.filter((c) =>
       q ? c.title.toLowerCase().includes(q) : true
     );
-  }, [query]);
+  }, [query, allListings]);
 
   const setSlot = (idx: number, id: string | null) => {
     setSlots((prev) => {
@@ -50,7 +52,7 @@ export default function CompareCarsContent() {
     setOpenPicker(null);
   };
 
-  const rows: { label: string; getValue: (car: (typeof carListings)[number] | null) => React.ReactNode }[] = [
+  const rows: { label: string; getValue: (car: CarListing | null) => React.ReactNode }[] = [
     {
       label: "Price",
       getValue: (car) =>
@@ -172,7 +174,11 @@ export default function CompareCarsContent() {
                     ))}
                     {filtered.length === 0 && (
                       <li className="px-2 py-3 text-center text-xs text-gray-500">
-                        No matches
+                        {loading
+                          ? "Loading cars…"
+                          : allListings.length === 0
+                            ? "No cars available yet."
+                            : "No matches"}
                       </li>
                     )}
                   </ul>
