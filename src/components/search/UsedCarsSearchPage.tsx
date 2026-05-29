@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useListings } from "@/context/ListingsContext";
 import { useLocation } from "@/context/LocationContext";
 import { cities, type CityName } from "@/data/locations";
@@ -14,6 +14,7 @@ import {
   type SortOptionId,
 } from "@/data/searchPage";
 import ExploreCarCard from "@/components/explore/ExploreCarCard";
+import MobileFiltersDrawer from "@/components/ui/MobileFiltersDrawer";
 import { enrichCar, sortCars } from "@/lib/carMeta";
 import {
   applySearchFilters,
@@ -69,6 +70,7 @@ export default function UsedCarsSearchPage() {
   const searchParams = useSearchParams();
   const { allListings } = useListings();
   const { selectedCity, setSelectedCity } = useLocation();
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const filters = readFilters(searchParams);
   const sort = (searchParams.get("sort") as SortOptionId) || "relevance";
@@ -137,6 +139,8 @@ export default function UsedCarsSearchPage() {
     })
   );
 
+  const activeFilterCount = activeChips.length;
+
   const handleFilterChange = (
     key: keyof SearchFilterParams,
     value: string | null
@@ -178,17 +182,42 @@ export default function UsedCarsSearchPage() {
         </p>
 
         <section className="mt-6 flex flex-col gap-6 lg:flex-row">
-          <SearchFiltersSidebar
-            filters={filters}
-            baseCars={cityCars}
-            locationCounts={locationCounts}
-            onFilterChange={handleFilterChange}
-            onClearAll={clearAllFilters}
-          />
+          <div className="hidden lg:block">
+            <SearchFiltersSidebar
+              filters={filters}
+              baseCars={cityCars}
+              locationCounts={locationCounts}
+              onFilterChange={handleFilterChange}
+              onClearAll={clearAllFilters}
+            />
+          </div>
 
-          <div className="flex-1">
+          <div className="min-w-0 flex-1">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setMobileFiltersOpen(true)}
+                  className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 shadow-sm hover:border-[#f75d34] hover:text-[#f75d34] lg:hidden"
+                  aria-label="Open filters"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    aria-hidden
+                  >
+                    <path d="M4 6h16M7 12h10M10 18h4" strokeLinecap="round" />
+                  </svg>
+                  Filters
+                  {activeFilterCount > 0 && (
+                    <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#f75d34] px-1 text-[10px] font-bold text-white">
+                      {activeFilterCount}
+                    </span>
+                  )}
+                </button>
                 {activeChips.map((chip) => (
                   <ActiveFilterChip
                     key={chip.key}
@@ -197,17 +226,20 @@ export default function UsedCarsSearchPage() {
                   />
                 ))}
                 {activeChips.length === 0 && (
-                  <span className="text-caption sm:text-sm">No filters applied</span>
+                  <span className="hidden text-caption sm:inline sm:text-sm">
+                    No filters applied
+                  </span>
                 )}
               </div>
               <label className="flex items-center gap-2 text-body-muted">
-                Sort by
+                <span className="hidden sm:inline">Sort by</span>
                 <select
                   value={sort}
                   onChange={(e) =>
                     updateParams({ sort: e.target.value as SortOptionId })
                   }
                   className="rounded border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-800 outline-none focus:border-[#f75d34]"
+                  aria-label="Sort by"
                 >
                   {sortOptions.map((opt) => (
                     <option key={opt.id} value={opt.id}>
@@ -256,6 +288,20 @@ export default function UsedCarsSearchPage() {
           </div>
         </section>
       </div>
+
+      <MobileFiltersDrawer
+        open={mobileFiltersOpen}
+        onClose={() => setMobileFiltersOpen(false)}
+        title={`Filters${activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}`}
+      >
+        <SearchFiltersSidebar
+          filters={filters}
+          baseCars={cityCars}
+          locationCounts={locationCounts}
+          onFilterChange={handleFilterChange}
+          onClearAll={clearAllFilters}
+        />
+      </MobileFiltersDrawer>
     </main>
   );
 }

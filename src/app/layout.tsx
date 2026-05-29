@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import ConditionalFooter from "@/components/ConditionalFooter";
 import FloatingCompareWidget from "@/components/FloatingCompareWidget";
@@ -20,6 +20,13 @@ export const metadata: Metadata = {
   title: "Old Car Bazar | Buy & Sell Used Cars in India",
   description:
     "Buy and sell used cars online. Explore verified listings, free valuation, car loan, and sell your car in minutes.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#f75d34",
 };
 
 export default function RootLayout({

@@ -40,8 +40,7 @@ export default function FiltersSidebar() {
   return (
     <motion.aside
       initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-80px" }}
+      animate="visible"
       variants={fadeInLeft}
       className="w-full shrink-0 lg:w-[280px]"
     >
@@ -61,8 +60,7 @@ export default function FiltersSidebar() {
         <motion.ul
           variants={staggerContainer}
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
+          animate="visible"
           className="grid grid-cols-2 gap-2"
         >
           {recommendedFilters.map((filter) => (
@@ -82,8 +80,7 @@ export default function FiltersSidebar() {
       <motion.section
         variants={fadeInUp}
         initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
+        animate="visible"
         transition={{ delay: 0.15 }}
         whileHover={{ boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }}
         className="rounded-lg border border-gray-200 bg-white p-4"
@@ -93,8 +90,7 @@ export default function FiltersSidebar() {
         <motion.ul
           variants={staggerContainer}
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
+          animate="visible"
           className="space-y-1"
         >
           {budgetFilters.map((opt) => (

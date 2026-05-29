@@ -78,7 +78,7 @@ export default function HeroSection() {
         variants={staggerContainerSlow}
         initial="hidden"
         animate="visible"
-        className="relative mx-auto max-w-[1280px] px-4 py-14 lg:px-6 lg:py-20"
+        className="relative mx-auto max-w-[1280px] px-4 py-10 sm:py-14 lg:px-6 lg:py-20"
       >
         <motion.div variants={fadeInUp} className="max-w-2xl">
           <motion.span
@@ -117,7 +117,7 @@ export default function HeroSection() {
             variants={fadeInUp}
             whileHover={{ scale: 1.01 }}
             onSubmit={handleSearch}
-            className="mt-8 flex flex-col gap-3 rounded-xl bg-white/10 p-4 backdrop-blur-sm sm:flex-row sm:items-end sm:gap-2 sm:p-3"
+            className="mt-6 flex flex-col gap-3 rounded-xl bg-white/10 p-3 backdrop-blur-sm sm:mt-8 sm:flex-row sm:items-end sm:gap-2"
           >
             <label className="flex-1">
               <span className="mb-1 block text-xs font-medium text-gray-300">
@@ -151,7 +151,7 @@ export default function HeroSection() {
               type="submit"
               whileHover={{ scale: 1.05, backgroundColor: "#e54d24" }}
               whileTap={{ scale: 0.95 }}
-              className="rounded-lg bg-[#f75d34] px-8 py-2.5 text-sm font-semibold text-white sm:py-3"
+              className="w-full rounded-lg bg-[#f75d34] px-8 py-3 text-sm font-semibold text-white sm:w-auto sm:py-2.5"
             >
               Search Cars
             </motion.button>
@@ -179,7 +179,7 @@ export default function HeroSection() {
           variants={staggerContainer}
           initial="hidden"
           animate="visible"
-          className="mt-12 grid grid-cols-3 gap-4 border-t border-white/10 pt-8 sm:max-w-lg"
+          className="mt-8 grid grid-cols-3 gap-3 border-t border-white/10 pt-6 sm:mt-12 sm:max-w-lg sm:gap-4 sm:pt-8"
         >
           {stats.map((stat) => (
             <motion.li
@@ -192,11 +192,11 @@ export default function HeroSection() {
                 initial={{ opacity: 0, scale: 0.5 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ type: "spring", stiffness: 200, delay: 0.6 }}
-                className="text-2xl font-bold text-[#f75d34] sm:text-3xl"
+                className="text-xl font-bold text-[#f75d34] sm:text-3xl"
               >
                 {stat.value}
               </motion.p>
-              <p className="mt-1 text-caption sm:text-sm">
+              <p className="mt-1 text-[11px] text-gray-300 sm:text-sm">
                 {stat.label}
               </p>
             </motion.li>

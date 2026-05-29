@@ -57,7 +57,7 @@ export default function CarListingGrid() {
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.4 }}
-        className="mb-4 flex items-center justify-between"
+        className="mb-4 flex flex-wrap items-center justify-between gap-2"
       >
         <p className="text-body-muted">
           Showing{" "}
@@ -66,13 +66,14 @@ export default function CarListingGrid() {
           </span>{" "}
           cars in {selectedCity}
         </p>
-        <label className="flex items-center gap-2 text-body-muted">
-          Sort by
+        <label className="ml-auto flex items-center gap-2 text-body-muted">
+          <span className="hidden sm:inline">Sort by</span>
           <motion.select
             whileFocus={{ scale: 1.02 }}
             value={sort}
             onChange={(e) => setSort(e.target.value as SortKey)}
             className="rounded border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-800 outline-none focus:border-[#f75d34]"
+            aria-label="Sort by"
           >
             {sortOptions.map((opt) => (
               <option key={opt.id} value={opt.id}>

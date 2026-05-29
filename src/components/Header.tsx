@@ -29,10 +29,15 @@ import {
 
 type OpenMenu = "buy-cars" | "sell-car" | "loan-tools" | "help" | null;
 
-const navItems: { id: OpenMenu; label: string }[] = [
-  { id: "buy-cars", label: "BUY USED CARS" },
-  { id: "sell-car", label: "SELL CAR" },
-  { id: "loan-tools", label: "LOAN & TOOLS" },
+const navItems: {
+  id: OpenMenu;
+  label: string;
+  /** Shorter label used on small screens to avoid horizontal scroll. */
+  shortLabel?: string;
+}[] = [
+  { id: "buy-cars", label: "BUY USED CARS", shortLabel: "BUY" },
+  { id: "sell-car", label: "SELL CAR", shortLabel: "SELL" },
+  { id: "loan-tools", label: "LOAN & TOOLS", shortLabel: "LOAN" },
   { id: "help", label: "HELP" },
 ];
 
@@ -110,7 +115,7 @@ export default function Header() {
   };
 
   const navButtonClass = (active: boolean) =>
-    `flex items-center gap-0.5 whitespace-nowrap rounded-md px-3 py-3 text-xs font-semibold tracking-wide sm:px-4 sm:text-[13px] ${
+    `flex items-center gap-0.5 whitespace-nowrap rounded-md px-2 py-3 text-[11px] font-semibold tracking-wide sm:px-4 sm:text-[13px] ${
       active
         ? "bg-orange-50 text-[#f75d34]"
         : "text-gray-800 hover:bg-gray-50 hover:text-[#f75d34]"
@@ -125,7 +130,7 @@ export default function Header() {
         className="sticky top-0 z-[70] border-b border-gray-200 bg-white shadow-sm"
       >
         {/* Top bar */}
-        <motion.div className="mx-auto flex max-w-[1280px] items-center gap-3 px-4 py-3 lg:gap-4 lg:px-6">
+        <motion.div className="mx-auto flex max-w-[1280px] items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-4 sm:py-3 lg:gap-4 lg:px-6">
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Link href="/" className="flex shrink-0 items-center">
               <Image
@@ -133,7 +138,7 @@ export default function Header() {
                 alt="Old Car Bazar"
                 width={220}
                 height={60}
-                className="h-12 w-auto object-contain sm:h-14"
+                className="h-10 w-auto object-contain sm:h-14"
                 priority
               />
             </Link>
@@ -222,9 +227,9 @@ export default function Header() {
         </motion.div>
 
         {/* Mobile search + sell */}
-        <motion.div className="flex items-center gap-2 border-t border-gray-100 px-4 pb-3 md:hidden">
+        <motion.div className="flex items-center gap-2 border-t border-gray-100 px-3 pb-3 pt-1 sm:px-4 md:hidden">
           <form
-            className="flex flex-1 overflow-hidden rounded-full border border-gray-300"
+            className="flex flex-1 items-center overflow-hidden rounded-full border border-gray-300 bg-white"
             onSubmit={submitSearch}
             role="search"
           >
@@ -233,14 +238,14 @@ export default function Header() {
               aria-label="Search cars"
               className="pl-3 text-gray-400 hover:text-[#f75d34]"
             >
-              <SearchIcon className="h-4 w-4 self-center" />
+              <SearchIcon className="h-4 w-4" />
             </button>
             <input
               type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search used cars..."
-              className="flex-1 px-2 py-2 text-sm outline-none"
+              className="min-w-0 flex-1 bg-transparent px-2 py-2 text-sm outline-none"
             />
           </form>
           <Link
@@ -259,8 +264,8 @@ export default function Header() {
           className="relative border-t border-gray-100 bg-white"
           onMouseLeave={closeMenuDelayed}
         >
-          <motion.div className="mx-auto flex max-w-[1280px] items-center justify-between px-4 lg:px-6">
-            <ul className="flex items-center overflow-visible">
+          <motion.div className="mx-auto flex max-w-[1280px] items-center gap-2 px-2 sm:px-4 lg:px-6">
+            <ul className="scrollbar-hide -mx-1 flex flex-1 items-center overflow-x-auto px-1">
               <motion.li
                 initial={{ opacity: 0, y: -6 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -268,7 +273,7 @@ export default function Header() {
               >
                 <Link
                   href="/"
-                  className="rounded-md px-2.5 py-3 text-xs font-semibold tracking-wide text-gray-800 hover:bg-orange-50 hover:text-[#f75d34] sm:px-4 sm:text-[13px]"
+                  className="rounded-md px-2 py-3 text-[11px] font-semibold tracking-wide text-gray-800 hover:bg-orange-50 hover:text-[#f75d34] sm:px-4 sm:text-[13px]"
                 >
                   Home
                 </Link>
@@ -288,7 +293,14 @@ export default function Header() {
                     aria-haspopup="true"
                     className={navButtonClass(openMenu === item.id)}
                   >
-                    {item.label}
+                    {item.shortLabel ? (
+                      <>
+                        <span className="sm:hidden">{item.shortLabel}</span>
+                        <span className="hidden sm:inline">{item.label}</span>
+                      </>
+                    ) : (
+                      item.label
+                    )}
                     <ChevronDownIcon
                       className={`h-3 w-3 transition-transform duration-200 ${
                         openMenu === item.id
@@ -306,10 +318,10 @@ export default function Header() {
               whileHover={{ scale: 1.05, color: "#f75d34" }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setLocationOpen(true)}
-              className="flex shrink-0 items-center gap-1 py-3 text-sm font-medium text-gray-800 md:hidden"
+              className="flex shrink-0 items-center gap-1 py-3 text-xs font-medium text-gray-800 sm:hidden"
             >
               <PinIcon className="h-4 w-4 text-[#f75d34]" />
-              {selectedCity}
+              <span className="max-w-[70px] truncate">{selectedCity}</span>
             </motion.button>
           </motion.div>
 

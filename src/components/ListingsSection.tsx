@@ -1,13 +1,16 @@
 ﻿"use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useLocation } from "@/context/LocationContext";
 import CarListingGrid from "./CarListingGrid";
 import FiltersSidebar from "./FiltersSidebar";
+import MobileFiltersDrawer from "./ui/MobileFiltersDrawer";
 import { fadeInUp, staggerContainer } from "@/lib/motion";
 
 export default function ListingsSection() {
   const { selectedCity, totalCarsInCity } = useLocation();
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   return (
     <motion.main
@@ -56,10 +59,40 @@ export default function ListingsSection() {
           variants={fadeInUp}
           className="mt-6 flex flex-col gap-6 lg:flex-row"
         >
-          <FiltersSidebar />
-          <CarListingGrid />
+          <div className="hidden lg:block">
+            <FiltersSidebar />
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <button
+              type="button"
+              onClick={() => setMobileFiltersOpen(true)}
+              className="mb-4 inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:border-[#f75d34] hover:text-[#f75d34] lg:hidden"
+              aria-label="Open filters"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                aria-hidden
+              >
+                <path d="M4 6h16M7 12h10M10 18h4" strokeLinecap="round" />
+              </svg>
+              Filters
+            </button>
+            <CarListingGrid />
+          </div>
         </motion.section>
       </motion.section>
+
+      <MobileFiltersDrawer
+        open={mobileFiltersOpen}
+        onClose={() => setMobileFiltersOpen(false)}
+      >
+        <FiltersSidebar />
+      </MobileFiltersDrawer>
     </motion.main>
   );
 }
