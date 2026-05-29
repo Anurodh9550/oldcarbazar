@@ -193,8 +193,50 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
 
   const quickLine = `${detail.transmission} • ${detail.fuel} • ${detail.ownership} • ${detail.kms.toLocaleString("en-IN")} kms`;
 
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
+    "https://oldcarbazar.com";
+  const carJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Car",
+    name: detail.title,
+    description: detail.description ?? quickLine,
+    image: detail.images,
+    brand: { "@type": "Brand", name: detail.brand },
+    model: detail.title,
+    vehicleTransmission: detail.transmission,
+    fuelType: detail.fuel,
+    bodyType: detail.bodyType,
+    mileageFromOdometer: {
+      "@type": "QuantitativeValue",
+      value: detail.kms,
+      unitCode: "KMT",
+    },
+    numberOfPreviousOwners:
+      typeof detail.ownership === "string"
+        ? detail.ownership.match(/\d+/)?.[0]
+        : undefined,
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "INR",
+      price: Math.round(detail.priceLakh * 100000),
+      availability: "https://schema.org/InStock",
+      url: `${siteUrl}/used-cars/${detail.id}`,
+      itemCondition: "https://schema.org/UsedCondition",
+      seller: {
+        "@type": "Person",
+        name: detail.sellerName,
+        areaServed: detail.area,
+      },
+    },
+  };
+
   return (
     <main className="bg-[#f5f5f5] pb-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(carJsonLd) }}
+      />
       <div className="border-b border-gray-200 bg-white">
         <div className="mx-auto max-w-[1280px] px-4 py-3 text-caption sm:px-6">
           <Link href="/used-cars" className="hover:text-[#f75d34]">

@@ -29,6 +29,9 @@ export const metadata: Metadata = {
     siteName: "Old Car Bazar",
     type: "website",
   },
+  verification: {
+    google: "o4oLSWNyxwTMFdFjBXWzk7qVR14aHtDZyj8-L6rdpNw",
+  },
 };
 
 export const viewport: Viewport = {
@@ -36,6 +39,37 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   themeColor: "#f75d34",
+};
+
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
+  "https://oldcarbazar.com";
+
+const organizationLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Old Car Bazar",
+  url: SITE_URL,
+  logo: `${SITE_URL}/icon.png`,
+  description:
+    "India's marketplace for buying & selling used cars with direct owner contact, free valuation, car loan, and verified listings.",
+  sameAs: [
+    "https://www.facebook.com/oldcarbazar",
+    "https://www.instagram.com/oldcarbazar",
+    "https://twitter.com/oldcarbazar",
+  ],
+};
+
+const websiteLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Old Car Bazar",
+  url: SITE_URL,
+  potentialAction: {
+    "@type": "SearchAction",
+    target: `${SITE_URL}/used-cars/search?q={search_term_string}`,
+    "query-input": "required name=search_term_string",
+  },
 };
 
 export default function RootLayout({
@@ -49,6 +83,16 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} h-full font-sans antialiased`}
     >
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteLd) }}
+        />
+      </head>
       <body className="flex min-h-full flex-col font-sans">
         <Providers>
           <div className="flex-1">{children}</div>
