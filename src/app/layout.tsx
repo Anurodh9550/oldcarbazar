@@ -17,9 +17,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Old Car Bazar | Buy & Sell Used Cars in India",
+  title: "Old Car Bazar — Buy & Sell Used Cars in India",
   description:
     "Buy and sell used cars online. Explore verified listings, free valuation, car loan, and sell your car in minutes.",
+  applicationName: "Old Car Bazar",
+  metadataBase: new URL("https://oldcarbazar.com"),
+  openGraph: {
+    title: "Old Car Bazar — Buy & Sell Used Cars in India",
+    description:
+      "Explore verified used cars across India. Compare prices, chat with sellers, and drive home your dream car.",
+    siteName: "Old Car Bazar",
+    type: "website",
+  },
 };
 
 export const viewport: Viewport = {
