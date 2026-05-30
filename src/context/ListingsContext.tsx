@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { useAdmin } from "@/context/AdminContext";
@@ -21,6 +22,16 @@ import type {
 } from "@/types/listing";
 
 const STORAGE_KEY = "oldCarBazar_user_listings";
+// Stale-while-revalidate cache for the public listings feed. We persist the
+// last successful /listings/ response so a returning visitor sees cars
+// INSTANTLY even when the Render free-tier backend is cold-starting (30-60s
+// on first request after 15 min of idle). Fresh data is fetched in the
+// background and replaces the cached entries when it arrives.
+const API_LISTINGS_CACHE_KEY = "oldCarBazar_api_listings_cache";
+type ApiListingsCache = {
+  ts: number;
+  listings: UserCarListing[];
+};
 
 type ListingsContextValue = {
   allListings: CarListing[];
@@ -92,13 +103,33 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [hydrated, setHydrated] = useState(false);
+  // Mirror of apiListings used inside refreshListings without putting the
+  // listings array itself into the callback's deps (would cause the function
+  // to be recreated on every fetch and ripple through every consumer).
+  const apiListingsRef = useRef<UserCarListing[]>([]);
+  apiListingsRef.current = apiListings;
 
   const refreshListings = useCallback(async () => {
     setError("");
-    setLoading(true);
+    // If we already have cached/previous listings, keep showing them while we
+    // silently fetch fresh data. Only flip into the global "loading" state on
+    // a truly empty first paint, otherwise the whole page would flash to a
+    // spinner on every navigation while the Render backend warms up.
+    if (apiListingsRef.current.length === 0) {
+      setLoading(true);
+    }
     try {
       const publicListings = await api.listListings();
       setApiListings(publicListings);
+      try {
+        const cache: ApiListingsCache = {
+          ts: Date.now(),
+          listings: publicListings,
+        };
+        localStorage.setItem(API_LISTINGS_CACHE_KEY, JSON.stringify(cache));
+      } catch {
+        /* localStorage quota / private mode — fine to skip */
+      }
       if (hasAdminSession) {
         const adminListings = await api.adminListings();
         setUserListings(adminListings);
@@ -114,7 +145,9 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not load listings.");
-      setApiListings([]);
+      // IMPORTANT: do NOT wipe `apiListings` on error. If the user already
+      // saw cached cars (cold start, network blip), keep those visible
+      // instead of flashing to an empty state.
       if (
         err instanceof ApiError &&
         err.status === 401
@@ -149,6 +182,23 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
         if (saved) {
           const parsed = JSON.parse(saved) as UserCarListing[];
           setUserListings(parsed.map(normalizeStoredListing));
+        }
+      }
+      // Hydrate the public listings cache so returning visitors see cars
+      // immediately while the backend (Render free tier) cold-starts.
+      const cachedApi = localStorage.getItem(API_LISTINGS_CACHE_KEY);
+      if (cachedApi) {
+        const parsed = JSON.parse(cachedApi) as ApiListingsCache;
+        if (
+          parsed &&
+          Array.isArray(parsed.listings) &&
+          parsed.listings.length > 0
+        ) {
+          const normalized = parsed.listings.map(normalizeStoredListing);
+          setApiListings(normalized);
+          // We have content to render — skip the page-wide spinner; the
+          // background refresh in `refreshListings` will quietly update it.
+          setLoading(false);
         }
       }
     } catch {
