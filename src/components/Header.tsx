@@ -136,9 +136,9 @@ export default function Header() {
               <Image
                 src="/logocarr.png"
                 alt="Old Car Bazar"
-                width={220}
-                height={60}
-                className="h-10 w-auto object-contain sm:h-14"
+                width={160}
+                height={160}
+                className="h-12 w-auto object-contain sm:h-16"
                 priority
               />
             </Link>
