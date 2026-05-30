@@ -231,11 +231,48 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
     },
   };
 
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: siteUrl,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Used Cars",
+        item: `${siteUrl}/used-cars`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: detail.brand,
+        item: `${siteUrl}/used-cars/search?brand=${encodeURIComponent(
+          detail.brand.toLowerCase()
+        )}`,
+      },
+      {
+        "@type": "ListItem",
+        position: 4,
+        name: detail.title,
+        item: `${siteUrl}/used-cars/${detail.id}`,
+      },
+    ],
+  };
+
   return (
     <main className="bg-[#f5f5f5] pb-16">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(carJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
       <div className="border-b border-gray-200 bg-white">
         <div className="mx-auto max-w-[1280px] px-4 py-3 text-caption sm:px-6">

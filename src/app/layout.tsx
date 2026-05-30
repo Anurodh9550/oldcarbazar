@@ -23,6 +23,9 @@ export const metadata: Metadata = {
 
   applicationName: "Old Car Bazar",
   metadataBase: new URL("https://oldcarbazar.com"),
+  alternates: {
+    canonical: "/",
+  },
 
   openGraph: {
     title: "Old Car Bazar | India's Trusted Marketplace for Used Cars",
@@ -30,6 +33,25 @@ export const metadata: Metadata = {
       "Browse thousands of verified used car listings, compare prices, and sell your car quickly. India's growing destination for buying and selling pre-owned vehicles.",
     siteName: "Old Car Bazar",
     type: "website",
+    url: "https://oldcarbazar.com",
+    locale: "en_IN",
+    images: [
+      {
+        url: "/ocb-logo-icon.png",
+        width: 1024,
+        height: 1024,
+        alt: "Old Car Bazar — Buy, Sell, Drive Better",
+        type: "image/png",
+      },
+    ],
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Old Car Bazar | India's Trusted Marketplace for Used Cars",
+    description:
+      "Buy & sell used cars across India. Verified listings, free valuation, instant seller contact.",
+    images: ["/ocb-logo-icon.png"],
   },
 
   verification: {
@@ -55,10 +77,29 @@ const organizationLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: "Old Car Bazar",
+  alternateName: "OldCarBazar",
   url: SITE_URL,
-  logo: `${SITE_URL}/icon.png`,
+  logo: {
+    "@type": "ImageObject",
+    url: `${SITE_URL}/ocb-logo-icon.png`,
+    width: 1024,
+    height: 1024,
+    caption: "Old Car Bazar",
+  },
+  image: `${SITE_URL}/ocb-logo-icon.png`,
   description:
     "India's marketplace for buying & selling used cars with direct owner contact, free valuation, car loan, and verified listings.",
+  slogan: "Buy. Sell. Drive Better.",
+  areaServed: {
+    "@type": "Country",
+    name: "India",
+  },
+  contactPoint: {
+    "@type": "ContactPoint",
+    contactType: "customer support",
+    availableLanguage: ["English", "Hindi"],
+    areaServed: "IN",
+  },
   sameAs: [
     "https://www.facebook.com/oldcarbazar",
     "https://www.instagram.com/oldcarbazar",
