@@ -35,15 +35,6 @@ export const metadata: Metadata = {
     type: "website",
     url: "https://oldcarbazar.com",
     locale: "en_IN",
-    images: [
-      {
-        url: "/ocb-logo-icon.png",
-        width: 1024,
-        height: 1024,
-        alt: "Old Car Bazar — Buy, Sell, Drive Better",
-        type: "image/png",
-      },
-    ],
   },
 
   twitter: {
@@ -51,7 +42,6 @@ export const metadata: Metadata = {
     title: "Old Car Bazar | India's Trusted Marketplace for Used Cars",
     description:
       "Buy & sell used cars across India. Verified listings, free valuation, instant seller contact.",
-    images: ["/ocb-logo-icon.png"],
   },
 
   verification: {
