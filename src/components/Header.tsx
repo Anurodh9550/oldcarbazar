@@ -134,11 +134,11 @@ export default function Header() {
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Link href="/" className="flex shrink-0 items-center">
               <Image
-                src="/logocar.png"
+                src="/logocarr.png"
                 alt="Old Car Bazar"
-                width={160}
-                height={160}
-                className="h-12 w-auto object-contain sm:h-16"
+                width={220}
+                height={60}
+                className="h-10 w-auto object-contain sm:h-14"
                 priority
               />
             </Link>
