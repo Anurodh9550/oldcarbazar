@@ -132,31 +132,15 @@ export default function Header() {
         {/* Top bar */}
         <motion.div className="mx-auto flex max-w-[1280px] items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-4 sm:py-3 lg:gap-4 lg:px-6">
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Link
-              href="/"
-              aria-label="Old Car Bazar — Home"
-              className="flex shrink-0 items-center gap-2 sm:gap-2.5"
-            >
+            <Link href="/" className="flex shrink-0 items-center">
               <Image
-                src="/ocb-logo-icon.png"
-                alt="Old Car Bazar logo"
-                width={56}
-                height={56}
-                className="h-9 w-9 shrink-0 object-contain sm:h-12 sm:w-12"
+                src="/logocarr.png"
+                alt="Old Car Bazar"
+                width={220}
+                height={60}
+                className="h-10 w-auto object-contain sm:h-14"
                 priority
               />
-              <span className="flex flex-col leading-none">
-                <span className="text-base font-extrabold tracking-tight text-gray-900 sm:text-xl">
-                  <span className="bg-gradient-to-r from-[#ff7a47] to-[#e54d24] bg-clip-text text-transparent">
-                    Old
-                  </span>
-                  <span className="text-gray-900">Car</span>
-                  <span className="text-[#f75d34]">Bazar</span>
-                </span>
-                <span className="mt-0.5 hidden text-[9px] font-semibold uppercase tracking-[0.18em] text-gray-500 sm:block">
-                  Buy · Sell · Drive Better
-                </span>
-              </span>
             </Link>
           </motion.div>
 

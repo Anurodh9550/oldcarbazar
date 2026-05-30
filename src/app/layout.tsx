@@ -71,12 +71,12 @@ const organizationLd = {
   url: SITE_URL,
   logo: {
     "@type": "ImageObject",
-    url: `${SITE_URL}/ocb-logo-icon.png`,
+    url: `${SITE_URL}/logocar.png`,
     width: 1024,
     height: 1024,
     caption: "Old Car Bazar",
   },
-  image: `${SITE_URL}/ocb-logo-icon.png`,
+  image: `${SITE_URL}/logocarr.png`,
   description:
     "India's marketplace for buying & selling used cars with direct owner contact, free valuation, car loan, and verified listings.",
   slogan: "Buy. Sell. Drive Better.",

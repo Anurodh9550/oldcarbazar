@@ -6,7 +6,7 @@ export const OG_CONTENT_TYPE = "image/png";
 
 export async function loadLogoDataUrl(): Promise<string> {
   const buffer = await readFile(
-    join(process.cwd(), "public", "ocb-logo-icon.png")
+    join(process.cwd(), "public", "logocar.png")
   );
   const base64 = buffer.toString("base64");
   return `data:image/png;base64,${base64}`;
