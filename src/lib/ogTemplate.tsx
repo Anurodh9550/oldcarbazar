@@ -29,6 +29,8 @@ export function OgCard({
   accent = "#f75d34",
   highlights,
 }: OgCardProps) {
+  const tags = highlights ?? [];
+
   return (
     <div
       style={{
@@ -38,7 +40,7 @@ export function OgCard({
         flexDirection: "column",
         backgroundColor: "#0f0f0f",
         backgroundImage:
-          "radial-gradient(circle at 18% 22%, rgba(247,93,52,0.22) 0%, rgba(247,93,52,0) 55%), radial-gradient(circle at 82% 78%, rgba(247,93,52,0.18) 0%, rgba(247,93,52,0) 50%), linear-gradient(135deg, #0f0f0f 0%, #1c1c1c 100%)",
+          "linear-gradient(135deg, #0f0f0f 0%, #1c1c1c 100%)",
         padding: "60px 70px",
         color: "#ffffff",
         fontFamily: "ui-sans-serif, system-ui, sans-serif",
@@ -52,6 +54,7 @@ export function OgCard({
           right: 0,
           width: 0,
           height: 0,
+          display: "flex",
           borderTop: `220px solid ${accent}`,
           borderLeft: "220px solid transparent",
           opacity: 0.92,
@@ -64,6 +67,7 @@ export function OgCard({
           left: 0,
           width: "100%",
           height: 8,
+          display: "flex",
           backgroundColor: accent,
         }}
       />
@@ -75,7 +79,6 @@ export function OgCard({
           gap: 20,
         }}
       >
-        {}
         <img
           src={logoSrc}
           width={92}
@@ -90,9 +93,16 @@ export function OgCard({
             padding: 8,
           }}
         />
-        <div style={{ display: "flex", flexDirection: "column" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
           <div
             style={{
+              display: "flex",
+              flexDirection: "row",
               fontSize: 38,
               fontWeight: 900,
               letterSpacing: -1,
@@ -101,11 +111,12 @@ export function OgCard({
             }}
           >
             <span style={{ color: accent }}>Old</span>
-            <span>Car</span>
+            <span style={{ color: "#ffffff" }}>Car</span>
             <span style={{ color: accent }}>Bazar</span>
           </div>
           <div
             style={{
+              display: "flex",
               marginTop: 6,
               fontSize: 16,
               letterSpacing: 4,
@@ -130,6 +141,7 @@ export function OgCard({
         <div
           style={{
             display: "flex",
+            flexDirection: "row",
             alignItems: "center",
             gap: 14,
             fontSize: 20,
@@ -139,15 +151,16 @@ export function OgCard({
             textTransform: "uppercase",
           }}
         >
-          <span
+          <div
             style={{
+              display: "flex",
               width: 36,
               height: 4,
               backgroundColor: accent,
               borderRadius: 2,
             }}
           />
-          {eyebrow}
+          <div style={{ display: "flex" }}>{eyebrow}</div>
         </div>
         <div
           style={{
@@ -180,6 +193,7 @@ export function OgCard({
       <div
         style={{
           display: "flex",
+          flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
           gap: 30,
@@ -189,15 +203,17 @@ export function OgCard({
         <div
           style={{
             display: "flex",
+            flexDirection: "row",
             gap: 18,
             flexWrap: "wrap",
           }}
         >
-          {(highlights ?? []).map((tag) => (
+          {tags.map((tag) => (
             <div
               key={tag}
               style={{
                 display: "flex",
+                flexDirection: "row",
                 alignItems: "center",
                 gap: 10,
                 padding: "10px 18px",
@@ -209,15 +225,16 @@ export function OgCard({
                 fontWeight: 600,
               }}
             >
-              <span
+              <div
                 style={{
+                  display: "flex",
                   width: 8,
                   height: 8,
                   borderRadius: 999,
                   backgroundColor: accent,
                 }}
               />
-              {tag}
+              <div style={{ display: "flex" }}>{tag}</div>
             </div>
           ))}
         </div>
