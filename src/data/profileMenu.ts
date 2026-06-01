@@ -7,12 +7,14 @@ export type ProfileMenuItem = {
     | "activity"
     | "car"
     | "garage"
+    | "listings"
     | "settings"
     | "consent";
   dividerAfter?: boolean;
 };
 
 export const profileMenuItems: ProfileMenuItem[] = [
+  { label: "My Listings", href: "/my-listings", icon: "listings" },
   { label: "My Orders", href: "/my-orders", icon: "orders" },
   { label: "Shortlisted Vehicles", href: "/shortlisted", icon: "heart" },
   { label: "My Activity", href: "/my-activity", icon: "activity" },
