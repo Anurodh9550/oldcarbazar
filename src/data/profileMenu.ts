@@ -9,12 +9,14 @@ export type ProfileMenuItem = {
     | "garage"
     | "listings"
     | "settings"
-    | "consent";
+    | "consent"
+    | "pro";
   dividerAfter?: boolean;
 };
 
 export const profileMenuItems: ProfileMenuItem[] = [
   { label: "My Listings", href: "/my-listings", icon: "listings" },
+  { label: "Upgrade to Pro", href: "/pricing", icon: "pro", dividerAfter: true },
   { label: "My Orders", href: "/my-orders", icon: "orders" },
   { label: "Shortlisted Vehicles", href: "/shortlisted", icon: "heart" },
   { label: "My Activity", href: "/my-activity", icon: "activity" },

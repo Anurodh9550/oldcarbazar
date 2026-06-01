@@ -6,6 +6,7 @@ import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { useMemo, useRef, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { getSellerIdFromUser, useListings } from "@/context/ListingsContext";
+import { useSubscription } from "@/context/SubscriptionContext";
 import { ApiError, ensureValidAccessToken } from "@/lib/api";
 import Spinner from "@/components/ui/Spinner";
 import PageLoader from "@/components/ui/PageLoader";
@@ -27,6 +28,7 @@ export default function MyListingsContent() {
     updateListingStatus,
     loading: listingsLoading,
   } = useListings();
+  const { status: subscriptionStatus } = useSubscription();
 
   const sellerId = user ? getSellerIdFromUser(user) : "";
   const listings = useMemo(
@@ -36,6 +38,14 @@ export default function MyListingsContent() {
 
   const activeCount = listings.filter((l) => l.status === "active").length;
   const soldCount = listings.filter((l) => l.status === "sold").length;
+
+  // Quota state derived purely from server response — never compute the
+  // limit locally because Free vs Pro is a backend decision.
+  const limit = subscriptionStatus?.listings_limit ?? null;
+  const used = subscriptionStatus?.listings_used ?? activeCount;
+  const isUnlimited = subscriptionStatus?.is_unlimited ?? false;
+  const limitReached = !isUnlimited && limit !== null && used >= limit;
+  const isPro = subscriptionStatus && subscriptionStatus.plan !== "free";
 
   const [busyId, setBusyId] = useState<string | null>(null);
   const [busyAction, setBusyAction] = useState<
@@ -160,18 +170,85 @@ export default function MyListingsContent() {
         ))}
       </div>
 
+      {subscriptionStatus && (
+        <div
+          className={`mb-6 flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between ${
+            limitReached
+              ? "border-red-200 bg-red-50/70"
+              : isPro
+              ? "border-emerald-200 bg-emerald-50/60"
+              : "border-orange-100 bg-orange-50/60"
+          }`}
+        >
+          <div>
+            <p className="text-sm font-semibold text-gray-900">
+              {isPro ? (
+                <>
+                  <span className="mr-1.5 rounded-full bg-emerald-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                    Pro
+                  </span>
+                  Unlimited listings active
+                </>
+              ) : limitReached ? (
+                <>
+                  You&apos;ve reached the free plan limit ({used}/{limit})
+                </>
+              ) : (
+                <>
+                  Free plan · {used} of {limit ?? "—"} listings used
+                </>
+              )}
+            </p>
+            <p className="mt-0.5 text-xs text-gray-600">
+              {isPro
+                ? subscriptionStatus.expires_at
+                  ? `Renews on ${new Date(
+                      subscriptionStatus.expires_at
+                    ).toLocaleDateString("en-IN", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}`
+                  : "Thanks for supporting Old Car Bazar."
+                : limitReached
+                ? "Mark a car as Sold to free a slot, or upgrade for unlimited listings."
+                : `${(limit ?? 0) - used} more free listing${
+                    (limit ?? 0) - used === 1 ? "" : "s"
+                  } left.`}
+            </p>
+          </div>
+          {!isPro && (
+            <Link
+              href="/pricing"
+              className="shrink-0 rounded-full bg-[#f75d34] px-4 py-2 text-sm font-semibold text-white shadow hover:bg-[#e54d24]"
+            >
+              {limitReached ? "Upgrade now" : "Upgrade to Pro"}
+            </Link>
+          )}
+        </div>
+      )}
+
       <div className="mb-6 flex flex-col gap-4 border-b border-gray-100 pb-6 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-body-muted">
           Showing <span className="font-semibold text-gray-900">{listings.length}</span>{" "}
           listings
         </p>
         <div className="flex flex-wrap gap-2">
-          <Link
-            href="/sell-car"
-            className="rounded-lg bg-[#f75d34] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#e54d24]"
-          >
-            + Post New Ad
-          </Link>
+          {limitReached ? (
+            <Link
+              href="/pricing"
+              className="rounded-lg bg-[#f75d34] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#e54d24]"
+            >
+              Upgrade to Post More
+            </Link>
+          ) : (
+            <Link
+              href="/sell-car"
+              className="rounded-lg bg-[#f75d34] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#e54d24]"
+            >
+              + Post New Ad
+            </Link>
+          )}
           <Link
             href="/seller"
             className="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 hover:border-[#f75d34] hover:text-[#f75d34]"

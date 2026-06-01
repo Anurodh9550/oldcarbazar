@@ -170,6 +170,40 @@ type Paginated<T> = {
   results: T[];
 };
 
+export type ApiPlan = {
+  code: string;
+  name: string;
+  price_inr: number;
+  duration_days: number;
+  listing_limit: number | null;
+  perks: string[];
+};
+
+export type SubscriptionStatus = {
+  plan: string;
+  plan_name: string;
+  listings_used: number;
+  listings_limit: number | null;
+  is_unlimited: boolean;
+  can_publish: boolean;
+  started_at: string | null;
+  expires_at: string | null;
+  free_listing_limit: number;
+};
+
+export type ApiSubscriptionRecord = {
+  id: string;
+  plan: string;
+  amount_inr: number;
+  status: "active" | "expired" | "cancelled" | "pending";
+  started_at: string;
+  expires_at: string;
+  provider: string;
+  provider_payment_id: string;
+  created_at: string;
+  updated_at: string;
+};
+
 export class ApiError extends Error {
   status: number;
   data: unknown;
@@ -1163,6 +1197,33 @@ export const api = {
       method: "POST",
     });
     return apiOfferToOffer(data);
+  },
+
+  // ---------------- Subscriptions ---------------- //
+
+  async listPlans() {
+    const data = await apiFetch<{ plans: ApiPlan[] }>("/subscriptions/plans/");
+    return data.plans;
+  },
+
+  async subscriptionStatus() {
+    return apiFetch<SubscriptionStatus>("/subscriptions/status/");
+  },
+
+  async activateSubscription(plan: string, providerPaymentId?: string) {
+    const body: Record<string, string> = { plan };
+    if (providerPaymentId) body.provider_payment_id = providerPaymentId;
+    return apiFetch<ApiSubscriptionRecord>("/subscriptions/activate/", {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+  },
+
+  async mySubscriptions() {
+    const data = await apiFetch<{ subscriptions: ApiSubscriptionRecord[] }>(
+      "/subscriptions/mine/"
+    );
+    return data.subscriptions;
   },
 };
 

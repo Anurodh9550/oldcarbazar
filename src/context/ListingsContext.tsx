@@ -226,6 +226,8 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
           ? [listing, ...prev]
           : prev
       );
+      // Quota changed → tell SubscriptionContext to re-fetch.
+      window.dispatchEvent(new Event("ocb-listings-changed"));
       return listing;
     },
     []
@@ -267,6 +269,7 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
       }
       setUserListings((prev) => prev.filter((l) => l.id !== id));
       setApiListings((prev) => prev.filter((l) => l.id !== id));
+      window.dispatchEvent(new Event("ocb-listings-changed"));
       // Defensive sync so two tabs / cached localStorage can't resurrect it.
       refreshListings().catch(() => undefined);
     },
@@ -302,6 +305,8 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
       setApiListings((prev) =>
         prev.map((l) => (l.id === id ? { ...l, ...updated } : l))
       );
+      // Active ↔ sold toggle changes the quota usage too.
+      window.dispatchEvent(new Event("ocb-listings-changed"));
       // Sync against the server so other tabs / stale caches pick up the
       // new status immediately.
       refreshListings().catch(() => undefined);

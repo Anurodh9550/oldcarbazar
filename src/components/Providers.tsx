@@ -5,6 +5,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { ListingsProvider } from "@/context/ListingsContext";
 import { LocationProvider } from "@/context/LocationContext";
+import { SubscriptionProvider } from "@/context/SubscriptionContext";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -12,7 +13,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       <AuthProvider>
         <AdminProvider>
           <ListingsProvider>
-            <LocationProvider>{children}</LocationProvider>
+            <SubscriptionProvider>
+              <LocationProvider>{children}</LocationProvider>
+            </SubscriptionProvider>
           </ListingsProvider>
         </AdminProvider>
       </AuthProvider>

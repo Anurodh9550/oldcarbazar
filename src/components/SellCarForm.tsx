@@ -6,6 +6,9 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 import { useListings } from "@/context/ListingsContext";
+import { useSubscription } from "@/context/SubscriptionContext";
+import { ApiError, type SubscriptionStatus } from "@/lib/api";
+import UpgradeRequiredModal from "@/components/subscription/UpgradeRequiredModal";
 import { cities } from "@/data/locations";
 import {
   carBrands,
@@ -67,6 +70,12 @@ export default function SellCarForm({
   const router = useRouter();
   const { user, isLoggedIn, promoteToSeller } = useAuth();
   const { addListing, updateListing } = useListings();
+  const { status: subscriptionStatus, refresh: refreshSubscription } =
+    useSubscription();
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [upgradePayload, setUpgradePayload] = useState<SubscriptionStatus | null>(
+    null
+  );
   const isEdit = mode === "edit";
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<SellCarFormData>(() => ({
@@ -185,6 +194,27 @@ export default function SellCarForm({
         isEdit ? 1200 : 2000
       );
     } catch (err) {
+      // Quota exhausted → backend returns 402 with a `subscription`
+      // payload. Pop the upgrade modal and refresh the cached quota
+      // so the rest of the UI reflects the limit immediately.
+      if (
+        err instanceof ApiError &&
+        err.status === 402 &&
+        typeof err.data === "object" &&
+        err.data !== null
+      ) {
+        const data = err.data as {
+          code?: string;
+          subscription?: SubscriptionStatus;
+        };
+        if (data.code === "subscription_required") {
+          setUpgradePayload(data.subscription ?? subscriptionStatus);
+          setUpgradeOpen(true);
+          refreshSubscription();
+          setSubmitting(false);
+          return;
+        }
+      }
       const message =
         err instanceof Error
           ? err.message
@@ -233,6 +263,11 @@ export default function SellCarForm({
         embedded ? "" : "rounded-2xl border border-gray-200 bg-white shadow-lg"
       }
     >
+      <UpgradeRequiredModal
+        open={upgradeOpen}
+        onClose={() => setUpgradeOpen(false)}
+        status={upgradePayload}
+      />
       <div className="border-b border-gray-100 px-4 py-4 sm:px-6">
         <div className="flex gap-1 overflow-x-auto pb-1 sm:gap-2">
           {sellSteps.map((s) => (

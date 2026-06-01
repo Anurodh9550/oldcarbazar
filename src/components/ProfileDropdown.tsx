@@ -50,6 +50,12 @@ function MenuIcon({ type }: { type: ProfileMenuItem["icon"] }) {
           <path d="M8 9h8M8 13h8M8 17h5" strokeLinecap="round" />
         </svg>
       );
+    case "pro":
+      return (
+        <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+          <path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z" strokeLinejoin="round" />
+        </svg>
+      );
     case "consent":
     case "settings":
       return (
