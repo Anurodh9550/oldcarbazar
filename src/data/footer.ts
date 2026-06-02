@@ -25,6 +25,7 @@ export const footerConnectLinks = [
 
 export const footerOtherLinks = [
   { label: "Used Cars", href: "/used-cars" },
+  { label: "Browse Dealers", href: "/dealers" },
   { label: "Free Valuation", href: "/valuation" },
   { label: "RC Transfer Guide", href: "/rc-guide" },
   { label: "Insurance", href: "/insurance" },

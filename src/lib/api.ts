@@ -204,6 +204,45 @@ export type ApiSubscriptionRecord = {
   updated_at: string;
 };
 
+export type RazorpayCheckoutOrder = {
+  key_id: string;
+  order_id: string;
+  amount: number;
+  amount_inr: number;
+  currency: string;
+  plan: ApiPlan;
+  name: string;
+  email: string | null;
+  contact: string;
+};
+
+export type RazorpayVerifyPayload = {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+};
+
+export type ApiDealerCard = {
+  id: string;
+  name: string;
+  primary_city: string;
+  cities: string[];
+  avatar_url: string;
+  phone: string;
+  active_listings_count: number;
+  min_price_inr: string | null;
+  max_price_inr: string | null;
+  brands: string[];
+  is_pro: boolean;
+  last_listed_at: string | null;
+  member_since: string;
+};
+
+export type ApiDealerDetail = ApiDealerCard & {
+  listings: ApiListing[];
+  total_listings_count: number;
+};
+
 export class ApiError extends Error {
   status: number;
   data: unknown;
@@ -1210,6 +1249,20 @@ export const api = {
     return apiFetch<SubscriptionStatus>("/subscriptions/status/");
   },
 
+  async createRazorpayOrder(plan: string) {
+    return apiFetch<RazorpayCheckoutOrder>("/subscriptions/create-order/", {
+      method: "POST",
+      body: JSON.stringify({ plan }),
+    });
+  },
+
+  async verifyRazorpayPayment(payload: RazorpayVerifyPayload) {
+    return apiFetch<ApiSubscriptionRecord>("/subscriptions/verify-payment/", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  },
+
   async activateSubscription(plan: string, providerPaymentId?: string) {
     const body: Record<string, string> = { plan };
     if (providerPaymentId) body.provider_payment_id = providerPaymentId;
@@ -1224,6 +1277,31 @@ export const api = {
       "/subscriptions/mine/"
     );
     return data.subscriptions;
+  },
+
+  // ---------------- Dealers ---------------- //
+
+  async listDealers(params?: {
+    q?: string;
+    city?: string;
+    sort?: "listings" | "newest" | "name";
+    limit?: number;
+    offset?: number;
+  }) {
+    const search = new URLSearchParams();
+    if (params?.q) search.set("q", params.q);
+    if (params?.city) search.set("city", params.city);
+    if (params?.sort) search.set("sort", params.sort);
+    search.set("limit", String(params?.limit ?? 48));
+    if (params?.offset) search.set("offset", String(params.offset));
+    const data = await apiFetch<
+      ApiDealerCard[] | Paginated<ApiDealerCard>
+    >(`/dealers/?${search.toString()}`);
+    return unwrapList(data);
+  },
+
+  async getDealer(id: string) {
+    return apiFetch<ApiDealerDetail>(`/dealers/${id}/`);
   },
 };
 

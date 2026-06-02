@@ -311,6 +311,18 @@ export default function Header() {
                   </button>
                 </motion.li>
               ))}
+              <motion.li
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 + navItems.length * 0.04 }}
+              >
+                <Link
+                  href="/dealers"
+                  className="whitespace-nowrap rounded-md px-2 py-3 text-[11px] font-semibold tracking-wide text-gray-800 hover:bg-orange-50 hover:text-[#f75d34] sm:px-4 sm:text-[13px]"
+                >
+                  DEALERS
+                </Link>
+              </motion.li>
             </ul>
 
             <motion.button

@@ -7,6 +7,65 @@ import { useSubscription } from "@/context/SubscriptionContext";
 import { ApiError, api, type ApiPlan } from "@/lib/api";
 import AuthModal from "@/components/AuthModal";
 
+type RazorpaySuccessResponse = {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+};
+
+type RazorpayOptions = {
+  key: string;
+  amount: number;
+  currency: string;
+  name: string;
+  description: string;
+  order_id: string;
+  prefill: {
+    name: string;
+    email?: string | null;
+    contact: string;
+  };
+  notes?: Record<string, string>;
+  theme?: { color: string };
+  handler: (response: RazorpaySuccessResponse) => void;
+  modal?: { ondismiss?: () => void };
+};
+
+declare global {
+  interface Window {
+    Razorpay?: new (options: RazorpayOptions) => { open: () => void };
+  }
+}
+
+function loadRazorpayScript(): Promise<void> {
+  if (typeof window === "undefined") {
+    return Promise.reject(new Error("Razorpay can only run in the browser."));
+  }
+  if (window.Razorpay) return Promise.resolve();
+
+  return new Promise((resolve, reject) => {
+    const existing = document.querySelector<HTMLScriptElement>(
+      'script[src="https://checkout.razorpay.com/v1/checkout.js"]'
+    );
+    if (existing) {
+      existing.addEventListener("load", () => resolve(), { once: true });
+      existing.addEventListener(
+        "error",
+        () => reject(new Error("Could not load Razorpay checkout.")),
+        { once: true }
+      );
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error("Could not load Razorpay checkout."));
+    document.body.appendChild(script);
+  });
+}
+
 function formatPrice(plan: ApiPlan): string {
   if (plan.price_inr === 0) return "Free";
   return `₹${plan.price_inr.toLocaleString("en-IN")}`;
@@ -59,19 +118,64 @@ export default function PricingPage() {
     setSuccess("");
     setActivating(plan.code);
     try {
-      await api.activateSubscription(plan.code);
-      await refresh();
-      setSuccess(`${plan.name} plan activated! You can now post more cars.`);
-      setTimeout(() => router.push("/my-listings"), 1500);
+      const order = await api.createRazorpayOrder(plan.code);
+      await loadRazorpayScript();
+
+      if (!window.Razorpay) {
+        throw new Error("Razorpay checkout could not start.");
+      }
+
+      const checkout = new window.Razorpay({
+        key: order.key_id,
+        amount: order.amount,
+        currency: order.currency,
+        name: "Old Car Bazar",
+        description: `${order.plan.name} subscription`,
+        order_id: order.order_id,
+        prefill: {
+          name: order.name,
+          email: order.email,
+          contact: order.contact,
+        },
+        notes: {
+          plan: order.plan.code,
+          product: "old-car-bazar-subscription",
+        },
+        theme: { color: "#f75d34" },
+        handler: async (response) => {
+          try {
+            await api.verifyRazorpayPayment(response);
+            await refresh();
+            setSuccess(
+              `${plan.name} plan activated! You can now post more cars.`
+            );
+            setTimeout(() => router.push("/my-listings"), 1500);
+          } catch (err) {
+            setError(
+              err instanceof Error
+                ? err.message
+                : "Payment verification failed."
+            );
+          } finally {
+            setActivating(null);
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setActivating(null);
+          },
+        },
+      });
+
+      checkout.open();
     } catch (err) {
       if (err instanceof ApiError && err.status === 503) {
         setError(
-          "Payments aren't open yet. Tell our team to enable the gateway and try again."
+          "Payments are not configured yet. Add Razorpay keys and redeploy."
         );
       } else {
-        setError(err instanceof Error ? err.message : "Activation failed.");
+        setError(err instanceof Error ? err.message : "Payment could not start.");
       }
-    } finally {
       setActivating(null);
     }
   };
@@ -187,8 +291,8 @@ export default function PricingPage() {
                         } ${activating === plan.code ? "opacity-60" : ""}`}
                       >
                         {activating === plan.code
-                          ? "Activating..."
-                          : `Upgrade to ${plan.name}`}
+                          ? "Opening payment..."
+                          : `Pay & upgrade to ${plan.name}`}
                       </button>
                     )}
                   </div>
@@ -239,9 +343,9 @@ export default function PricingPage() {
                 How does payment work?
               </dt>
               <dd className="mt-1">
-                We&apos;re wiring up Razorpay (UPI, cards, net banking). Until
-                then, our support team can activate Pro for you manually after
-                payment confirmation.
+                Payment is handled securely by Razorpay with UPI, cards, net
+                banking and wallets. Your Pro plan is activated only after the
+                payment signature is verified by our backend.
               </dd>
             </div>
           </dl>

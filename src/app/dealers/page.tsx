@@ -1,22 +1,20 @@
+import { Suspense } from "react";
 import Header from "@/components/Header";
-import DealersListContent from "@/components/sell-hub/DealersListContent";
-import SellHubShell from "@/components/sell-hub/SellHubShell";
-import { sellHubPageMeta } from "@/data/sellHubPages";
-
-const meta = sellHubPageMeta.dealers;
+import DealersListPage from "@/components/dealers/DealersListPage";
 
 export const metadata = {
-  title: `${meta.title} | Old Car Bazar`,
-  description: meta.description,
+  title: "Trusted Car Dealers — Old Car Bazar",
+  description:
+    "Browse verified car dealers across India. Compare inventory, locations and pricing — then contact the dealer directly.",
 };
 
-export default function DealersPage() {
+export default function DealersRoute() {
   return (
     <>
       <Header />
-      <SellHubShell badge={meta.badge} title={meta.title} subtitle={meta.subtitle}>
-        <DealersListContent />
-      </SellHubShell>
+      <Suspense fallback={null}>
+        <DealersListPage />
+      </Suspense>
     </>
   );
 }
