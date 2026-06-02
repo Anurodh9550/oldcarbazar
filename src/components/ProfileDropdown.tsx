@@ -56,6 +56,13 @@ function MenuIcon({ type }: { type: ProfileMenuItem["icon"] }) {
           <path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z" strokeLinejoin="round" />
         </svg>
       );
+    case "billing":
+      return (
+        <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+          <path d="M5 3h14l-1 18-6-2-6 2L5 3z" strokeLinejoin="round" />
+          <path d="M9 8h6M9 12h6M9 16h4" strokeLinecap="round" />
+        </svg>
+      );
     case "consent":
     case "settings":
       return (

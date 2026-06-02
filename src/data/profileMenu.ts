@@ -10,13 +10,15 @@ export type ProfileMenuItem = {
     | "listings"
     | "settings"
     | "consent"
-    | "pro";
+    | "pro"
+    | "billing";
   dividerAfter?: boolean;
 };
 
 export const profileMenuItems: ProfileMenuItem[] = [
   { label: "My Listings", href: "/my-listings", icon: "listings" },
-  { label: "Upgrade to Pro", href: "/pricing", icon: "pro", dividerAfter: true },
+  { label: "Upgrade to Pro", href: "/pricing", icon: "pro" },
+  { label: "Billing & Invoices", href: "/my-subscriptions", icon: "billing", dividerAfter: true },
   { label: "My Orders", href: "/my-orders", icon: "orders" },
   { label: "Shortlisted Vehicles", href: "/shortlisted", icon: "heart" },
   { label: "My Activity", href: "/my-activity", icon: "activity" },

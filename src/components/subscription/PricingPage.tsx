@@ -144,12 +144,15 @@ export default function PricingPage() {
         theme: { color: "#f75d34" },
         handler: async (response) => {
           try {
-            await api.verifyRazorpayPayment(response);
+            const sub = await api.verifyRazorpayPayment(response);
             await refresh();
             setSuccess(
-              `${plan.name} plan activated! You can now post more cars.`
+              `${plan.name} plan activated! Redirecting to your invoice…`
             );
-            setTimeout(() => router.push("/my-listings"), 1500);
+            setTimeout(
+              () => router.push(`/invoice/${sub.id}`),
+              1200
+            );
           } catch (err) {
             setError(
               err instanceof Error

@@ -204,6 +204,35 @@ export type ApiSubscriptionRecord = {
   updated_at: string;
 };
 
+export type InvoicePayload = {
+  subscription_id: string;
+  invoice_number: string;
+  receipt: string;
+  issued_at: string;
+  plan_code: string;
+  plan_name: string;
+  amount_inr: number;
+  currency: string;
+  status: "active" | "expired" | "cancelled" | "pending";
+  started_at: string;
+  expires_at: string;
+  provider: string;
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  customer: {
+    name: string;
+    email: string;
+    phone: string;
+    city: string;
+  };
+  seller: {
+    name: string;
+    address: string;
+    email: string;
+    website: string;
+  };
+};
+
 export type RazorpayCheckoutOrder = {
   key_id: string;
   order_id: string;
@@ -1273,10 +1302,17 @@ export const api = {
   },
 
   async mySubscriptions() {
-    const data = await apiFetch<{ subscriptions: ApiSubscriptionRecord[] }>(
-      "/subscriptions/mine/"
+    const data = await apiFetch<{
+      subscriptions: ApiSubscriptionRecord[];
+      invoices: InvoicePayload[];
+    }>("/subscriptions/mine/");
+    return data;
+  },
+
+  async getInvoice(subscriptionId: string) {
+    return apiFetch<InvoicePayload>(
+      `/subscriptions/${subscriptionId}/invoice/`
     );
-    return data.subscriptions;
   },
 
   // ---------------- Dealers ---------------- //

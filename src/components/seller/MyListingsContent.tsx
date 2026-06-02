@@ -217,7 +217,14 @@ export default function MyListingsContent() {
                   } left.`}
             </p>
           </div>
-          {!isPro && (
+          {isPro ? (
+            <Link
+              href="/my-subscriptions"
+              className="shrink-0 rounded-full border border-emerald-600 px-4 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-50"
+            >
+              View invoices
+            </Link>
+          ) : (
             <Link
               href="/pricing"
               className="shrink-0 rounded-full bg-[#f75d34] px-4 py-2 text-sm font-semibold text-white shadow hover:bg-[#e54d24]"
