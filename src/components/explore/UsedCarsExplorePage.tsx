@@ -114,15 +114,19 @@ export default function UsedCarsExplorePage() {
           src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=1400&h=500&fit=crop"
           alt="Family with car"
           fill
-          className="object-cover opacity-40"
+          className="object-cover opacity-50"
           priority
         />
-        <div className="relative mx-auto flex max-w-[1280px] flex-col items-start gap-6 px-4 py-14 lg:flex-row lg:items-center lg:justify-between lg:px-6 lg:py-20">
-          <div className="max-w-lg text-white">
-            <h1 className="text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
+        <div
+          className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/65 to-black/40"
+          aria-hidden
+        />
+        <div className="relative z-10 mx-auto flex max-w-[1280px] flex-col items-start gap-6 px-4 py-14 lg:flex-row lg:items-center lg:justify-between lg:px-6 lg:py-20">
+          <div className="max-w-lg">
+            <h1 className="hero-title text-3xl sm:text-4xl lg:text-5xl !text-white">
               Your Dream Car Just One Click Away!
             </h1>
-            <p className="mt-3 text-base text-gray-300">
+            <p className="mt-3 text-base !text-white">
               Find the right car from our extensive collection in {selectedCity}
             </p>
             <Link

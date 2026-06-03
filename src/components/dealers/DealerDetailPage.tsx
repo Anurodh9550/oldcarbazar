@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { ApiError, api, apiListingToCarListing, type ApiDealerDetail } from "@/lib/api";
@@ -117,8 +118,25 @@ export default function DealerDetailPage({ dealerId }: { dealerId: string }) {
 
   return (
     <main className="bg-[#f7f7f7]">
-      <section className="bg-gradient-to-br from-[#1a1a1a] via-[#222] to-[#0f0f0f] px-4 pb-10 pt-8 text-white sm:px-8 lg:px-12">
-        <div className="mx-auto max-w-6xl">
+      <section className="relative overflow-hidden px-4 pb-10 pt-8 text-white sm:px-8 lg:px-12">
+        <Image
+          src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1920&h=800&fit=crop"
+          alt=""
+          fill
+          priority
+          className="object-cover"
+          sizes="100vw"
+        />
+        <div
+          className="absolute inset-0 bg-gradient-to-br from-black/85 via-black/70 to-[#1a1a1a]/90"
+          aria-hidden
+        />
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-[#f75d34]/20 via-transparent to-transparent"
+          aria-hidden
+        />
+
+        <div className="relative z-10 mx-auto max-w-6xl">
           <Link
             href="/dealers"
             className="inline-flex items-center gap-1 text-xs text-gray-300 hover:text-white"
@@ -140,7 +158,7 @@ export default function DealerDetailPage({ dealerId }: { dealerId: string }) {
             )}
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-2xl font-extrabold sm:text-3xl">
+                <h1 className="text-2xl font-extrabold text-white sm:text-3xl">
                   {dealer.name}
                 </h1>
                 {dealer.is_pro && (
@@ -238,7 +256,7 @@ export default function DealerDetailPage({ dealerId }: { dealerId: string }) {
 
 function Stat({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3">
+    <div className="rounded-xl border border-white/15 bg-black/40 px-4 py-3 backdrop-blur-sm">
       <p className="text-lg font-bold text-white sm:text-xl">{value}</p>
       <p className="mt-0.5 text-[11px] uppercase tracking-wider text-gray-400">
         {label}
