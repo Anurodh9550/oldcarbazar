@@ -14,9 +14,9 @@ import {
   CarsIcon,
   LoanToolsIcon,
   CheckIcon,
-  CitiesIcon,
   EyeIcon,
   InquiriesIcon,
+  PaymentsIcon,
   SellerIcon,
   ShieldIcon,
   StarIcon,
@@ -545,9 +545,9 @@ export default function DashboardContent() {
             <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
                 { href: "/admin/listings", label: "Listings", Icon: CarsIcon },
+                { href: "/admin/payments", label: "Payments", Icon: PaymentsIcon },
                 { href: "/admin/sellers", label: "Sellers", Icon: SellerIcon },
                 { href: "/admin/buyers", label: "Buyers", Icon: BuyerIcon },
-                { href: "/admin/cities", label: "Cities", Icon: CitiesIcon },
               ].map(({ href, label, Icon }) => (
                 <Link
                   key={href}

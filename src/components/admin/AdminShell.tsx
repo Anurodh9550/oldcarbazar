@@ -22,6 +22,7 @@ import {
   LoanToolsIcon,
   LogoutIcon,
   MenuIcon,
+  PaymentsIcon,
   SearchIcon,
   SellerIcon,
   SettingsIcon,
@@ -42,6 +43,7 @@ const navItems: NavItem[] = [
   { href: "/admin/buyers", label: "Buyers", Icon: BuyerIcon },
   { href: "/admin/sellers", label: "Sellers", Icon: SellerIcon },
   { href: "/admin/inquiries", label: "Inquiries", Icon: InquiriesIcon, badgeKey: "new-inquiries" },
+  { href: "/admin/payments", label: "Payments", Icon: PaymentsIcon },
   { href: "/admin/loan-tools", label: "Loan & Tools", Icon: LoanToolsIcon },
   { href: "/admin/analytics", label: "Analytics", Icon: AnalyticsIcon },
   { href: "/admin/cities", label: "Cities", Icon: CitiesIcon },
@@ -72,6 +74,10 @@ const titleMap: Record<string, { title: string; subtitle: string }> = {
   "/admin/inquiries": {
     title: "Inquiries",
     subtitle: "All buyer ↔ seller messages",
+  },
+  "/admin/payments": {
+    title: "Payments",
+    subtitle: "Subscriptions & boosts — who paid, how much, transaction IDs",
   },
   "/admin/loan-tools": {
     title: "Loan & Tools — Option by Features",

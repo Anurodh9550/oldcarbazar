@@ -274,6 +274,56 @@ export type BoostCheckoutOrder = {
   contact: string;
 };
 
+export type AdminSubscriptionPayment = {
+  id: string;
+  user_name: string;
+  user_phone: string;
+  user_email: string;
+  plan: string;
+  plan_name: string;
+  amount_inr: number;
+  status: "active" | "expired" | "cancelled" | "pending";
+  provider: string;
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  receipt: string;
+  invoice_number: string;
+  started_at: string;
+  expires_at: string;
+  created_at: string;
+};
+
+export type AdminBoostPayment = {
+  id: string;
+  user_name: string;
+  user_phone: string;
+  user_email: string;
+  listing_id: string;
+  listing_title: string;
+  package: string;
+  duration_days: number;
+  amount_inr: number;
+  status: "created" | "paid" | "failed";
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  receipt: string;
+  invoice_number: string;
+  boosted_until: string | null;
+  created_at: string;
+};
+
+export type AdminPaymentsResponse = {
+  subscriptions: AdminSubscriptionPayment[];
+  boosts: AdminBoostPayment[];
+  summary: {
+    subscriptions_count: number;
+    subscriptions_revenue: number;
+    boosts_count: number;
+    boosts_revenue: number;
+    total_revenue: number;
+  };
+};
+
 export type ApiDealerCard = {
   id: string;
   name: string;
@@ -1133,6 +1183,10 @@ export const api = {
 
   async adminDeleteListing(id: string) {
     await adminApiFetch<unknown>(`/listings/${id}/`, { method: "DELETE" });
+  },
+
+  async adminPayments() {
+    return adminApiFetch<AdminPaymentsResponse>("/admin-panel/payments/");
   },
 
   // ---------------- Inquiries (buyer ↔ seller leads) ---------------- //

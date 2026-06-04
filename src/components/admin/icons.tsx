@@ -11,6 +11,16 @@ export function DashboardIcon({ className }: IconProps) {
   );
 }
 
+export function PaymentsIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+      <rect x="2.5" y="5" width="19" height="14" rx="2.5" />
+      <path d="M2.5 9.5h19" strokeLinecap="round" />
+      <path d="M6 14.5h4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function CarsIcon({ className }: IconProps) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
