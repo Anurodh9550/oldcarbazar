@@ -274,6 +274,37 @@ export type BoostCheckoutOrder = {
   contact: string;
 };
 
+export type BoostInvoicePayload = {
+  boost_order_id: string;
+  invoice_number: string;
+  receipt: string;
+  issued_at: string;
+  package: string;
+  package_name: string;
+  duration_days: number;
+  amount_inr: number;
+  currency: string;
+  status: "created" | "paid" | "failed";
+  boosted_until: string | null;
+  provider: string;
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  listing_id: string;
+  listing_title: string;
+  customer: {
+    name: string;
+    email: string;
+    phone: string;
+    city: string;
+  };
+  seller: {
+    name: string;
+    address: string;
+    email: string;
+    website: string;
+  };
+};
+
 export type AdminSubscriptionPayment = {
   id: string;
   user_name: string;
@@ -1388,6 +1419,7 @@ export const api = {
     const data = await apiFetch<{
       subscriptions: ApiSubscriptionRecord[];
       invoices: InvoicePayload[];
+      boost_invoices: BoostInvoicePayload[];
     }>("/subscriptions/mine/");
     return data;
   },
