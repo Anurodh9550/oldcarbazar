@@ -37,6 +37,8 @@ export type ListingSellerMeta = {
 export type ListingAdminMeta = {
   moderation?: ListingModeration;
   featured?: boolean;
+  boostedUntil?: string | null;
+  isBoosted?: boolean;
   flagged?: boolean;
   flagReason?: string;
   rejectedReason?: string;

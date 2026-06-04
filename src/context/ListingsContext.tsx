@@ -53,6 +53,7 @@ type ListingsContextValue = {
     reason?: string
   ) => void;
   toggleFeatured: (id: string, featured?: boolean) => void;
+  markListingBoosted: (id: string, boostedUntil: string | null) => void;
   flagListing: (id: string, reason: string) => void;
   clearFlag: (id: string) => void;
   getMyListings: (sellerId: string) => UserCarListing[];
@@ -92,6 +93,37 @@ function normalizeStoredListing(raw: UserCarListing): UserCarListing {
     moderation: raw.moderation ?? "approved",
     featured: raw.featured ?? false,
   };
+}
+
+function isBoostedListing(item: CarListing): boolean {
+  const meta = item as Partial<UserCarListing>;
+  if (typeof meta.isBoosted === "boolean") return meta.isBoosted;
+  if (meta.boostedUntil) {
+    return new Date(meta.boostedUntil).getTime() > Date.now();
+  }
+  return false;
+}
+
+function compareRankedListings(a: CarListing, b: CarListing) {
+  const aFeatured = "featured" in a ? Boolean(a.featured) : a.badge === "FEATURED";
+  const bFeatured = "featured" in b ? Boolean(b.featured) : b.badge === "FEATURED";
+  if (aFeatured !== bFeatured) return bFeatured ? 1 : -1;
+
+  const aBoosted = isBoostedListing(a);
+  const bBoosted = isBoostedListing(b);
+  if (aBoosted !== bBoosted) return bBoosted ? 1 : -1;
+
+  const aInquiries = Number("inquiries" in a ? a.inquiries ?? 0 : 0);
+  const bInquiries = Number("inquiries" in b ? b.inquiries ?? 0 : 0);
+  if (aInquiries !== bInquiries) return bInquiries - aInquiries;
+
+  const aViews = Number("views" in a ? a.views ?? 0 : 0);
+  const bViews = Number("views" in b ? b.views ?? 0 : 0);
+  if (aViews !== bViews) return bViews - aViews;
+
+  const aCreatedAt = Number("createdAt" in a ? a.createdAt ?? 0 : 0);
+  const bCreatedAt = Number("createdAt" in b ? b.createdAt ?? 0 : 0);
+  return bCreatedAt - aCreatedAt;
 }
 
 export function ListingsProvider({ children }: { children: React.ReactNode }) {
@@ -360,6 +392,22 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
     }
   }, [hasAdminSession, refreshListings]);
 
+  const markListingBoosted = useCallback(
+    (id: string, boostedUntil: string | null) => {
+      const isBoosted = boostedUntil
+        ? new Date(boostedUntil).getTime() > Date.now()
+        : false;
+      const patch = { boostedUntil, isBoosted } as Partial<UserCarListing>;
+      setUserListings((prev) =>
+        prev.map((l) => (l.id === id ? { ...l, ...patch } : l))
+      );
+      setApiListings((prev) =>
+        prev.map((l) => (l.id === id ? { ...l, ...patch } : l))
+      );
+    },
+    []
+  );
+
   const flagListing = useCallback((id: string, reason: string) => {
     setUserListings((prev) =>
       prev.map((l) =>
@@ -437,7 +485,7 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
     // No seed/demo fallback: while the backend fetch is in flight the list
     // is empty (consumers use `loading` to render skeletons). This is what
     // stops the "demo cars flash before real cars" bug on production.
-    return [...publicUserListings, ...publicApiListings];
+    return [...publicUserListings, ...publicApiListings].sort(compareRankedListings);
   }, [apiListings, userListings]);
 
   const value = useMemo(
@@ -453,6 +501,7 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
       updateListingStatus,
       setListingModeration,
       toggleFeatured,
+      markListingBoosted,
       flagListing,
       clearFlag,
       getMyListings,
@@ -470,6 +519,7 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
       updateListingStatus,
       setListingModeration,
       toggleFeatured,
+      markListingBoosted,
       flagListing,
       clearFlag,
       getMyListings,

@@ -10,7 +10,14 @@ import { useSubscription } from "@/context/SubscriptionContext";
 import { ApiError, ensureValidAccessToken } from "@/lib/api";
 import Spinner from "@/components/ui/Spinner";
 import PageLoader from "@/components/ui/PageLoader";
+import BoostModal from "@/components/seller/BoostModal";
 import type { ListingStatus, UserCarListing } from "@/types/listing";
+
+function isListingBoosted(car: UserCarListing): boolean {
+  if (typeof car.isBoosted === "boolean") return car.isBoosted;
+  if (car.boostedUntil) return new Date(car.boostedUntil).getTime() > Date.now();
+  return false;
+}
 
 const statusStyles: Record<ListingStatus, string> = {
   active: "bg-green-100 text-green-700 ring-1 ring-green-200",
@@ -26,6 +33,7 @@ export default function MyListingsContent() {
     getMyListings,
     removeListing,
     updateListingStatus,
+    markListingBoosted,
     loading: listingsLoading,
   } = useListings();
   const { status: subscriptionStatus } = useSubscription();
@@ -54,6 +62,7 @@ export default function MyListingsContent() {
   const [confirmDelete, setConfirmDelete] = useState<UserCarListing | null>(
     null
   );
+  const [boostTarget, setBoostTarget] = useState<UserCarListing | null>(null);
   const [deleteError, setDeleteError] = useState("");
   const [toast, setToast] = useState<Toast>(null);
   const toastTimerRef = useRef<number | null>(null);
@@ -317,6 +326,11 @@ export default function MyListingsContent() {
                     >
                       {car.status}
                     </span>
+                    {isListingBoosted(car) && (
+                      <span className="absolute left-3 top-10 rounded-full bg-[#f75d34] px-2.5 py-1 text-[10px] font-bold uppercase text-white shadow">
+                        🚀 Boosted
+                      </span>
+                    )}
                   </div>
                   <div className="flex flex-1 flex-col justify-between p-5">
                     <div>
@@ -374,6 +388,16 @@ export default function MyListingsContent() {
                           {isBusy && busyAction === "relist"
                             ? "Re-listing…"
                             : "Relist"}
+                        </button>
+                      )}
+                      {car.status === "active" && (
+                        <button
+                          type="button"
+                          disabled={isBusy}
+                          onClick={() => setBoostTarget(car)}
+                          className="inline-flex items-center gap-1.5 rounded-lg bg-[#f75d34] px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-[#e54d24] disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          🚀 {isListingBoosted(car) ? "Extend Boost" : "Boost"}
                         </button>
                       )}
                       <Link
@@ -468,6 +492,23 @@ export default function MyListingsContent() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Boost modal */}
+      {boostTarget && (
+        <BoostModal
+          listingId={boostTarget.id}
+          listingTitle={boostTarget.title}
+          onClose={() => setBoostTarget(null)}
+          onBoosted={(boostedUntil) => {
+            markListingBoosted(boostTarget.id, boostedUntil);
+            setBoostTarget(null);
+            flashToast(
+              "success",
+              `"${boostTarget.title}" boosted! It now ranks higher.`
+            );
+          }}
+        />
       )}
 
       {/* Toast */}

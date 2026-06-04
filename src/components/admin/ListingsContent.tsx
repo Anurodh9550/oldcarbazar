@@ -99,6 +99,13 @@ function enrich(list: CarListing): EnrichedListing {
   };
 }
 
+function compareRankedListings(a: EnrichedListing, b: EnrichedListing) {
+  if (a.featured !== b.featured) return b.featured ? 1 : -1;
+  if (a.inquiries !== b.inquiries) return b.inquiries - a.inquiries;
+  if (a.views !== b.views) return b.views - a.views;
+  return b.createdAt - a.createdAt;
+}
+
 export default function ListingsContent() {
   const search = useSearchParams();
   const presetFilter = (search?.get("filter") as FilterValue | null) ?? "all";
@@ -117,9 +124,9 @@ export default function ListingsContent() {
   const [filter, setFilter] = useState<FilterValue>(presetFilter);
   const [query, setQuery] = useState("");
   const [city, setCity] = useState<string>("");
-  const [sort, setSort] = useState<"newest" | "oldest" | "views" | "inquiries">(
-    "newest"
-  );
+  const [sort, setSort] = useState<
+    "ranking" | "newest" | "oldest" | "views" | "inquiries"
+  >("ranking");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [rejectModal, setRejectModal] = useState<{ id: string } | null>(null);
   const [rejectReason, setRejectReason] = useState("");
@@ -157,6 +164,7 @@ export default function ListingsContent() {
     }
 
     const sorted = [...list];
+    if (sort === "ranking") sorted.sort(compareRankedListings);
     if (sort === "newest") sorted.sort((a, b) => b.createdAt - a.createdAt);
     if (sort === "oldest") sorted.sort((a, b) => a.createdAt - b.createdAt);
     if (sort === "views") sorted.sort((a, b) => b.views - a.views);
@@ -385,6 +393,7 @@ export default function ListingsContent() {
           onChange={(e) => setSort(e.target.value as typeof sort)}
           className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-[#f75d34]"
         >
+          <option value="ranking">Ranking order</option>
           <option value="newest">Newest first</option>
           <option value="oldest">Oldest first</option>
           <option value="views">Most viewed</option>

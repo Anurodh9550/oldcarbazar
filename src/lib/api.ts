@@ -160,6 +160,8 @@ export type ApiListing = {
   whatsapp?: boolean;
   views?: number;
   inquiries_count?: number;
+  boosted_until?: string | null;
+  is_boosted?: boolean;
   created_at?: string;
 };
 
@@ -249,6 +251,27 @@ export type RazorpayVerifyPayload = {
   razorpay_order_id: string;
   razorpay_payment_id: string;
   razorpay_signature: string;
+};
+
+export type BoostPackage = {
+  code: string;
+  name: string;
+  price_inr: number;
+  duration_days: number;
+  perks: string[];
+};
+
+export type BoostCheckoutOrder = {
+  key_id: string;
+  order_id: string;
+  amount: number;
+  amount_inr: number;
+  currency: string;
+  package: BoostPackage;
+  listing_id: string;
+  name: string;
+  email: string | null;
+  contact: string;
 };
 
 export type ApiDealerCard = {
@@ -783,6 +806,12 @@ export function apiListingToCarListing(item: ApiListing): UserCarListing {
     createdAt: item.created_at ? new Date(item.created_at).getTime() : Date.now(),
     views: item.views ?? 0,
     inquiries: item.inquiries_count ?? 0,
+    boostedUntil: item.boosted_until ?? null,
+    isBoosted:
+      item.is_boosted ??
+      (item.boosted_until
+        ? new Date(item.boosted_until).getTime() > Date.now()
+        : false),
   };
 }
 
@@ -1313,6 +1342,36 @@ export const api = {
     return apiFetch<InvoicePayload>(
       `/subscriptions/${subscriptionId}/invoice/`
     );
+  },
+
+  // ---------------- Listing boost ---------------- //
+
+  async listBoostPackages() {
+    const data = await apiFetch<{ packages: BoostPackage[] }>(
+      "/listings/boost-packages/"
+    );
+    return data.packages;
+  },
+
+  async createBoostOrder(listingId: string, pkg: string) {
+    return apiFetch<BoostCheckoutOrder>(
+      `/listings/${listingId}/create-boost-order/`,
+      {
+        method: "POST",
+        body: JSON.stringify({ package: pkg }),
+      }
+    );
+  },
+
+  async verifyBoostPayment(listingId: string, payload: RazorpayVerifyPayload) {
+    const data = await apiFetch<ApiListing>(
+      `/listings/${listingId}/verify-boost-payment/`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }
+    );
+    return apiListingToCarListing(data);
   },
 
   // ---------------- Dealers ---------------- //

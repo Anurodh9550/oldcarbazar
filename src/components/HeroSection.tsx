@@ -1,10 +1,10 @@
-﻿"use client";
+"use client";
 
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useLocation } from "@/context/LocationContext";
 import {
   fadeIn,
@@ -16,8 +16,6 @@ import {
 const quickLinks: { label: string; query: string }[] = [
   { label: "Swift", query: "q=swift" },
   { label: "Creta", query: "q=creta" },
-  { label: "Harrier", query: "q=harrier" },
-  { label: "Innova", query: "q=innova" },
   { label: "Thar", query: "q=thar" },
   { label: "City", query: "q=city" },
 ];
@@ -30,11 +28,21 @@ const budgetOptions: { label: string; value: string }[] = [
   { label: "Above ₹10 Lakh", value: "10-15" },
 ];
 
+const heroImages = ["/hero-cars.png", "/hero-cars-2.png", "/hero-cars-3.png"];
+
 export default function HeroSection() {
   const router = useRouter();
-  const { selectedCity, totalCarsInCity } = useLocation();
+  const { selectedCity } = useLocation();
   const [brand, setBrand] = useState("");
   const [budget, setBudget] = useState("");
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % heroImages.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,12 +54,6 @@ export default function HeroSection() {
     router.push(qs ? `/used-cars/search?${qs}` : "/used-cars/search");
   };
 
-  const stats = [
-    { value: `${totalCarsInCity}+`, label: "Used Cars" },
-    { value: "₹45K", label: "Starting Price" },
-    { value: "500+", label: "Verified Sellers" },
-  ];
-
   return (
     <motion.section
       initial="hidden"
@@ -59,82 +61,73 @@ export default function HeroSection() {
       variants={fadeIn}
       className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
     >
-      <Image
-        src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1600&h=700&fit=crop"
-        alt="Used cars"
-        fill
-        priority
-        className="object-cover opacity-30"
-        sizes="100vw"
-      />
+      <div className="absolute inset-0">
+        <AnimatePresence>
+          <motion.div
+            key={activeSlide}
+            initial={{ opacity: 0, scale: 1.08 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ opacity: { duration: 1.2 }, scale: { duration: 4.5 } }}
+            className="absolute inset-0"
+          >
+            <Image
+              src={heroImages[activeSlide]}
+              alt="Used cars"
+              fill
+              priority
+              className="object-cover opacity-70"
+              sizes="100vw"
+            />
+          </motion.div>
+        </AnimatePresence>
+      </div>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
-        className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent"
+        className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent"
       />
 
       <motion.div
         variants={staggerContainerSlow}
         initial="hidden"
         animate="visible"
-        className="relative mx-auto max-w-[1280px] px-4 py-10 sm:py-14 lg:px-6 lg:py-20"
+        className="relative mx-auto max-w-[1280px] px-4 py-24 sm:py-32 lg:px-6 lg:py-40"
       >
         <motion.div variants={fadeInUp} className="max-w-2xl">
-          <motion.span
-            variants={fadeInUp}
-            className="eyebrow-sell mt-0 ring-1 ring-[#f75d34]/40"
-          >
-            {selectedCity}&apos;s #1 Used Car Marketplace
-          </motion.span>
-
           <motion.h1
             variants={fadeInUp}
-            className="hero-title mt-4"
+            className="text-4xl font-extrabold leading-[1.1] tracking-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.45)] sm:text-5xl lg:text-6xl"
           >
             Find Your Perfect{" "}
             <motion.span
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.5, duration: 0.5 }}
-              className="text-[#f75d34]"
+              className="bg-gradient-to-r from-[#f75d34] to-[#ff8c42] bg-clip-text text-transparent"
             >
               Used Car
             </motion.span>{" "}
             Today
           </motion.h1>
 
-          <motion.p
-            variants={fadeInUp}
-            className="hero-lead mt-4"
-          >
-            Browse {totalCarsInCity}+ verified second-hand cars in {selectedCity}{" "}
-            from ₹45,000. Compare prices,
-            chat with sellers, and drive home your dream car.
-          </motion.p>
-
           <motion.form
             variants={fadeInUp}
             whileHover={{ scale: 1.01 }}
             onSubmit={handleSearch}
-            className="mt-6 flex flex-col gap-3 rounded-xl bg-white/10 p-3 backdrop-blur-sm sm:mt-8 sm:flex-row sm:items-end sm:gap-2"
+            className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-2"
           >
             <label className="flex-1">
-              <span className="mb-1 block text-xs font-medium text-gray-300">
-                Brand or Model
-              </span>
               <input
                 type="text"
                 value={brand}
                 onChange={(e) => setBrand(e.target.value)}
-                placeholder="e.g. Swift, Creta, Harrier"
+                placeholder="Search Swift, Creta, Harrier…"
                 className="w-full rounded-lg border border-white/20 bg-white/95 px-4 py-2.5 text-sm text-gray-900 outline-none placeholder:text-gray-400 focus:border-[#f75d34] focus:ring-2 focus:ring-[#f75d34]/30"
               />
             </label>
             <label className="flex-1">
-              <span className="mb-1 block text-xs font-medium text-gray-300">
-                Budget
-              </span>
               <select
                 value={budget}
                 onChange={(e) => setBudget(e.target.value)}
@@ -174,35 +167,21 @@ export default function HeroSection() {
             ))}
           </motion.div>
         </motion.div>
-
-        <motion.ul
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
-          className="mt-8 grid grid-cols-3 gap-3 border-t border-white/10 pt-6 sm:mt-12 sm:max-w-lg sm:gap-4 sm:pt-8"
-        >
-          {stats.map((stat) => (
-            <motion.li
-              key={stat.label}
-              variants={fadeInUp}
-              whileHover={{ scale: 1.05 }}
-              className="text-center sm:text-left"
-            >
-              <motion.p
-                initial={{ opacity: 0, scale: 0.5 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ type: "spring", stiffness: 200, delay: 0.6 }}
-                className="text-xl font-bold text-[#f75d34] sm:text-3xl"
-              >
-                {stat.value}
-              </motion.p>
-              <p className="mt-1 text-[11px] text-gray-300 sm:text-sm">
-                {stat.label}
-              </p>
-            </motion.li>
-          ))}
-        </motion.ul>
       </motion.div>
+
+      <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-2">
+        {heroImages.map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            aria-label={`Show slide ${i + 1}`}
+            onClick={() => setActiveSlide(i)}
+            className={`h-2 rounded-full transition-all ${
+              i === activeSlide ? "w-6 bg-[#f75d34]" : "w-2 bg-white/50 hover:bg-white/80"
+            }`}
+          />
+        ))}
+      </div>
     </motion.section>
   );
 }
