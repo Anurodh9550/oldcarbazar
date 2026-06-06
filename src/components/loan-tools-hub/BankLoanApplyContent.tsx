@@ -9,7 +9,6 @@ import {
   loanBankCatalogue,
   loanPartners,
   type LoanBankInfo,
-  type LoanPartnerId,
 } from "@/data/loanBanks";
 import type { LoanEmploymentType } from "@/types/loanInquiry";
 
@@ -55,11 +54,8 @@ function BankLogo({ bank, size = "lg" }: { bank: LoanBankInfo; size?: "lg" | "sm
 export default function BankLoanApplyContent() {
   const searchParams = useSearchParams();
   const [selectedBank, setSelectedBank] = useState<LoanBankInfo | null>(null);
-  const [selectedPartner, setSelectedPartner] = useState<LoanPartnerId | null>(
-    null
-  );
-  const [partnerQuery, setPartnerQuery] = useState("");
   const [bankQuery, setBankQuery] = useState("");
+  const [showAllBanks, setShowAllBanks] = useState(false);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -78,20 +74,9 @@ export default function BankLoanApplyContent() {
 
   const partner = selectedBank ? loanPartners[selectedBank.partner] : null;
 
-  const filteredPartners = useMemo(() => {
-    const q = partnerQuery.trim().toLowerCase();
-    return Object.values(loanPartners).filter(
-      (p) =>
-        !q ||
-        p.name.toLowerCase().includes(q) ||
-        p.tagline.toLowerCase().includes(q)
-    );
-  }, [partnerQuery]);
-
   const filteredBanks = useMemo(() => {
     const q = bankQuery.trim().toLowerCase();
     return loanBankCatalogue.filter((b) => {
-      if (selectedPartner && b.partner !== selectedPartner) return false;
       if (!q) return true;
       return (
         b.name.toLowerCase().includes(q) ||
@@ -99,7 +84,15 @@ export default function BankLoanApplyContent() {
         b.highlight.toLowerCase().includes(q)
       );
     });
-  }, [bankQuery, selectedPartner]);
+  }, [bankQuery]);
+
+  const BANK_PREVIEW = 6;
+  // While searching, always show every match. Otherwise show a preview until
+  // the visitor taps "View all".
+  const visibleBanks =
+    showAllBanks || bankQuery.trim()
+      ? filteredBanks
+      : filteredBanks.slice(0, BANK_PREVIEW);
 
   const handleSelectBank = (bank: LoanBankInfo) => {
     setSelectedBank(bank);
@@ -162,92 +155,14 @@ export default function BankLoanApplyContent() {
 
   return (
     <div className="space-y-12">
-      {/* Loan partners */}
-      <section>
-        <h2 className="section-title-lg">Our Trusted Loan Partners</h2>
-        <p className="mt-1 text-body-muted">
-          Select a loan partner to see only its banks — or search by name.
-        </p>
-        <label className="mt-4 flex max-w-md items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 focus-within:border-[#f75d34] focus-within:ring-2 focus-within:ring-[#f75d34]/20">
-          <span className="text-gray-400" aria-hidden>
-            🔍
-          </span>
-          <input
-            type="search"
-            value={partnerQuery}
-            onChange={(e) => setPartnerQuery(e.target.value)}
-            placeholder="Search loan partners…"
-            className="flex-1 bg-transparent text-sm outline-none placeholder:text-gray-400"
-          />
-        </label>
-        <div className="mt-5 grid gap-4 sm:grid-cols-3">
-          {filteredPartners.length === 0 ? (
-            <p className="col-span-full rounded-xl border border-dashed border-gray-300 bg-gray-50 p-6 text-center text-sm text-gray-500">
-              No loan partners match &ldquo;{partnerQuery}&rdquo;.
-            </p>
-          ) : (
-            filteredPartners.map((p) => {
-              const isActive = selectedPartner === p.id;
-              return (
-                <button
-                  type="button"
-                  key={p.id}
-                  onClick={() =>
-                    setSelectedPartner((prev) => (prev === p.id ? null : p.id))
-                  }
-                  className={`rounded-2xl border bg-white p-5 text-left shadow-sm transition ${
-                    isActive
-                      ? "border-[#f75d34] ring-2 ring-[#f75d34]/20"
-                      : "border-gray-200 hover:border-[#f75d34]/40 hover:shadow-md"
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span
-                      className={`inline-flex items-center rounded-lg bg-gradient-to-r ${p.accent} px-3 py-1 text-sm font-bold text-white`}
-                    >
-                      {p.name}
-                    </span>
-                    <span
-                      className={`flex h-5 w-5 items-center justify-center rounded-full border text-[10px] font-bold ${
-                        isActive
-                          ? "border-[#f75d34] bg-[#f75d34] text-white"
-                          : "border-gray-300 text-transparent"
-                      }`}
-                      aria-hidden
-                    >
-                      ✓
-                    </span>
-                  </div>
-                  <p className="mt-3 text-sm font-semibold text-gray-900">
-                    {p.tagline}
-                  </p>
-                  <p className="mt-1 text-caption sm:text-sm">{p.description}</p>
-                </button>
-              );
-            })
-          )}
-        </div>
-      </section>
-
       {/* Bank selection */}
       <section>
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h2 className="section-title-lg">Select a Bank</h2>
-            <p className="mt-1 text-body-muted">
-              Choose your preferred lender and click{" "}
-              <strong>Check Eligibility</strong> to apply.
-            </p>
-          </div>
-          {selectedPartner && (
-            <button
-              type="button"
-              onClick={() => setSelectedPartner(null)}
-              className="rounded-full border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50"
-            >
-              Showing {loanPartners[selectedPartner].name} banks · Clear ✕
-            </button>
-          )}
+        <div>
+          <h2 className="section-title-lg">Select a Bank</h2>
+          <p className="mt-1 text-body-muted">
+            Choose your preferred lender and click{" "}
+            <strong>Check Eligibility</strong> to apply.
+          </p>
         </div>
         <label className="mt-4 flex max-w-md items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 focus-within:border-[#f75d34] focus-within:ring-2 focus-within:ring-[#f75d34]/20">
           <span className="text-gray-400" aria-hidden>
@@ -263,12 +178,11 @@ export default function BankLoanApplyContent() {
         </label>
         {filteredBanks.length === 0 && (
           <p className="mt-5 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-6 text-center text-sm text-gray-500">
-            No banks found. Try a different search
-            {selectedPartner ? " or clear the partner filter" : ""}.
+            No banks found. Try a different search.
           </p>
         )}
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredBanks.map((bank) => {
+          {visibleBanks.map((bank) => {
             const isActive = selectedBank?.slug === bank.slug;
             const bankPartner = loanPartners[bank.partner];
             return (
@@ -332,6 +246,19 @@ export default function BankLoanApplyContent() {
             );
           })}
         </div>
+        {!bankQuery.trim() && filteredBanks.length > BANK_PREVIEW && (
+          <div className="mt-6 text-center">
+            <button
+              type="button"
+              onClick={() => setShowAllBanks((v) => !v)}
+              className="rounded-full border border-[#f75d34] px-6 py-2.5 text-sm font-semibold text-[#f75d34] transition hover:bg-orange-50"
+            >
+              {showAllBanks
+                ? "Show less"
+                : `View all ${filteredBanks.length} banks`}
+            </button>
+          </div>
+        )}
       </section>
 
       {/* Loan inquiry form */}
