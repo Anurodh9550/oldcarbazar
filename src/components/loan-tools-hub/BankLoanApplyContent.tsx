@@ -184,7 +184,6 @@ export default function BankLoanApplyContent() {
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {visibleBanks.map((bank) => {
             const isActive = selectedBank?.slug === bank.slug;
-            const bankPartner = loanPartners[bank.partner];
             return (
               <div
                 key={bank.slug}
@@ -223,13 +222,7 @@ export default function BankLoanApplyContent() {
                   </dd>
                 </dl>
 
-                <div className="mt-4 flex items-center justify-between gap-2 border-t border-gray-100 pt-3">
-                  <span className="text-[11px] text-gray-500">
-                    via{" "}
-                    <span className="font-semibold text-gray-700">
-                      {bankPartner.name}
-                    </span>
-                  </span>
+                <div className="mt-4 flex items-center justify-end gap-2 border-t border-gray-100 pt-3">
                   <button
                     type="button"
                     onClick={() => handleSelectBank(bank)}
@@ -272,8 +265,8 @@ export default function BankLoanApplyContent() {
               Select a bank above to get started
             </p>
             <p className="mt-1 text-caption sm:text-sm">
-              Your loan inquiry form will appear here with the bank and loan
-              partner auto-filled.
+              Your loan inquiry form will appear here with the selected bank
+              auto-filled.
             </p>
           </div>
         ) : submitted ? (
@@ -285,8 +278,8 @@ export default function BankLoanApplyContent() {
               Thank you for your interest.
             </h3>
             <p className="mx-auto mt-2 max-w-md text-body-muted">
-              Your loan inquiry has been submitted successfully. Our loan
-              partner <strong>{partner?.name}</strong> will contact you shortly.
+              Your loan inquiry has been submitted successfully. Our loan team
+              will contact you shortly.
             </p>
             <button
               type="button"
@@ -329,24 +322,22 @@ export default function BankLoanApplyContent() {
                 </dl>
               </div>
 
-              {partner && (
-                <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">
-                    Loan Partner
-                  </p>
-                  <span
-                    className={`mt-3 inline-flex items-center rounded-lg bg-gradient-to-r ${partner.accent} px-3 py-1 text-sm font-bold text-white`}
-                  >
-                    {partner.name}
-                  </span>
-                  <p className="mt-2 text-sm font-semibold text-gray-900">
-                    {partner.tagline}
-                  </p>
-                  <p className="mt-1 text-caption sm:text-sm">
-                    {partner.description}
-                  </p>
-                </div>
-              )}
+              <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+                <dl className="space-y-1.5 text-[12px]">
+                  <div className="flex justify-between">
+                    <dt className="text-gray-500">Processing Fee</dt>
+                    <dd className="font-semibold text-gray-900">
+                      {selectedBank.processing}
+                    </dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-gray-500">Max Funding</dt>
+                    <dd className="font-semibold text-gray-900">
+                      {selectedBank.maxFunding}
+                    </dd>
+                  </div>
+                </dl>
+              </div>
             </div>
 
             {/* Form */}
@@ -358,24 +349,16 @@ export default function BankLoanApplyContent() {
                 Loan Inquiry Form
               </h3>
               <p className="mt-1 text-caption sm:text-sm">
-                Fill in your details and our partner will reach out with the
+                Fill in your details and our loan team will reach out with the
                 best offer.
               </p>
 
               {/* Auto-filled (read-only) */}
-              <div className="mt-5 grid grid-cols-2 gap-3">
+              <div className="mt-5">
                 <label className="block">
                   <span className={labelClass}>Selected Bank</span>
                   <input
                     value={selectedBank.name}
-                    readOnly
-                    className={`${inputClass} cursor-not-allowed bg-gray-100 font-semibold text-gray-700`}
-                  />
-                </label>
-                <label className="block">
-                  <span className={labelClass}>Loan Partner</span>
-                  <input
-                    value={partner?.name ?? ""}
                     readOnly
                     className={`${inputClass} cursor-not-allowed bg-gray-100 font-semibold text-gray-700`}
                   />
