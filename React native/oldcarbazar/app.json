@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "Old Car Bazar",
+    "slug": "oldcarbazar",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/logocar.png",
+    "scheme": "oldcarbazar",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.oldcarbazar.app"
+    },
+    "android": {
+      "package": "com.oldcarbazar.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#f75d34",
+        "foregroundImage": "./assets/images/logocar.png"
+      }
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/images/logocar.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-asset"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "apiUrl": "https://backend-oldcarbazar.onrender.com/api/v1"
+    }
+  }
+}

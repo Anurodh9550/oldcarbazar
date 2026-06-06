@@ -1,35 +1,49 @@
 import type { MetadataRoute } from "next";
 
-/**
- * Web App Manifest served at /manifest.webmanifest. Adds the "Add to Home
- * Screen" experience on mobile browsers and is read by Google for the PWA
- * signals it uses when ranking mobile results.
- */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Old Car Bazar — Buy & Sell Used Cars in India",
+    name: "Old Car Bazar | Buy & Sell Used Cars",
     short_name: "Old Car Bazar",
     description:
-      "Buy & sell used cars across India. Verified listings, free valuation, car loan, and instant seller contact.",
+      "India's trusted marketplace for used cars. Buy, sell, compare prices and connect with verified sellers.",
     start_url: "/",
     scope: "/",
     display: "standalone",
+    orientation: "portrait",
     background_color: "#ffffff",
     theme_color: "#f75d34",
-    orientation: "portrait",
+    lang: "en-IN",
     categories: ["shopping", "business", "automotive"],
     icons: [
       {
-        src: "/icon.png",
-        sizes: "any",
+        src: "/logocar.png",
+        sizes: "192x192",
         type: "image/png",
         purpose: "any",
       },
       {
-        src: "/apple-icon.png",
-        sizes: "any",
+        src: "/logocar.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: "/logocar.png",
+        sizes: "512x512",
         type: "image/png",
         purpose: "maskable",
+      },
+    ],
+    shortcuts: [
+      {
+        name: "Browse used cars",
+        short_name: "Browse",
+        url: "/used-cars",
+      },
+      {
+        name: "Sell your car",
+        short_name: "Sell",
+        url: "/sell-car",
       },
     ],
   };

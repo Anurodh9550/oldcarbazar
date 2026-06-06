@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useLoanToolsContent } from "@/hooks/useLoanToolsContent";
+import { findBankSlugByName } from "@/data/loanBanks";
 
 const inputClass =
   "w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none focus:border-[#f75d34] focus:ring-2 focus:ring-[#f75d34]/20";
@@ -193,7 +194,11 @@ export default function UsedCarLoanContent() {
                     <td className="px-4 py-4 text-gray-700">{bank.tenure}</td>
                     <td className="px-4 py-4">
                       <Link
-                        href="/loan-eligibility"
+                        href={`/car-loan${
+                          findBankSlugByName(bank.name)
+                            ? `?bank=${findBankSlugByName(bank.name)}`
+                            : ""
+                        }`}
                         className="rounded-full bg-orange-50 px-3 py-1.5 text-xs font-semibold text-[#f75d34] hover:bg-orange-100"
                       >
                         Check eligibility

@@ -43,6 +43,7 @@ const navItems: NavItem[] = [
   { href: "/admin/buyers", label: "Buyers", Icon: BuyerIcon },
   { href: "/admin/sellers", label: "Sellers", Icon: SellerIcon },
   { href: "/admin/inquiries", label: "Inquiries", Icon: InquiriesIcon, badgeKey: "new-inquiries" },
+  { href: "/admin/loan-inquiries", label: "Loan Inquiries", Icon: LoanToolsIcon },
   { href: "/admin/payments", label: "Payments", Icon: PaymentsIcon },
   { href: "/admin/loan-tools", label: "Loan & Tools", Icon: LoanToolsIcon },
   { href: "/admin/analytics", label: "Analytics", Icon: AnalyticsIcon },
@@ -74,6 +75,10 @@ const titleMap: Record<string, { title: string; subtitle: string }> = {
   "/admin/inquiries": {
     title: "Inquiries",
     subtitle: "All buyer ↔ seller messages",
+  },
+  "/admin/loan-inquiries": {
+    title: "Loan Inquiries",
+    subtitle: "Used-car loan leads from banks & loan partners",
   },
   "/admin/payments": {
     title: "Payments",
@@ -133,6 +138,8 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
     else if (pathname.startsWith("/admin/sellers")) target = "/admin/sellers";
     else if (pathname.startsWith("/admin/inquiries"))
       target = "/admin/inquiries";
+    else if (pathname.startsWith("/admin/loan-inquiries"))
+      target = "/admin/loan-inquiries";
     router.push(`${target}?q=${encodeURIComponent(q)}`);
   };
 

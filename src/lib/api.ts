@@ -22,6 +22,12 @@ import type {
   TestDriveBooking,
   TestDriveStatus,
 } from "@/types/engagement";
+import type {
+  CreateLoanInquiryPayload,
+  LoanEmploymentType,
+  LoanInquiry,
+  LoanInquiryStatus,
+} from "@/types/loanInquiry";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
@@ -575,6 +581,7 @@ function isPublicApiPath(path: string, method: string) {
     if (p === "/inquiries/") return true;
     if (p === "/test-drives/") return true;
     if (p === "/offers/") return true;
+    if (p === "/loan-inquiries/") return true;
   }
   return false;
 }
@@ -1274,6 +1281,54 @@ export const api = {
     await adminApiFetch<unknown>(`/inquiries/${id}/`, { method: "DELETE" });
   },
 
+  // ---------------- Loan inquiries (used-car loan leads) ---------------- //
+
+  async createLoanInquiry(payload: CreateLoanInquiryPayload) {
+    const body: Record<string, string | number> = {
+      bank_name: payload.bank_name,
+      loan_partner: payload.loan_partner,
+      full_name: payload.full_name.trim(),
+      mobile: payload.mobile,
+      email: payload.email.trim(),
+      city: payload.city.trim(),
+      monthly_income: payload.monthly_income,
+      employment_type: payload.employment_type,
+    };
+    if (payload.car_budget && payload.car_budget.trim()) {
+      body.car_budget = payload.car_budget.trim();
+    }
+    if (payload.message && payload.message.trim()) {
+      body.message = payload.message.trim();
+    }
+    const data = await apiFetch<ApiLoanInquiry>("/loan-inquiries/", {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+    return apiLoanInquiryToLoanInquiry(data);
+  },
+
+  async adminLoanInquiries() {
+    const data = await adminApiFetch<ApiLoanInquiry[] | Paginated<ApiLoanInquiry>>(
+      "/loan-inquiries/?limit=500"
+    );
+    return unwrapList(data).map(apiLoanInquiryToLoanInquiry);
+  },
+
+  async adminUpdateLoanInquiryStatus(id: string, status: LoanInquiryStatus) {
+    const data = await adminApiFetch<ApiLoanInquiry>(
+      `/loan-inquiries/${id}/status/`,
+      {
+        method: "POST",
+        body: JSON.stringify({ status }),
+      }
+    );
+    return apiLoanInquiryToLoanInquiry(data);
+  },
+
+  async adminDeleteLoanInquiry(id: string) {
+    await adminApiFetch<unknown>(`/loan-inquiries/${id}/`, { method: "DELETE" });
+  },
+
   // ---------------- Test drive bookings ---------------- //
 
   async createTestDrive(payload: {
@@ -1526,6 +1581,46 @@ type ApiOffer = {
   created_at: string;
   updated_at: string;
 };
+
+type ApiLoanInquiry = {
+  id: string;
+  bank_name: string;
+  loan_partner: string;
+  full_name: string;
+  mobile: string;
+  email: string;
+  city: string;
+  monthly_income: number;
+  employment_type: LoanEmploymentType;
+  employment_type_label: string;
+  car_budget: string;
+  message: string;
+  status: LoanInquiryStatus;
+  status_label: string;
+  created_at: string;
+  updated_at: string;
+};
+
+function apiLoanInquiryToLoanInquiry(data: ApiLoanInquiry): LoanInquiry {
+  return {
+    id: data.id,
+    bankName: data.bank_name,
+    loanPartner: data.loan_partner,
+    fullName: data.full_name,
+    mobile: data.mobile,
+    email: data.email,
+    city: data.city,
+    monthlyIncome: Number(data.monthly_income) || 0,
+    employmentType: data.employment_type,
+    employmentTypeLabel: data.employment_type_label,
+    carBudget: data.car_budget,
+    message: data.message,
+    status: data.status,
+    statusLabel: data.status_label,
+    createdAt: new Date(data.created_at).getTime(),
+    updatedAt: new Date(data.updated_at).getTime(),
+  };
+}
 
 function apiTestDriveToTestDrive(data: ApiTestDrive): TestDriveBooking {
   return {
