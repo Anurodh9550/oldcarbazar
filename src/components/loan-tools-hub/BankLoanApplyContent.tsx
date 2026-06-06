@@ -16,6 +16,21 @@ const inputClass =
   "w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none focus:border-[#f75d34] focus:ring-2 focus:ring-[#f75d34]/20";
 const labelClass = "mb-1 block text-xs font-semibold text-gray-600";
 
+const benefits = [
+  { icon: "⚡", title: "Quick Approval", desc: "Sanction in 24–48 hrs" },
+  { icon: "🏦", title: "30+ Lenders", desc: "Top banks & NBFCs" },
+  { icon: "📉", title: "Low Rates", desc: "Starting at 9.15% p.a." },
+  { icon: "📄", title: "Minimal Docs", desc: "100% paperless apply" },
+];
+
+function StepBadge({ n }: { n: number }) {
+  return (
+    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#f75d34] text-xs font-black text-white shadow-sm">
+      {n}
+    </span>
+  );
+}
+
 type FormState = {
   fullName: string;
   mobile: string;
@@ -154,48 +169,81 @@ export default function BankLoanApplyContent() {
   };
 
   return (
-    <div className="space-y-12">
-      {/* Bank selection */}
+    <div className="space-y-10">
+      {/* Benefits strip */}
+      <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {benefits.map((b) => (
+          <div
+            key={b.title}
+            className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm"
+          >
+            <span className="text-2xl" aria-hidden>
+              {b.icon}
+            </span>
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-gray-900">{b.title}</p>
+              <p className="text-[11px] text-gray-500">{b.desc}</p>
+            </div>
+          </div>
+        ))}
+      </section>
+
+      {/* Step 1 — Bank selection */}
       <section>
-        <div>
-          <h2 className="section-title-lg">Select a Bank</h2>
-          <p className="mt-1 text-body-muted">
-            Choose your preferred lender and click{" "}
-            <strong>Check Eligibility</strong> to apply.
-          </p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex items-start gap-3">
+            <StepBadge n={1} />
+            <div>
+              <h2 className="section-title-lg">Select a Bank</h2>
+              <p className="mt-1 text-body-muted">
+                Pick your preferred lender and tap{" "}
+                <strong>Check Eligibility</strong>.
+              </p>
+            </div>
+          </div>
+          <label className="flex w-full items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 focus-within:border-[#f75d34] focus-within:ring-2 focus-within:ring-[#f75d34]/20 sm:w-72">
+            <span className="text-gray-400" aria-hidden>
+              🔍
+            </span>
+            <input
+              type="search"
+              value={bankQuery}
+              onChange={(e) => setBankQuery(e.target.value)}
+              placeholder="Search banks…"
+              className="flex-1 bg-transparent text-sm outline-none placeholder:text-gray-400"
+            />
+          </label>
         </div>
-        <label className="mt-4 flex max-w-md items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 focus-within:border-[#f75d34] focus-within:ring-2 focus-within:ring-[#f75d34]/20">
-          <span className="text-gray-400" aria-hidden>
-            🔍
-          </span>
-          <input
-            type="search"
-            value={bankQuery}
-            onChange={(e) => setBankQuery(e.target.value)}
-            placeholder="Search banks by name…"
-            className="flex-1 bg-transparent text-sm outline-none placeholder:text-gray-400"
-          />
-        </label>
+
+        <p className="mt-3 text-xs font-medium text-gray-400">
+          Showing {visibleBanks.length} of {filteredBanks.length} lenders
+        </p>
+
         {filteredBanks.length === 0 && (
-          <p className="mt-5 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-6 text-center text-sm text-gray-500">
+          <p className="mt-3 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-6 text-center text-sm text-gray-500">
             No banks found. Try a different search.
           </p>
         )}
-        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {visibleBanks.map((bank) => {
             const isActive = selectedBank?.slug === bank.slug;
             return (
               <div
                 key={bank.slug}
-                className={`flex flex-col rounded-2xl border bg-white p-5 shadow-sm transition ${
+                className={`relative flex flex-col rounded-2xl border bg-white p-5 shadow-sm transition ${
                   isActive
                     ? "border-[#f75d34] ring-2 ring-[#f75d34]/20"
-                    : "border-gray-200 hover:border-[#f75d34]/40 hover:shadow-md"
+                    : "border-gray-200 hover:-translate-y-0.5 hover:border-[#f75d34]/40 hover:shadow-md"
                 }`}
               >
+                {isActive && (
+                  <span className="absolute right-4 top-4 flex h-6 w-6 items-center justify-center rounded-full bg-[#f75d34] text-xs font-bold text-white">
+                    ✓
+                  </span>
+                )}
                 <div className="flex items-start gap-3">
                   <BankLogo bank={bank} />
-                  <div className="min-w-0">
+                  <div className="min-w-0 pr-6">
                     <p className="font-bold text-gray-900">{bank.name}</p>
                     <p className="mt-0.5 text-[11px] font-medium text-green-700">
                       {bank.highlight}
@@ -222,19 +270,17 @@ export default function BankLoanApplyContent() {
                   </dd>
                 </dl>
 
-                <div className="mt-4 flex items-center justify-end gap-2 border-t border-gray-100 pt-3">
-                  <button
-                    type="button"
-                    onClick={() => handleSelectBank(bank)}
-                    className={`rounded-full px-4 py-2 text-xs font-bold transition ${
-                      isActive
-                        ? "bg-[#f75d34] text-white"
-                        : "bg-orange-50 text-[#f75d34] hover:bg-orange-100"
-                    }`}
-                  >
-                    {isActive ? "Selected ✓" : "Check Eligibility"}
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => handleSelectBank(bank)}
+                  className={`mt-4 w-full rounded-xl py-2.5 text-xs font-bold transition ${
+                    isActive
+                      ? "bg-[#f75d34] text-white"
+                      : "bg-orange-50 text-[#f75d34] hover:bg-orange-100"
+                  }`}
+                >
+                  {isActive ? "Selected ✓" : "Check Eligibility"}
+                </button>
               </div>
             );
           })}
@@ -254,8 +300,19 @@ export default function BankLoanApplyContent() {
         )}
       </section>
 
-      {/* Loan inquiry form */}
+      {/* Step 2 — Loan inquiry form */}
       <section ref={formRef} className="scroll-mt-24">
+        <div className="mb-5 flex items-start gap-3">
+          <StepBadge n={2} />
+          <div>
+            <h2 className="section-title-lg">Your Details</h2>
+            <p className="mt-1 text-body-muted">
+              Tell us about yourself and our loan team will get you the best
+              offer.
+            </p>
+          </div>
+        </div>
+
         {!selectedBank ? (
           <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-10 text-center">
             <span className="text-4xl" aria-hidden>
@@ -271,7 +328,7 @@ export default function BankLoanApplyContent() {
           </div>
         ) : submitted ? (
           <div className="rounded-2xl border border-green-200 bg-green-50 p-8 text-center sm:p-12">
-            <span className="text-5xl" aria-hidden>
+            <span className="flex mx-auto h-16 w-16 items-center justify-center rounded-full bg-green-100 text-4xl">
               ✅
             </span>
             <h3 className="mt-4 text-xl font-bold text-gray-900">
@@ -290,53 +347,60 @@ export default function BankLoanApplyContent() {
             </button>
           </div>
         ) : (
-          <div className="grid gap-6 lg:grid-cols-[1fr_1.4fr] lg:items-start">
+          <div className="grid gap-6 lg:grid-cols-[1fr_1.5fr] lg:items-start">
             {/* Auto-filled info card */}
-            <div className="space-y-4">
-              <div className="rounded-2xl border border-gray-200 bg-gradient-to-br from-orange-50 via-white to-white p-5 shadow-sm">
-                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#f75d34]">
-                  Selected Bank
-                </p>
-                <div className="mt-3 flex items-center gap-3">
+            <div className="lg:sticky lg:top-24">
+              <div className="overflow-hidden rounded-2xl border border-gray-200 shadow-sm">
+                <div className="flex items-center gap-3 bg-gradient-to-br from-orange-50 via-white to-white p-5">
                   <BankLogo bank={selectedBank} />
-                  <div>
-                    <p className="font-bold text-gray-900">{selectedBank.name}</p>
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#f75d34]">
+                      Selected Bank
+                    </p>
+                    <p className="truncate font-bold text-gray-900">
+                      {selectedBank.name}
+                    </p>
                     <p className="text-[11px] font-medium text-green-700">
                       {selectedBank.highlight}
                     </p>
                   </div>
                 </div>
-                <dl className="mt-4 space-y-1.5 text-[12px]">
-                  <div className="flex justify-between">
+                <dl className="divide-y divide-gray-100 bg-white px-5 text-[12px]">
+                  <div className="flex justify-between py-2.5">
                     <dt className="text-gray-500">Interest Rate</dt>
                     <dd className="font-semibold text-gray-900">
                       {selectedBank.rate}
                     </dd>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between py-2.5">
                     <dt className="text-gray-500">Tenure</dt>
                     <dd className="font-semibold text-gray-900">
                       {selectedBank.tenure}
                     </dd>
                   </div>
-                </dl>
-              </div>
-
-              <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-                <dl className="space-y-1.5 text-[12px]">
-                  <div className="flex justify-between">
+                  <div className="flex justify-between py-2.5">
                     <dt className="text-gray-500">Processing Fee</dt>
                     <dd className="font-semibold text-gray-900">
                       {selectedBank.processing}
                     </dd>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between py-2.5">
                     <dt className="text-gray-500">Max Funding</dt>
                     <dd className="font-semibold text-gray-900">
                       {selectedBank.maxFunding}
                     </dd>
                   </div>
                 </dl>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedBank(null);
+                    setSubmitted(false);
+                  }}
+                  className="w-full border-t border-gray-100 bg-white py-3 text-xs font-semibold text-gray-500 hover:bg-gray-50 hover:text-[#f75d34]"
+                >
+                  ← Change bank
+                </button>
               </div>
             </div>
 
@@ -356,7 +420,7 @@ export default function BankLoanApplyContent() {
               {/* Auto-filled (read-only) */}
               <div className="mt-5">
                 <label className="block">
-                  <span className={labelClass}>Selected Bank</span>
+                  <span className={labelClass}>Selected Bank (auto-filled)</span>
                   <input
                     value={selectedBank.name}
                     readOnly
@@ -453,7 +517,7 @@ export default function BankLoanApplyContent() {
                   <textarea
                     value={form.message}
                     onChange={(e) => update("message", e.target.value)}
-                    placeholder="Anything you'd like our loan partner to know…"
+                    placeholder="Anything you'd like our loan team to know…"
                     rows={3}
                     className={`${inputClass} resize-none`}
                   />
@@ -473,6 +537,10 @@ export default function BankLoanApplyContent() {
               >
                 {submitting ? "Submitting…" : "Submit Loan Inquiry"}
               </button>
+
+              <p className="mt-3 text-center text-[11px] font-medium text-gray-400">
+                🔒 100% secure · No impact on your CIBIL score
+              </p>
 
               <p className="mt-4 rounded-lg bg-gray-50 px-3 py-3 text-[11px] leading-relaxed text-gray-500">
                 By submitting this form, you consent to Old Car Bazar sharing
