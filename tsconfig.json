@@ -24,11 +24,13 @@
   },
   "include": [
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "next.config.ts",
+    "eslint.config.mjs",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    "*.mts"
   ],
-  "exclude": ["node_modules", "React native"]
+  "exclude": ["node_modules", "React native", "React native/**/*"]
 }
