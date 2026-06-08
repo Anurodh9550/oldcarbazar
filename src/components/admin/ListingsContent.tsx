@@ -24,7 +24,15 @@ import {
   XIcon,
 } from "./icons";
 
-type FilterValue = "all" | "approved" | "pending" | "rejected" | "blocked" | "featured" | "flagged";
+type FilterValue =
+  | "all"
+  | "approved"
+  | "pending"
+  | "rejected"
+  | "blocked"
+  | "featured"
+  | "boosted"
+  | "flagged";
 
 const moderationBadge: Record<
   ListingModeration,
@@ -52,6 +60,7 @@ type EnrichedListing = (UserCarListing | CarListing) & {
   isUser: boolean;
   moderationStatus: ListingModeration;
   featured: boolean;
+  boosted: boolean;
   flagged: boolean;
   flagReason?: string;
   rejectedReason?: string;
@@ -68,6 +77,15 @@ function stableMetric(id: string, salt: number) {
   return h;
 }
 
+function listingIsBoosted(list: CarListing): boolean {
+  const meta = list as Partial<UserCarListing>;
+  if (typeof meta.isBoosted === "boolean") return meta.isBoosted;
+  if (meta.boostedUntil) {
+    return new Date(meta.boostedUntil).getTime() > Date.now();
+  }
+  return false;
+}
+
 function enrich(list: CarListing): EnrichedListing {
   if (isUserListing(list)) {
     return {
@@ -75,6 +93,7 @@ function enrich(list: CarListing): EnrichedListing {
       isUser: true,
       moderationStatus: list.moderation ?? "approved",
       featured: !!list.featured,
+      boosted: listingIsBoosted(list),
       flagged: !!list.flagged,
       flagReason: list.flagReason,
       rejectedReason: list.rejectedReason,
@@ -90,6 +109,7 @@ function enrich(list: CarListing): EnrichedListing {
     isUser: false,
     moderationStatus: "approved",
     featured: list.badge === "FEATURED",
+    boosted: listingIsBoosted(list),
     flagged: false,
     views: stableMetric(list.id, 7) + 20,
     inquiries: stableMetric(list.id, 13) % 30,
@@ -114,6 +134,7 @@ export default function ListingsContent() {
     userListings,
     setListingModeration,
     toggleFeatured,
+    markListingBoosted,
     flagListing,
     clearFlag,
     removeListing,
@@ -149,6 +170,7 @@ export default function ListingsContent() {
     else if (filter === "rejected") list = list.filter((l) => l.moderationStatus === "rejected");
     else if (filter === "blocked") list = list.filter((l) => l.moderationStatus === "blocked");
     else if (filter === "featured") list = list.filter((l) => l.featured);
+    else if (filter === "boosted") list = list.filter((l) => l.boosted);
     else if (filter === "flagged") list = list.filter((l) => l.flagged);
 
     if (city) list = list.filter((l) => l.location === city);
@@ -180,6 +202,7 @@ export default function ListingsContent() {
       rejected: combined.filter((l) => l.moderationStatus === "rejected").length,
       blocked: combined.filter((l) => l.moderationStatus === "blocked").length,
       featured: combined.filter((l) => l.featured).length,
+      boosted: combined.filter((l) => l.boosted).length,
       flagged: combined.filter((l) => l.flagged).length,
     };
     return c;
@@ -300,6 +323,17 @@ export default function ListingsContent() {
       id
     );
   };
+  const handleBoost = (id: string, title: string, on: boolean) => {
+    const boostedUntil = on
+      ? new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toISOString()
+      : null;
+    markListingBoosted(id, boostedUntil);
+    logActivity(
+      on ? "listing-featured" : "listing-unfeatured",
+      `${on ? "Boosted" : "Removed boost from"} — ${title}`,
+      id
+    );
+  };
   const handleFlag = (id: string, title: string) => {
     const reason = prompt("Why are you flagging this listing?", "Suspicious content");
     if (!reason) return;
@@ -336,6 +370,7 @@ export default function ListingsContent() {
             { id: "rejected", label: "Rejected" },
             { id: "blocked", label: "Blocked" },
             { id: "featured", label: "Featured" },
+            { id: "boosted", label: "Boosted" },
             { id: "flagged", label: "Flagged" },
           ] as { id: FilterValue; label: string }[]
         ).map((c) => {
@@ -541,6 +576,14 @@ export default function ListingsContent() {
                                   ★ FEATURED
                                 </span>
                               )}
+                              {car.boosted && (
+                                <span
+                                  title="Boosted"
+                                  className="rounded-full bg-indigo-100 px-1.5 py-0.5 text-[10px] font-bold text-indigo-700"
+                                >
+                                  🚀 BOOSTED
+                                </span>
+                              )}
                               {car.flagged && (
                                 <span
                                   title={car.flagReason}
@@ -632,6 +675,17 @@ export default function ListingsContent() {
                                 className="h-3.5 w-3.5"
                                 filled={car.featured}
                               />
+                            </IconButton>
+                          )}
+                          {car.isUser && (
+                            <IconButton
+                              title={car.boosted ? "Remove boost" : "Boost listing"}
+                              tone={car.boosted ? "indigoSolid" : "indigo"}
+                              onClick={() =>
+                                handleBoost(car.id, car.title, !car.boosted)
+                              }
+                            >
+                              <BoostIcon className="h-3.5 w-3.5" />
                             </IconButton>
                           )}
                           {car.isUser && (
@@ -755,7 +809,35 @@ function InquiriesIconMini() {
   );
 }
 
-type Tone = "emerald" | "red" | "amber" | "slate" | "dark" | "redLight";
+function BoostIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+      <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+      <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+      <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+    </svg>
+  );
+}
+
+type Tone =
+  | "emerald"
+  | "red"
+  | "amber"
+  | "slate"
+  | "dark"
+  | "redLight"
+  | "indigo"
+  | "indigoSolid";
 
 function IconButton({
   title,
@@ -777,6 +859,9 @@ function IconButton({
     slate: "bg-slate-50 text-slate-600 hover:bg-slate-100 ring-1 ring-slate-200",
     dark: "bg-slate-900 text-white hover:bg-slate-800",
     redLight: "bg-white text-red-600 hover:bg-red-50 ring-1 ring-red-200",
+    indigo:
+      "bg-indigo-50 text-indigo-700 hover:bg-indigo-100 ring-1 ring-indigo-200",
+    indigoSolid: "bg-indigo-600 text-white hover:bg-indigo-500",
   };
   return (
     <button
