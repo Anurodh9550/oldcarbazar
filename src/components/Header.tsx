@@ -127,19 +127,19 @@ export default function Header() {
         initial="hidden"
         animate="visible"
         variants={fadeInDown}
-        className="sticky top-0 z-[70] shadow-md"
+        className="sticky top-0 z-[70] border-b border-gray-200 bg-white shadow-sm"
       >
-        {/* Top bar — Flipkart-style brand bar */}
-        <motion.div className="bg-gradient-to-r from-[#f97a4d] to-[#e54d24]">
+        {/* Top bar */}
+        <motion.div className="bg-white">
           <div className="mx-auto flex max-w-[1280px] items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-4 sm:py-2.5 lg:gap-5 lg:px-6">
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
               <Link href="/" className="flex shrink-0 items-center">
                 <Image
-                  src="/logocarr-white.png"
+                  src="/logocarr-trans.png"
                   alt="Old Car Bazar"
                   width={220}
                   height={60}
-                  className="h-9 w-auto object-contain sm:h-12"
+                  className="h-10 w-auto object-contain sm:h-14"
                   priority
                 />
               </Link>
@@ -151,11 +151,11 @@ export default function Header() {
               onSubmit={submitSearch}
               role="search"
             >
-              <label className="flex w-full max-w-2xl items-center gap-2 overflow-hidden rounded-md bg-white px-4 py-2.5 shadow-sm focus-within:ring-2 focus-within:ring-white/70">
+              <label className="flex w-full max-w-2xl items-center gap-2 overflow-hidden rounded-full border border-gray-300 bg-white px-4 py-2 shadow-sm focus-within:border-[#f75d34] focus-within:ring-2 focus-within:ring-[#f75d34]/20">
                 <button
                   type="submit"
                   aria-label="Search cars"
-                  className="text-[#f75d34] hover:text-[#e54d24]"
+                  className="text-gray-400 hover:text-[#f75d34]"
                 >
                   <SearchIcon className="h-4 w-4 shrink-0" />
                 </button>
@@ -176,9 +176,9 @@ export default function Header() {
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={() => setLocationOpen(true)}
-                className="hidden items-center gap-1 rounded-full border border-white/40 px-3 py-1.5 text-sm font-medium text-white hover:bg-white/10 sm:flex"
+                className="hidden items-center gap-1 rounded-full border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:border-[#f75d34] hover:text-[#f75d34] sm:flex"
               >
-                <PinIcon className="h-4 w-4 text-white" />
+                <PinIcon className="h-4 w-4 text-[#f75d34]" />
                 {selectedCity}
                 <ChevronDownIcon className="h-3 w-3" />
               </motion.button>
@@ -186,7 +186,7 @@ export default function Header() {
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
                 <Link
                   href="/sell-car"
-                  className="hidden rounded-md bg-white px-4 py-2 text-sm font-bold text-[#f75d34] shadow-sm hover:bg-orange-50 sm:inline-block"
+                  className="hidden rounded-full bg-[#f75d34] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#e54d24] sm:inline-block"
                 >
                   Sell Car
                 </Link>
@@ -195,9 +195,9 @@ export default function Header() {
               <motion.button
                 type="button"
                 aria-label="Saved cars"
-                whileHover={{ scale: 1.12 }}
+                whileHover={{ scale: 1.12, color: "#f75d34" }}
                 onClick={() => router.push("/shortlisted")}
-                className="hidden text-white/90 hover:text-white sm:block"
+                className="hidden text-gray-600 sm:block"
               >
                 <HeartIcon className="h-5 w-5" />
               </motion.button>
@@ -206,19 +206,19 @@ export default function Header() {
                 <span
                   aria-label="Checking session"
                   role="status"
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full text-white"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full text-gray-500"
                 >
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-gray-200 border-t-[#f75d34]" />
                 </span>
               ) : isLoggedIn ? (
                 <ProfileDropdown />
               ) : (
                 <motion.button
                   type="button"
-                  whileHover={{ scale: 1.03 }}
+                  whileHover={{ x: 2, color: "#f75d34" }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => setAuthOpen(true)}
-                  className="flex items-center gap-1.5 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-[#f75d34] shadow-sm hover:bg-orange-50"
+                  className="flex items-center gap-1.5 text-sm font-medium text-gray-800"
                 >
                   <UserIcon className="h-5 w-5" />
                   <span className="hidden sm:inline">Login</span>
@@ -228,16 +228,16 @@ export default function Header() {
           </div>
 
           {/* Mobile search + sell */}
-          <motion.div className="flex items-center gap-2 px-3 pb-3 pt-0 sm:px-4 md:hidden">
+          <motion.div className="flex items-center gap-2 border-t border-gray-100 px-3 pb-3 pt-1 sm:px-4 md:hidden">
             <form
-              className="flex flex-1 items-center overflow-hidden rounded-md bg-white shadow-sm"
+              className="flex flex-1 items-center overflow-hidden rounded-full border border-gray-300 bg-white"
               onSubmit={submitSearch}
               role="search"
             >
               <button
                 type="submit"
                 aria-label="Search cars"
-                className="pl-3 text-[#f75d34]"
+                className="pl-3 text-gray-400 hover:text-[#f75d34]"
               >
                 <SearchIcon className="h-4 w-4" />
               </button>
@@ -251,7 +251,7 @@ export default function Header() {
             </form>
             <Link
               href="/sell-car"
-              className="shrink-0 rounded-md bg-white px-3 py-2 text-xs font-bold text-[#f75d34]"
+              className="shrink-0 rounded-full bg-[#f75d34] px-3 py-2 text-xs font-semibold text-white"
             >
               Sell
             </Link>
