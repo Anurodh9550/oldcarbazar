@@ -133,16 +133,13 @@ export default function Header() {
         <motion.div className="bg-gradient-to-r from-[#f97a4d] to-[#e54d24]">
           <div className="mx-auto flex max-w-[1280px] items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-4 sm:py-2.5 lg:gap-5 lg:px-6">
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-              <Link
-                href="/"
-                className="flex shrink-0 items-center rounded-lg bg-white px-2 py-1 shadow-sm ring-1 ring-black/5 sm:px-3 sm:py-1.5"
-              >
+              <Link href="/" className="flex shrink-0 items-center">
                 <Image
-                  src="/logocarr.png"
+                  src="/logocarr-white.png"
                   alt="Old Car Bazar"
                   width={220}
                   height={60}
-                  className="h-8 w-auto object-contain sm:h-11"
+                  className="h-9 w-auto object-contain sm:h-12"
                   priority
                 />
               </Link>
