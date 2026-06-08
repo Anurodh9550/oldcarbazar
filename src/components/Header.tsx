@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { fadeInDown } from "@/lib/motion";
@@ -43,11 +43,13 @@ const navItems: {
 
 export default function Header() {
   const router = useRouter();
+  const pathname = usePathname();
   const [authOpen, setAuthOpen] = useState(false);
   const [locationOpen, setLocationOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<OpenMenu>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const { selectedCity } = useLocation();
   const { isLoggedIn, loading: authLoading } = useAuth();
 
@@ -91,6 +93,36 @@ export default function Header() {
     };
   }, []);
 
+  // Press "/" anywhere to jump into the search box.
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "/" || e.metaKey || e.ctrlKey || e.altKey) return;
+      const el = document.activeElement as HTMLElement | null;
+      const tag = el?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || el?.isContentEditable) return;
+      e.preventDefault();
+      searchInputRef.current?.focus();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  const isNavActive = (id: OpenMenu) => {
+    if (openMenu === id) return true;
+    if (!pathname) return false;
+    if (id === "buy-cars") return pathname.startsWith("/used-cars");
+    if (id === "sell-car") return pathname.startsWith("/sell");
+    if (id === "loan-tools")
+      return (
+        pathname.startsWith("/emi") ||
+        pathname.startsWith("/loan") ||
+        pathname.startsWith("/compare-loans") ||
+        pathname.startsWith("/car-loan")
+      );
+    if (id === "help") return pathname.startsWith("/help");
+    return false;
+  };
+
   const handleMenuItemClick = (item: MenuLink) => {
     if (item.href === "#cities") {
       setLocationOpen(true);
@@ -115,7 +147,7 @@ export default function Header() {
   };
 
   const navButtonClass = (active: boolean) =>
-    `flex items-center gap-0.5 whitespace-nowrap rounded-md px-2 py-3 text-[11px] font-semibold tracking-wide sm:px-4 sm:text-[13px] ${
+    `relative flex items-center gap-0.5 whitespace-nowrap rounded-md px-2 py-2.5 text-[11px] font-semibold tracking-wide sm:px-4 sm:text-[13px] ${
       active
         ? "bg-orange-50 text-[#f75d34]"
         : "text-gray-800 hover:bg-orange-50 hover:text-[#f75d34]"
@@ -129,9 +161,12 @@ export default function Header() {
         variants={fadeInDown}
         className="sticky top-0 z-[70] border-b border-gray-200 bg-white shadow-sm"
       >
+        {/* Signature accent strip */}
+        <div className="h-1 w-full bg-gradient-to-r from-[#f75d34] via-[#ff9a6c] to-[#f75d34]" />
+
         {/* Top bar */}
         <motion.div className="bg-white">
-          <div className="mx-auto flex max-w-[1280px] items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-4 sm:py-2.5 lg:gap-5 lg:px-6">
+          <div className="mx-auto flex max-w-[1280px] items-center gap-2 px-3 py-1.5 sm:gap-3 sm:px-4 sm:py-2 lg:gap-5 lg:px-6">
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
               <Link href="/" className="flex shrink-0 items-center">
                 <Image
@@ -139,7 +174,7 @@ export default function Header() {
                   alt="Old Car Bazar"
                   width={220}
                   height={60}
-                  className="h-10 w-auto object-contain sm:h-14"
+                  className="h-8 w-auto object-contain sm:h-10"
                   priority
                 />
               </Link>
@@ -151,7 +186,7 @@ export default function Header() {
               onSubmit={submitSearch}
               role="search"
             >
-              <label className="flex w-full max-w-2xl items-center gap-2 overflow-hidden rounded-full border border-gray-300 bg-white px-4 py-2 shadow-sm focus-within:border-[#f75d34] focus-within:ring-2 focus-within:ring-[#f75d34]/20">
+              <label className="flex w-full max-w-2xl items-center gap-2 overflow-hidden rounded-full border border-gray-200 bg-gray-50 px-4 py-1.5 transition focus-within:border-[#f75d34] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#f75d34]/15">
                 <button
                   type="submit"
                   aria-label="Search cars"
@@ -160,12 +195,16 @@ export default function Header() {
                   <SearchIcon className="h-4 w-4 shrink-0" />
                 </button>
                 <input
+                  ref={searchInputRef}
                   type="search"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search used cars — Swift, Creta, Maruti..."
                   className="w-full bg-transparent text-sm text-gray-800 outline-none placeholder:text-gray-400"
                 />
+                <kbd className="hidden shrink-0 rounded border border-gray-300 bg-white px-1.5 py-0.5 text-[10px] font-semibold text-gray-400 lg:block">
+                  /
+                </kbd>
               </label>
             </motion.form>
 
@@ -275,9 +314,17 @@ export default function Header() {
               >
                 <Link
                   href="/"
-                  className="rounded-md px-2 py-3 text-[11px] font-semibold tracking-wide text-gray-800 hover:bg-orange-50 hover:text-[#f75d34] sm:px-4 sm:text-[13px]"
+                  className={`relative rounded-md px-2 py-2.5 text-[11px] font-semibold tracking-wide hover:bg-orange-50 hover:text-[#f75d34] sm:px-4 sm:text-[13px] ${
+                    pathname === "/" ? "text-[#f75d34]" : "text-gray-800"
+                  }`}
                 >
                   Home
+                  {pathname === "/" && (
+                    <motion.span
+                      layoutId="navUnderline"
+                      className="pointer-events-none absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-[#f75d34] sm:inset-x-4"
+                    />
+                  )}
                 </Link>
               </motion.li>
               {navItems.map((item, i) => (
@@ -310,6 +357,12 @@ export default function Header() {
                           : "text-gray-500"
                       }`}
                     />
+                    {isNavActive(item.id) && (
+                      <motion.span
+                        layoutId="navUnderline"
+                        className="pointer-events-none absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-[#f75d34] sm:inset-x-4"
+                      />
+                    )}
                   </button>
                 </motion.li>
               ))}
@@ -320,9 +373,19 @@ export default function Header() {
               >
                 <Link
                   href="/dealers"
-                  className="whitespace-nowrap rounded-md px-2 py-3 text-[11px] font-semibold tracking-wide text-gray-800 hover:bg-orange-50 hover:text-[#f75d34] sm:px-4 sm:text-[13px]"
+                  className={`relative whitespace-nowrap rounded-md px-2 py-2.5 text-[11px] font-semibold tracking-wide hover:bg-orange-50 hover:text-[#f75d34] sm:px-4 sm:text-[13px] ${
+                    pathname?.startsWith("/dealers")
+                      ? "text-[#f75d34]"
+                      : "text-gray-800"
+                  }`}
                 >
                   DEALERS
+                  {pathname?.startsWith("/dealers") && (
+                    <motion.span
+                      layoutId="navUnderline"
+                      className="pointer-events-none absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-[#f75d34] sm:inset-x-4"
+                    />
+                  )}
                 </Link>
               </motion.li>
             </ul>
