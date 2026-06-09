@@ -10,10 +10,10 @@ import {
   buildCarDetail,
   findCarById,
   getSimilarCars,
-  REVIEW_SAMPLES,
   type CarDetailTab,
 } from "@/lib/carDetail";
 import ExploreCarCard from "@/components/explore/ExploreCarCard";
+import CarReviewsSection from "@/components/car-detail/CarReviewsSection";
 import SellerDetailsModal from "@/components/car-detail/SellerDetailsModal";
 import BuyerInquiryModal from "@/components/car-detail/BuyerInquiryModal";
 import TestDriveModal from "@/components/car-detail/TestDriveModal";
@@ -645,32 +645,7 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
             )}
 
             {activeTab === "reviews" && (
-              <section className="rounded-2xl border border-gray-200 bg-white p-6">
-                <div className="flex items-center gap-3">
-                  <span className="text-3xl font-bold text-gray-900">4.3</span>
-                  <div>
-                    <p className="card-title">User Reviews & Rating</p>
-                    <p className="text-caption">Based on 424 reviews (model family)</p>
-                  </div>
-                </div>
-                <ul className="mt-6 space-y-4">
-                  {REVIEW_SAMPLES.map((r) => (
-                    <li key={r.name} className="rounded-xl border border-gray-100 p-4">
-                      <div className="flex items-center gap-3">
-                        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 font-bold text-[#f75d34]">
-                          {r.name.charAt(0)}
-                        </span>
-                        <div>
-                          <p className="card-title">{r.name}</p>
-                          <p className="text-caption">★ {r.rating}/5 · {r.tag}</p>
-                        </div>
-                      </div>
-                      <p className="card-title mt-3">{r.title}</p>
-                      <p className="text-body-muted mt-1">{r.text}</p>
-                    </li>
-                  ))}
-                </ul>
-              </section>
+              <CarReviewsSection carId={detail.id} />
             )}
 
             {similar.length > 0 && (

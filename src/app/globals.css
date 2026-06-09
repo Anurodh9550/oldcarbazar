@@ -314,3 +314,50 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* Branded logo loader */
+@keyframes ocb-loader-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(250%);
+  }
+}
+
+@keyframes ocb-logo-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 0.85;
+  }
+}
+
+.ocb-loader-bar {
+  position: relative;
+  overflow: hidden;
+}
+.ocb-loader-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, transparent, #f75d34, #ff9a6c, transparent);
+  animation: ocb-loader-sweep 1.1s ease-in-out infinite;
+}
+
+.ocb-logo-pulse {
+  animation: ocb-logo-pulse 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ocb-loader-bar::after,
+  .ocb-logo-pulse {
+    animation: none;
+  }
+}

@@ -1,9 +1,9 @@
 "use client";
 
-import Spinner from "./Spinner";
+import LogoLoader from "./LogoLoader";
 
 type PageLoaderProps = {
-  /** Short message shown under the spinner. */
+  /** Short message shown under the logo. */
   message?: string;
   /** Tighter padding for inside cards/modals. */
   compact?: boolean;
@@ -11,8 +11,8 @@ type PageLoaderProps = {
 };
 
 /**
- * Centered block-level loading indicator. Use as the placeholder content of a
- * section/page while the initial data is being fetched.
+ * Centered block-level loading indicator showing the Old Car Bazar logo. Use as
+ * the placeholder content of a section/page while initial data is being fetched.
  */
 export default function PageLoader({
   message = "Loading…",
@@ -20,15 +20,6 @@ export default function PageLoader({
   className = "",
 }: PageLoaderProps) {
   return (
-    <div
-      role="status"
-      aria-live="polite"
-      className={`flex w-full flex-col items-center justify-center gap-3 ${
-        compact ? "py-8" : "py-16"
-      } ${className}`}
-    >
-      <Spinner size="lg" />
-      <p className="text-sm font-medium text-gray-600">{message}</p>
-    </div>
+    <LogoLoader message={message} compact={compact} className={className} />
   );
 }

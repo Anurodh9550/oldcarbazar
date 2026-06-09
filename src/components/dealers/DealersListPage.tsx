@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { api, type ApiDealerCard } from "@/lib/api";
+import PageLoader from "@/components/ui/PageLoader";
 import DealerCard from "./DealerCard";
 
 const SORT_OPTIONS: {
@@ -161,14 +162,11 @@ export default function DealersListPage() {
           )}
 
           {loading ? (
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="h-44 animate-pulse rounded-2xl border border-gray-100 bg-white"
-                />
-              ))}
-            </div>
+            <PageLoader
+              message="Loading dealers from database…"
+              compact
+              className="mt-8 rounded-2xl border border-gray-100 bg-white"
+            />
           ) : dealers.length === 0 ? (
             <div className="mt-12 rounded-2xl border-2 border-dashed border-gray-200 bg-white py-16 text-center">
               <span className="text-5xl">🚘</span>

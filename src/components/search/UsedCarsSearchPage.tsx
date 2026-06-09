@@ -21,6 +21,13 @@ import {
   enrichCarForSearch,
   getFilterLabel,
 } from "@/lib/searchFilters";
+import {
+  EMI_DEFAULTS,
+  formatEmi,
+  getCarEmi,
+  getDealRating,
+} from "@/lib/smartCar";
+import PageLoader from "@/components/ui/PageLoader";
 import SearchFiltersSidebar from "./SearchFiltersSidebar";
 
 function ActiveFilterChip({
@@ -41,6 +48,81 @@ function ActiveFilterChip({
         ×
       </span>
     </button>
+  );
+}
+
+const EMI_PRESETS = [10000, 15000, 20000, 30000];
+
+function EmiAffordabilityPanel({
+  value,
+  onChange,
+}: {
+  value: number;
+  onChange: (next: number) => void;
+}) {
+  return (
+    <div className="mb-4 rounded-xl border border-orange-100 bg-gradient-to-r from-orange-50 to-white p-4 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f75d34]/10 text-base">
+            💸
+          </span>
+          <div>
+            <p className="text-sm font-bold text-gray-900">
+              Find cars by monthly EMI
+            </p>
+            <p className="text-[11px] text-gray-500">
+              {EMI_DEFAULTS.downPaymentPct * 100}% down ·{" "}
+              {EMI_DEFAULTS.interestRate}% rate · {EMI_DEFAULTS.tenureMonths / 12}{" "}
+              yr tenure
+            </p>
+          </div>
+        </div>
+        {value > 0 && (
+          <button
+            type="button"
+            onClick={() => onChange(0)}
+            className="text-xs font-semibold text-[#f75d34] hover:underline"
+          >
+            Reset
+          </button>
+        )}
+      </div>
+
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        {EMI_PRESETS.map((preset) => (
+          <button
+            key={preset}
+            type="button"
+            onClick={() => onChange(value === preset ? 0 : preset)}
+            className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
+              value === preset
+                ? "border-[#f75d34] bg-[#f75d34] text-white"
+                : "border-gray-300 bg-white text-gray-700 hover:border-[#f75d34]"
+            }`}
+          >
+            ≤ ₹{(preset / 1000).toFixed(0)}k/mo
+          </button>
+        ))}
+        <label className="ml-auto flex items-center gap-2 text-xs text-gray-600">
+          <span className="hidden sm:inline">Custom</span>
+          <span className="flex items-center rounded-lg border border-gray-300 bg-white px-2 py-1">
+            <span className="text-gray-400">₹</span>
+            <input
+              type="number"
+              inputMode="numeric"
+              min={0}
+              step={1000}
+              value={value || ""}
+              onChange={(e) => onChange(Number(e.target.value) || 0)}
+              placeholder="EMI"
+              className="w-20 bg-transparent text-right text-sm outline-none"
+            />
+            <span className="text-gray-400">/mo</span>
+          </span>
+        </label>
+      </div>
+    </div>
   );
 }
 
@@ -68,9 +150,10 @@ function readFilters(searchParams: URLSearchParams): SearchFilterParams {
 export default function UsedCarsSearchPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { allListings } = useListings();
+  const { allListings, loading: listingsLoading } = useListings();
   const { selectedCity, setSelectedCity } = useLocation();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [emiBudget, setEmiBudget] = useState<number>(0);
 
   const filters = readFilters(searchParams);
   const sort = (searchParams.get("sort") as SortOptionId) || "relevance";
@@ -121,6 +204,17 @@ export default function UsedCarsSearchPage() {
     return sortCars(list, sort);
   }, [cityCars, filters, sort]);
 
+  const visibleCars = useMemo(() => {
+    if (!emiBudget) return filteredCars;
+    return filteredCars.filter((car) => getCarEmi(car) <= emiBudget);
+  }, [filteredCars, emiBudget]);
+
+  const dealRatings = useMemo(() => {
+    const map = new Map<string, ReturnType<typeof getDealRating>>();
+    visibleCars.forEach((car) => map.set(car.id, getDealRating(car, cityCars)));
+    return map;
+  }, [visibleCars, cityCars]);
+
   const brandName = filters.brand ? getBrandNameFromSlug(filters.brand) : null;
 
   const pageTitle = brandName
@@ -161,6 +255,16 @@ export default function UsedCarsSearchPage() {
     );
     updateParams(cleared);
   };
+
+  if (listingsLoading && allListings.length === 0) {
+    return (
+      <main className="min-h-screen bg-[#f5f5f5]">
+        <div className="mx-auto max-w-[1280px] px-4 py-16 lg:px-6">
+          <PageLoader message="Loading cars from database…" />
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-[#f5f5f5]">
@@ -250,36 +354,58 @@ export default function UsedCarsSearchPage() {
               </label>
             </div>
 
+            <EmiAffordabilityPanel value={emiBudget} onChange={setEmiBudget} />
+
             <p className="mb-4 text-body-muted">
               Showing{" "}
               <span className="font-semibold text-[#f75d34]">
-                {filteredCars.length}
+                {visibleCars.length}
               </span>{" "}
               cars in {activeCity}
+              {emiBudget > 0 && (
+                <span className="text-gray-500">
+                  {" "}
+                  within {formatEmi(emiBudget)} EMI
+                </span>
+              )}
             </p>
 
-            {filteredCars.length === 0 ? (
+            {visibleCars.length === 0 ? (
               <div className="rounded-xl border border-dashed border-gray-300 bg-white py-16 text-center">
                 <p className="text-lg font-semibold text-gray-800">No cars found</p>
                 <p className="mt-2 text-caption sm:text-sm">
-                  Try removing filters or change city from the header.
+                  {emiBudget > 0
+                    ? "Try increasing your monthly EMI budget or removing filters."
+                    : "Try removing filters or change city from the header."}
                 </p>
-                <Link
-                  href="/used-cars"
-                  className="mt-4 inline-block text-sm font-semibold text-[#f75d34] hover:underline"
-                >
-                  Browse all used cars
-                </Link>
+                {emiBudget > 0 ? (
+                  <button
+                    type="button"
+                    onClick={() => setEmiBudget(0)}
+                    className="mt-4 inline-block text-sm font-semibold text-[#f75d34] hover:underline"
+                  >
+                    Clear EMI budget
+                  </button>
+                ) : (
+                  <Link
+                    href="/used-cars"
+                    className="mt-4 inline-block text-sm font-semibold text-[#f75d34] hover:underline"
+                  >
+                    Browse all used cars
+                  </Link>
+                )}
               </div>
             ) : (
               <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                {filteredCars.map((car) => (
+                {visibleCars.map((car) => (
                   <li key={car.id}>
                     <ExploreCarCard
                       car={car}
                       layout="grid"
                       showDiscount
                       showActions
+                      showEmi
+                      dealRating={dealRatings.get(car.id)}
                     />
                   </li>
                 ))}

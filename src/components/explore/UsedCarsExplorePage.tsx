@@ -23,19 +23,22 @@ import CarCarousel from "./CarCarousel";
 import UsedCarsBottomSections from "./UsedCarsBottomSections";
 import { PinIcon, SearchIcon } from "@/components/icons";
 import { uniqueIndianCities } from "@/data/indianCities";
+import PageLoader from "@/components/ui/PageLoader";
+import FindMyCarWizard from "./FindMyCarWizard";
 
 const POPULAR_CITY_ROWS_VISIBLE = 12;
 
 export default function UsedCarsExplorePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { allListings } = useListings();
+  const { allListings, loading: listingsLoading } = useListings();
   const { selectedCity, setSelectedCity } = useLocation();
   const [bodyType, setBodyType] = useState("Hatchback");
   const [budget, setBudget] = useState("0-5");
   const [showAllNearby, setShowAllNearby] = useState(false);
   const [citySearch, setCitySearch] = useState("");
   const [showAllCities, setShowAllCities] = useState(false);
+  const [wizardOpen, setWizardOpen] = useState(false);
 
   useEffect(() => {
     const brand = searchParams.get("brand");
@@ -106,6 +109,14 @@ export default function UsedCarsExplorePage() {
     if (match) setSelectedCity(match.name as CityName);
   };
 
+  if (listingsLoading && allListings.length === 0) {
+    return (
+      <main className="min-h-screen bg-white">
+        <PageLoader message="Loading cars from database…" />
+      </main>
+    );
+  }
+
   return (
     <main className="bg-white">
       {/* Hero */}
@@ -129,12 +140,21 @@ export default function UsedCarsExplorePage() {
             <p className="mt-3 text-base !text-white">
               Find the right car from our extensive collection in {selectedCity}
             </p>
-            <Link
-              href="#explore-listings"
-              className="mt-6 inline-block rounded-lg bg-[#f75d34] px-8 py-3 text-sm font-semibold text-white hover:bg-[#e54d24]"
-            >
-              Buy Used Cars
-            </Link>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link
+                href="#explore-listings"
+                className="inline-block rounded-lg bg-[#f75d34] px-8 py-3 text-sm font-semibold text-white hover:bg-[#e54d24]"
+              >
+                Buy Used Cars
+              </Link>
+              <button
+                type="button"
+                onClick={() => setWizardOpen(true)}
+                className="inline-flex items-center gap-2 rounded-lg border border-white/40 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20"
+              >
+                <span aria-hidden>✨</span> Find My Car
+              </button>
+            </div>
           </div>
           <div className="hidden lg:block lg:w-1/2" />
         </div>
@@ -403,6 +423,8 @@ export default function UsedCarsExplorePage() {
           />
         </div>
       </div>
+
+      <FindMyCarWizard open={wizardOpen} onClose={() => setWizardOpen(false)} />
     </main>
   );
 }

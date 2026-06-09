@@ -6,7 +6,7 @@ import { useLocation } from "@/context/LocationContext";
 import { useListings } from "@/context/ListingsContext";
 import { fadeInRight, staggerContainer } from "@/lib/motion";
 import CarCard from "./CarCard";
-import CarCardSkeleton from "./ui/CarCardSkeleton";
+import PageLoader from "./ui/PageLoader";
 import { parseKms } from "@/lib/carMeta";
 
 type SortKey = "relevance" | "price-asc" | "price-desc" | "kms-asc";
@@ -92,7 +92,7 @@ export default function CarListingGrid() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <CarCardSkeleton count={6} />
+            <PageLoader message="Loading cars from database…" compact />
           </motion.div>
         ) : sortedCars.length === 0 ? (
           <motion.div

@@ -8,6 +8,8 @@ import { toggleShortlist, isShortlisted } from "@/lib/shortlist";
 import { useState } from "react";
 import { HeartIcon } from "../icons";
 import WhatsAppIcon from "../WhatsAppIcon";
+import DealBadge from "@/components/ui/DealBadge";
+import { formatEmi, getCarEmi, type DealRating } from "@/lib/smartCar";
 
 function formatOriginalPrice(lakh: number) {
   return lakh >= 100
@@ -21,6 +23,10 @@ type ExploreCarCardProps = {
   showActions?: boolean;
   partnerLabel?: string;
   layout?: "carousel" | "grid";
+  /** Price-fairness rating; when provided, a smart badge + EMI hint are shown. */
+  dealRating?: DealRating | null;
+  /** Show an estimated monthly EMI under the price. */
+  showEmi?: boolean;
 };
 
 export default function ExploreCarCard({
@@ -29,11 +35,14 @@ export default function ExploreCarCard({
   showActions = false,
   partnerLabel,
   layout = "carousel",
+  dealRating,
+  showEmi = false,
 }: ExploreCarCardProps) {
   const showDeal = showDiscount && car.isDiscounted && car.originalPriceLakh;
   const detailHref = getCarDetailPath(car.id);
   const whatsappHref = `https://wa.me/919876543210?text=${encodeURIComponent(`Hi, I'm interested in ${car.title} on Old Car Bazar.`)}`;
   const [saved, setSaved] = useState(() => isShortlisted(car.id));
+  const emi = showEmi ? getCarEmi(car) : 0;
 
   return (
     <article
@@ -59,6 +68,9 @@ export default function ExploreCarCard({
               {partnerLabel}
             </span>
           )}
+          {dealRating && (
+            <DealBadge rating={dealRating} className="absolute right-2 top-2" />
+          )}
         </div>
 
         <div className="p-3">
@@ -83,6 +95,14 @@ export default function ExploreCarCard({
 
           <div className="mt-2">
             <p className="text-base font-bold text-gray-900">{car.price}</p>
+            {showEmi && emi > 0 && (
+              <p className="mt-0.5 text-[11px] font-medium text-gray-500">
+                EMI from{" "}
+                <span className="font-semibold text-[#f75d34]">
+                  {formatEmi(emi)}
+                </span>
+              </p>
+            )}
             {showDeal && car.originalPriceLakh && (
               <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs">
                 <span className="text-gray-400 line-through">

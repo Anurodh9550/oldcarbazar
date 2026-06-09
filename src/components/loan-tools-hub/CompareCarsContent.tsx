@@ -6,6 +6,15 @@ import { useMemo, useState } from "react";
 import { useListings } from "@/context/ListingsContext";
 import type { CarListing } from "@/data/cars";
 import { compareTips } from "@/data/loanToolsPages";
+import { enrichCar, type EnrichedCar } from "@/lib/carMeta";
+import {
+  formatEmi,
+  getCarEmi,
+  getDealRating,
+  getSmartScore,
+} from "@/lib/smartCar";
+import { getCarDetailPath } from "@/lib/carDetail";
+import DealBadge from "@/components/ui/DealBadge";
 
 const MAX_SLOTS = 3;
 
@@ -35,6 +44,45 @@ export default function CompareCarsContent() {
       ),
     [slots, allListings]
   );
+
+  const peers = useMemo(() => allListings.map(enrichCar), [allListings]);
+
+  const enrichedSelected = useMemo(
+    () => selectedCars.map((c) => (c ? enrichCar(c) : null)),
+    [selectedCars]
+  );
+
+  const scored = useMemo(
+    () =>
+      enrichedSelected.map((car) =>
+        car
+          ? {
+              car,
+              emi: getCarEmi(car),
+              deal: getDealRating(car, peers),
+              smart: getSmartScore(car, peers),
+            }
+          : null
+      ),
+    [enrichedSelected, peers]
+  );
+
+  const winner = useMemo<{
+    car: EnrichedCar;
+    score: number;
+    idx: number;
+  } | null>(() => {
+    let best: { car: EnrichedCar; score: number; idx: number } | null = null;
+    scored.forEach((s, idx) => {
+      if (!s) return;
+      if (best === null || s.smart.score > best.score) {
+        best = { car: s.car, score: s.smart.score, idx };
+      }
+    });
+    return best;
+  }, [scored]);
+
+  const filledCount = scored.filter(Boolean).length;
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -79,6 +127,41 @@ export default function CompareCarsContent() {
       label: "Type",
       getValue: (car) =>
         car ? (car.badge ?? "Standard listing") : "—",
+    },
+    {
+      label: "EMI (est.)",
+      getValue: (car) => {
+        if (!car) return "—";
+        const enriched = enrichCar(car);
+        return (
+          <span className="font-semibold text-gray-900">
+            {formatEmi(getCarEmi(enriched))}
+          </span>
+        );
+      },
+    },
+    {
+      label: "Price verdict",
+      getValue: (car) => {
+        if (!car) return "—";
+        const deal = getDealRating(enrichCar(car), peers);
+        return deal ? <DealBadge rating={deal} showDiff /> : "—";
+      },
+    },
+    {
+      label: "OCB Smart Score",
+      getValue: (car) => {
+        if (!car) return "—";
+        const smart = getSmartScore(enrichCar(car), peers);
+        return (
+          <span className="inline-flex items-center gap-1.5">
+            <span className={`text-base font-extrabold ${smart.colorClass}`}>
+              {smart.score}
+            </span>
+            <span className="text-[11px] text-gray-500">/100 · {smart.label}</span>
+          </span>
+        );
+      },
     },
   ];
 
@@ -188,6 +271,33 @@ export default function CompareCarsContent() {
           );
         })}
       </div>
+
+      {winner && filledCount >= 2 && (
+        <div className="flex flex-col gap-3 rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-white p-5 sm:flex-row sm:items-center">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-2xl text-white shadow">
+            🏆
+          </div>
+          <div className="flex-1">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-700">
+              Our pick
+            </p>
+            <p className="text-base font-bold text-gray-900">
+              {winner.car.title}
+            </p>
+            <p className="mt-0.5 text-sm text-gray-600">
+              Best overall value with an OCB Smart Score of{" "}
+              <span className="font-bold text-emerald-700">{winner.score}/100</span>{" "}
+              — based on kms, ownership and price vs similar cars.
+            </p>
+          </div>
+          <Link
+            href={getCarDetailPath(winner.car.id)}
+            className="shrink-0 rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700"
+          >
+            View winner →
+          </Link>
+        </div>
+      )}
 
       <div className="overflow-hidden rounded-2xl border border-gray-200">
         <div className="overflow-x-auto">

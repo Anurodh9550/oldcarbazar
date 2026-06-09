@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ApiError, api, apiListingToCarListing, type ApiDealerDetail } from "@/lib/api";
 import { enrichCar } from "@/lib/carMeta";
 import ExploreCarCard from "@/components/explore/ExploreCarCard";
+import PageLoader from "@/components/ui/PageLoader";
 
 function initials(name: string): string {
   return name
@@ -80,7 +81,9 @@ export default function DealerDetailPage({ dealerId }: { dealerId: string }) {
   if (loading) {
     return (
       <main className="bg-[#f7f7f7] px-4 py-16 sm:px-8">
-        <div className="mx-auto h-44 max-w-5xl animate-pulse rounded-2xl bg-white" />
+        <div className="mx-auto max-w-5xl rounded-2xl bg-white">
+          <PageLoader message="Loading dealer from database…" />
+        </div>
       </main>
     );
   }
