@@ -154,7 +154,7 @@ export default function HeroSection() {
             variants={staggerContainer}
             className="mt-4 flex flex-wrap items-center gap-2"
           >
-            <span className="text-caption">Popular:</span>
+            <span className="text-xs font-medium text-white/70">Popular:</span>
             {quickLinks.map((car) => (
               <motion.div key={car.label} variants={fadeInUp}>
                 <Link

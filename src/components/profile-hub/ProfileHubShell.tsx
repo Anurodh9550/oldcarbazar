@@ -24,7 +24,15 @@ export default function ProfileHubShell({
       <div className="relative overflow-hidden border-b border-orange-200/30 bg-[#1a1a2e]">
         <div
           aria-hidden
-          className="absolute inset-0 bg-gradient-to-br from-[#1a1a2e] via-[#2d2d44] to-[#1a1a2e]"
+          className="absolute inset-0 bg-cover bg-center opacity-35"
+          style={{
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1493238792000-8113da705763?w=1600&h=700&fit=crop')",
+          }}
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-gradient-to-br from-[#1a1a2e]/95 via-[#2d2d44]/85 to-[#1a1a2e]/95"
         />
         <div
           aria-hidden

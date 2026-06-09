@@ -22,8 +22,21 @@ export default function SellHubShell({
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-[#f0f2f5]">
-      <div className="relative overflow-hidden border-b border-orange-900/20 bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0f172a]">
+      <div className="relative overflow-hidden border-b border-orange-900/20 bg-[#0f172a]">
         <div
+          aria-hidden
+          className="absolute inset-0 bg-cover bg-center opacity-40"
+          style={{
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=1600&h=700&fit=crop')",
+          }}
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-gradient-to-br from-[#0f172a]/95 via-[#1e293b]/85 to-[#0f172a]/95"
+        />
+        <div
+          aria-hidden
           className="pointer-events-none absolute inset-0 opacity-30"
           style={{
             backgroundImage:
