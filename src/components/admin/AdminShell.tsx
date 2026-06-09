@@ -9,6 +9,7 @@ import { useAdmin } from "@/context/AdminContext";
 import { useListings } from "@/context/ListingsContext";
 import { adminRoleColors, adminRoleLabels } from "@/data/admin";
 import {
+  AdsIcon,
   AnalyticsIcon,
   ArrowUpRightIcon,
   BellIcon,
@@ -23,6 +24,7 @@ import {
   LogoutIcon,
   MenuIcon,
   PaymentsIcon,
+  PromoIcon,
   SearchIcon,
   SellerIcon,
   SettingsIcon,
@@ -46,6 +48,8 @@ const navItems: NavItem[] = [
   { href: "/admin/loan-inquiries", label: "Loan Inquiries", Icon: LoanToolsIcon },
   { href: "/admin/payments", label: "Payments", Icon: PaymentsIcon },
   { href: "/admin/loan-tools", label: "Loan & Tools", Icon: LoanToolsIcon },
+  { href: "/admin/promo", label: "Promo & Offers", Icon: PromoIcon },
+  { href: "/admin/ads", label: "Ads Manager", Icon: AdsIcon },
   { href: "/admin/analytics", label: "Analytics", Icon: AnalyticsIcon },
   { href: "/admin/cities", label: "Cities", Icon: CitiesIcon },
   { href: "/admin/settings", label: "Settings", Icon: SettingsIcon },
@@ -88,6 +92,14 @@ const titleMap: Record<string, { title: string; subtitle: string }> = {
     title: "Loan & Tools — Option by Features",
     subtitle:
       "Manage loan pages, bank offers, eligibility copy and car-tool features",
+  },
+  "/admin/promo": {
+    title: "Promo & Offers",
+    subtitle: "Edit the offer/feature popup shown across the site",
+  },
+  "/admin/ads": {
+    title: "Ads Manager",
+    subtitle: "Run banner ads and target them to specific pages",
   },
   "/admin/analytics": {
     title: "Analytics",

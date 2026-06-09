@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import AdSlot from "@/components/ads/AdSlot";
 import Header from "@/components/Header";
 import UsedCarsExplorePage from "@/components/explore/UsedCarsExplorePage";
 
@@ -12,6 +13,7 @@ export default function UsedCarsPage() {
   return (
     <>
       <Header />
+      <AdSlot page="used-cars" placement="top" className="mt-4" />
       <Suspense fallback={null}>
         <UsedCarsExplorePage />
       </Suspense>

@@ -1,3 +1,4 @@
+import AdSlot from "@/components/ads/AdSlot";
 import Header from "@/components/Header";
 import CarDetailPage from "@/components/car-detail/CarDetailPage";
 
@@ -20,6 +21,7 @@ export default async function UsedCarDetailPage({ params }: PageProps) {
   return (
     <>
       <Header />
+      <AdSlot page="car-detail" placement="top" className="mt-4" />
       <CarDetailPage carId={id} />
     </>
   );

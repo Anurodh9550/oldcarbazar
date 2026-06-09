@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import ConditionalFooter from "@/components/ConditionalFooter";
 import FloatingCompareWidget from "@/components/FloatingCompareWidget";
 import Providers from "@/components/Providers";
+import PromoPopup from "@/components/promo/PromoPopup";
 import SiteFooter from "@/components/SiteFooter";
 import "./globals.css";
 
@@ -133,6 +134,7 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col font-sans">
         <Providers>
           <div className="flex-1">{children}</div>
+          <PromoPopup />
           <FloatingCompareWidget />
           <ConditionalFooter>
             <SiteFooter />

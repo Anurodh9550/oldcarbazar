@@ -32,6 +32,26 @@ export function CarsIcon({ className }: IconProps) {
   );
 }
 
+export function AdsIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+      <rect x="3" y="5" width="18" height="14" rx="2.5" />
+      <path d="M7 15v-4.5a1.5 1.5 0 013 0V15M7 13h3" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M14 15V9.5h1.5a1.75 1.75 0 010 3.5H14" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function PromoIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+      <path d="M3 11v2a1 1 0 001 1h2l4 3.5V7.5L6 11H4a1 1 0 00-1 1z" strokeLinejoin="round" />
+      <path d="M14 8.5a4 4 0 010 7" strokeLinecap="round" />
+      <path d="M17 6a7 7 0 010 12" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function UsersIcon({ className }: IconProps) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
