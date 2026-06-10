@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 import { api } from "@/lib/api";
@@ -35,7 +35,8 @@ export default function TestDriveModal({
   const { user } = useAuth();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const initialSchedule = useMemo(defaultScheduleValue, []);
+  // Computed once on mount; also used as the `min` bound for the datetime input.
+  const [initialSchedule] = useState(() => defaultScheduleValue());
   const [scheduledAt, setScheduledAt] = useState(initialSchedule);
   const [locationNote, setLocationNote] = useState(defaultLocation);
   const [message, setMessage] = useState("");

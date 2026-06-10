@@ -8,28 +8,41 @@ type AdBannerProps = {
 };
 
 /**
+ * Wrapper hoisted to module scope so it is a stable component type. Declaring
+ * it inside AdBanner made React remount the whole ad subtree on every render.
+ */
+function AdWrapper({
+  ad,
+  preview,
+  children,
+}: {
+  ad: Ad;
+  preview: boolean;
+  children: React.ReactNode;
+}) {
+  if (preview) return <div className="block">{children}</div>;
+  const external = ad.ctaHref?.startsWith("http");
+  return (
+    <a
+      href={ad.ctaHref || "#"}
+      className="block"
+      aria-label={ad.title}
+      target={external ? "_blank" : undefined}
+      rel={external ? "noopener noreferrer" : undefined}
+    >
+      {children}
+    </a>
+  );
+}
+
+/**
  * Visual for a single ad. Shared by the live ad slots and the admin preview so
  * the operator sees exactly what visitors get. Always labelled "Ad".
  */
 export default function AdBanner({ ad, preview = false }: AdBannerProps) {
-  const Wrapper = ({ children }: { children: React.ReactNode }) =>
-    preview ? (
-      <div className="block">{children}</div>
-    ) : (
-      <a
-        href={ad.ctaHref || "#"}
-        className="block"
-        aria-label={ad.title}
-        target={ad.ctaHref?.startsWith("http") ? "_blank" : undefined}
-        rel={ad.ctaHref?.startsWith("http") ? "noopener noreferrer" : undefined}
-      >
-        {children}
-      </a>
-    );
-
   if (ad.style === "image" && ad.imageUrl) {
     return (
-      <Wrapper>
+      <AdWrapper ad={ad} preview={preview}>
         <div className="group relative overflow-hidden rounded-2xl border border-gray-200 shadow-sm">
           <span className="absolute right-2 top-2 z-10 rounded bg-black/55 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white">
             Ad
@@ -45,12 +58,12 @@ export default function AdBanner({ ad, preview = false }: AdBannerProps) {
             />
           </div>
         </div>
-      </Wrapper>
+      </AdWrapper>
     );
   }
 
   return (
-    <Wrapper>
+    <AdWrapper ad={ad} preview={preview}>
       <div className="relative flex flex-col items-start gap-3 overflow-hidden rounded-2xl border border-orange-100 bg-gradient-to-r from-[#fff4ef] via-white to-[#fff4ef] p-4 shadow-sm transition hover:shadow-md sm:flex-row sm:items-center sm:p-5">
         <span className="absolute right-2 top-2 rounded bg-gray-200 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-gray-500">
           Ad
@@ -79,6 +92,6 @@ export default function AdBanner({ ad, preview = false }: AdBannerProps) {
           </span>
         )}
       </div>
-    </Wrapper>
+    </AdWrapper>
   );
 }

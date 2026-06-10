@@ -13,11 +13,11 @@ export default function MyGarageContent() {
         actionHref="/sell-car"
       />
       <p className="mt-6 rounded-xl bg-orange-50 px-4 py-3 text-sm text-gray-700">
-        <strong>Tip:</strong> If you're selling a car, use{" "}
+        <strong>Tip:</strong> If you&apos;re selling a car, use{" "}
         <a href="/my-listings" className="font-semibold text-[#f75d34] hover:underline">
           My Listings
         </a>{" "}
-        — that's where your ads are managed.
+        — that&apos;s where your ads are managed.
       </p>
     </>
   );

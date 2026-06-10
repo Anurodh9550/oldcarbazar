@@ -315,7 +315,7 @@ export default function SellCarForm({
             {step === 1 && (
               <div className="space-y-6">
                 <p className="rounded-lg bg-[#f75d34]/5 px-3 py-2 text-caption text-gray-600">
-                  Your car's specs and contact info — buyers will see these on the Overview tab.
+                  Your car&apos;s specs and contact info — buyers will see these on the Overview tab.
                 </p>
 
                 <div>

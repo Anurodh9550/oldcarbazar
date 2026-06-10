@@ -139,7 +139,12 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
   // listings array itself into the callback's deps (would cause the function
   // to be recreated on every fetch and ripple through every consumer).
   const apiListingsRef = useRef<UserCarListing[]>([]);
-  apiListingsRef.current = apiListings;
+  // Sync the mirror inside an effect — mutating a ref during render is
+  // disallowed in React 19 and can apply stale/duplicate values under
+  // concurrent rendering.
+  useEffect(() => {
+    apiListingsRef.current = apiListings;
+  }, [apiListings]);
 
   const refreshListings = useCallback(async () => {
     setError("");

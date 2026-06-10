@@ -208,7 +208,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 <div className="space-y-4">
                   <div className="rounded-lg bg-orange-50 px-4 py-3 text-sm text-gray-700">
                     <p className="font-medium text-gray-900">
-                      Self-serve password reset isn't available yet.
+                      Self-serve password reset isn&apos;t available yet.
                     </p>
                     <p className="mt-1 text-body-muted">
                       Email your phone and registered name to:{" "}

@@ -150,7 +150,13 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
 
   const openBundleInquiry = () => setShowInquiry(true);
 
-  const listing = findCarById(carId, allListings);
+  // Memoize the upstream lookup too so `listing` is a stable reference; without
+  // this, findCarById returned a fresh object each render and the React
+  // Compiler bailed out of optimizing the whole component.
+  const listing = useMemo(
+    () => findCarById(carId, allListings),
+    [carId, allListings]
+  );
   const detail = useMemo(
     () => (listing ? buildCarDetail(listing) : null),
     [listing]

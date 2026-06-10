@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 
 type StarRatingProps = {
   /** Current value (1–5). For display mode this is the rating to show. */
@@ -15,7 +15,9 @@ type StarRatingProps = {
 
 function Star({ fill, size }: { fill: number; size: number }) {
   // fill: 0 (empty), 0.5 (half), 1 (full)
-  const id = `star-${Math.random().toString(36).slice(2, 8)}`;
+  // useId gives a stable, SSR-safe gradient id (no hydration mismatch and no
+  // new id on every re-render, which previously broke the fill reference).
+  const id = `star-${useId()}`;
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden>
       <defs>

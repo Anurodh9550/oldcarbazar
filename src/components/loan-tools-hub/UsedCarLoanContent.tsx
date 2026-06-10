@@ -215,7 +215,7 @@ export default function UsedCarLoanContent() {
       <section className="rounded-2xl bg-[#0f172a] p-6 text-white sm:p-8">
         <h2 className="text-xl font-bold sm:text-2xl">Documents Required</h2>
         <p className="mt-1 text-sm text-slate-300">
-          That's all we need — fully digital submission.
+          That&apos;s all we need — fully digital submission.
         </p>
         <ul className="mt-5 grid gap-2 sm:grid-cols-2">
           {loanDocs.map((d) => (

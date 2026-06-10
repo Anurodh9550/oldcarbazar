@@ -23,7 +23,6 @@ import type {
 } from "@/types/admin";
 import {
   cloneLoanToolsContent,
-  defaultLoanToolsContent,
   mergeLoanToolsContent,
   type LoanToolsContent,
 } from "@/data/loanToolsAdmin";

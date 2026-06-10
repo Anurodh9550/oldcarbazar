@@ -394,7 +394,7 @@ export default function LocationModal({
               {showCustomEntry && (
                 <div className="rounded-xl border border-dashed border-[#f75d34]/40 bg-[#f75d34]/5 p-4 text-center">
                   <p className="text-sm text-gray-700">
-                    &quot;{trimmedQuery}&quot; isn't in our list yet.
+                    &quot;{trimmedQuery}&quot; isn&apos;t in our list yet.
                   </p>
                   <button
                     type="button"
