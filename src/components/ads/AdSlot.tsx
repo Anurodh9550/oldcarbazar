@@ -6,10 +6,13 @@ import {
   ADS_CHANGED_EVENT,
   getAds,
   getAdsForPage,
+  normalizeAds,
+  setLocalAds,
   type Ad,
   type AdPageKey,
   type AdPlacement,
 } from "@/lib/ads";
+import { api } from "@/lib/api";
 import AdBanner from "./AdBanner";
 
 type AdSlotProps = {
@@ -32,8 +35,19 @@ export default function AdSlot({ page, placement, className = "" }: AdSlotProps)
 
   useEffect(() => {
     if (isAdmin) return;
-    const refresh = () => setAds(getAdsForPage(getAds(), page, placement));
+    const refresh = () => setAds(getAdsForPage(getAds(), page, placement, "web"));
     refresh();
+    // Hydrate from the backend so every visitor (not just the admin's browser)
+    // sees the ads configured in the admin panel.
+    api
+      .fetchAds()
+      .then((remote) => {
+        if (Array.isArray(remote) && remote.length > 0) {
+          setLocalAds(normalizeAds(remote as Partial<Ad>[]));
+          refresh();
+        }
+      })
+      .catch(() => {});
     window.addEventListener(ADS_CHANGED_EVENT, refresh);
     window.addEventListener("storage", refresh);
     return () => {

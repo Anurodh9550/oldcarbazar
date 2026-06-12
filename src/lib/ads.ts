@@ -14,6 +14,9 @@ export type AdPageKey =
 
 export type AdStyle = "image" | "banner";
 
+/** Where the ad runs: the website, the mobile app, or both. */
+export type AdPlatform = "web" | "app" | "both";
+
 export type Ad = {
   id: string;
   enabled: boolean;
@@ -28,7 +31,20 @@ export type Ad = {
   pages: AdPageKey[];
   placement: AdPlacement;
   style: AdStyle;
+  /** Run on website, mobile app, or both. Defaults to "both". */
+  platform: AdPlatform;
 };
+
+/** Read an ad's platform safely (older saved ads may not have the field). */
+export function adPlatform(ad: Ad): AdPlatform {
+  return ad.platform ?? "both";
+}
+
+/** Does this ad run on the given platform? ("both" matches everything.) */
+export function adMatchesPlatform(ad: Ad, platform: "web" | "app"): boolean {
+  const p = adPlatform(ad);
+  return p === platform || p === "both";
+}
 
 export const AD_PAGES: { key: AdPageKey; label: string }[] = [
   { key: "all", label: "All pages" },
@@ -50,6 +66,12 @@ export const AD_STYLES: { key: AdStyle; label: string }[] = [
   { key: "image", label: "Image banner" },
 ];
 
+export const AD_PLATFORMS: { key: AdPlatform; label: string }[] = [
+  { key: "both", label: "Website + App" },
+  { key: "web", label: "Website only" },
+  { key: "app", label: "Mobile app only" },
+];
+
 function makeId(): string {
   return `ad-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
@@ -67,6 +89,7 @@ export function makeEmptyAd(): Ad {
     pages: ["home"],
     placement: "top",
     style: "banner",
+    platform: "both",
   };
 }
 
@@ -83,8 +106,22 @@ export const defaultAds: Ad[] = [
     pages: ["home", "used-cars"],
     placement: "top",
     style: "banner",
+    platform: "both",
   },
 ];
+
+/** Ensure every ad has the newer fields, even if it was saved before they existed. */
+export function normalizeAd(ad: Partial<Ad>): Ad {
+  return {
+    ...makeEmptyAd(),
+    ...ad,
+    platform: (ad.platform as AdPlatform) ?? "both",
+  };
+}
+
+export function normalizeAds(ads: Partial<Ad>[]): Ad[] {
+  return Array.isArray(ads) ? ads.map(normalizeAd) : [];
+}
 
 export function getAds(): Ad[] {
   if (typeof window === "undefined") return defaultAds;
@@ -92,10 +129,18 @@ export function getAds(): Ad[] {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return defaultAds;
     const parsed = JSON.parse(raw) as Ad[];
-    return Array.isArray(parsed) ? parsed : defaultAds;
+    return Array.isArray(parsed) ? normalizeAds(parsed) : defaultAds;
   } catch {
     return defaultAds;
   }
+}
+
+/** Overwrite the local ad cache (used after loading from the backend). */
+export function setLocalAds(ads: Ad[]): Ad[] {
+  if (typeof window === "undefined") return ads;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(ads));
+  window.dispatchEvent(new Event(ADS_CHANGED_EVENT));
+  return ads;
 }
 
 export function saveAds(ads: Ad[]): Ad[] {
@@ -112,16 +157,18 @@ export function resetAds(): Ad[] {
   return defaultAds;
 }
 
-/** Enabled ads that target the given page + placement. */
+/** Enabled ads that target the given page + placement on the given platform. */
 export function getAdsForPage(
   ads: Ad[],
   page: AdPageKey,
-  placement: AdPlacement
+  placement: AdPlacement,
+  platform: "web" | "app" = "web"
 ): Ad[] {
   return ads.filter(
     (ad) =>
       ad.enabled &&
       ad.placement === placement &&
+      adMatchesPlatform(ad, platform) &&
       (ad.pages.includes(page) || ad.pages.includes("all"))
   );
 }

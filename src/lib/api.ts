@@ -116,6 +116,7 @@ type ApiSettings = {
   support_phone: string;
   brand_color: string;
   loan_tools_content?: Partial<LoanToolsContent> | null;
+  ads?: unknown[];
 };
 
 type ApiPhoto = {
@@ -1138,6 +1139,26 @@ export const api = {
       "/loan-tools/content/"
     );
     return data.content;
+  },
+
+  /** Public — enabled ad banners stored on the backend (shared with the app). */
+  async fetchAds() {
+    const data = await apiFetch<{ ads: unknown[] }>("/ads/");
+    return Array.isArray(data.ads) ? data.ads : [];
+  },
+
+  /** Read every ad (incl. disabled) for the admin editor, via app settings. */
+  async fetchAllAdsForAdmin() {
+    const data = await adminApiFetch<ApiSettings>("/admin-panel/settings/");
+    return Array.isArray(data.ads) ? data.ads : [];
+  },
+
+  /** Persist the full ad list to the backend so the website + app both see it. */
+  async updateAds(ads: unknown[]) {
+    await adminApiFetch<ApiSettings>("/admin-panel/settings/", {
+      method: "PATCH",
+      body: JSON.stringify({ ads }),
+    });
   },
 
   async updateLoanToolsContent(content: LoanToolsContent) {

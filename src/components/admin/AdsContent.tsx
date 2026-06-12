@@ -4,14 +4,18 @@ import { useEffect, useState } from "react";
 import {
   AD_PAGES,
   AD_PLACEMENTS,
+  AD_PLATFORMS,
   AD_STYLES,
   getAds,
   makeEmptyAd,
+  normalizeAds,
   resetAds,
   saveAds,
+  setLocalAds,
   type Ad,
   type AdPageKey,
 } from "@/lib/ads";
+import { api } from "@/lib/api";
 import AdBanner from "@/components/ads/AdBanner";
 
 const inputClass =
@@ -90,6 +94,32 @@ function AdEditor({
                 </button>
               ))}
             </div>
+          </label>
+
+          <label className="block">
+            <span className="text-xs font-semibold text-slate-700">
+              Run on
+            </span>
+            <div className="mt-1 flex flex-wrap gap-2">
+              {AD_PLATFORMS.map((p) => (
+                <button
+                  key={p.key}
+                  type="button"
+                  onClick={() => set("platform", p.key)}
+                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${
+                    (ad.platform ?? "both") === p.key
+                      ? "border-[#f75d34] bg-[#f75d34] text-white"
+                      : "border-slate-200 text-slate-600 hover:border-slate-300"
+                  }`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+            <p className="mt-1 text-[11px] text-slate-400">
+              Choose “Mobile app only” or “Website + App” to show this ad inside
+              the Old Car Bazar app.
+            </p>
           </label>
 
           <label className="block">
@@ -209,9 +239,25 @@ function AdEditor({
 export default function AdsContent() {
   const [ads, setAds] = useState<Ad[]>([]);
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [syncError, setSyncError] = useState("");
 
   useEffect(() => {
+    // Show the local cache instantly, then refresh from the backend so ads
+    // edited on another device (or meant for the app) load correctly.
     setAds(getAds());
+    api
+      .fetchAllAdsForAdmin()
+      .then((remote) => {
+        const normalized = normalizeAds(remote as Partial<Ad>[]);
+        if (normalized.length > 0) {
+          setAds(normalized);
+          setLocalAds(normalized);
+        }
+      })
+      .catch(() => {
+        // Backend unreachable — keep working from the local cache.
+      });
   }, []);
 
   const updateAd = (id: string, next: Ad) => {
@@ -226,10 +272,23 @@ export default function AdsContent() {
     setAds((prev) => [...prev, makeEmptyAd()]);
     setSaved(false);
   };
-  const handleSave = () => {
+  const handleSave = async () => {
+    setSyncError("");
+    setSaving(true);
+    // Save locally first so the website updates instantly.
     saveAds(ads);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+    try {
+      // Push to the backend so the mobile app (and other devices) get the ads.
+      await api.updateAds(ads);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch {
+      setSyncError(
+        "Saved on this device, but couldn't sync to the server — the app may not see these ads. Check your admin login and try again."
+      );
+    } finally {
+      setSaving(false);
+    }
   };
   const handleReset = () => {
     setAds(resetAds());
@@ -282,9 +341,10 @@ export default function AdsContent() {
         <button
           type="button"
           onClick={handleSave}
-          className="rounded-lg bg-[#f75d34] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#e54d24]"
+          disabled={saving}
+          className="rounded-lg bg-[#f75d34] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#e54d24] disabled:opacity-60"
         >
-          Save &amp; publish
+          {saving ? "Saving…" : "Save & publish"}
         </button>
         <button
           type="button"
@@ -295,7 +355,12 @@ export default function AdsContent() {
         </button>
         {saved && (
           <span className="text-sm font-semibold text-emerald-600">
-            ✓ Saved — live on the site
+            ✓ Saved — live on the site &amp; app
+          </span>
+        )}
+        {syncError && (
+          <span className="text-sm font-semibold text-amber-600">
+            {syncError}
           </span>
         )}
       </div>
