@@ -117,8 +117,8 @@ function AdEditor({
               ))}
             </div>
             <p className="mt-1 text-[11px] text-slate-400">
-              Choose “Mobile app only” or “Website + App” to show this ad inside
-              the Old Car Bazar app.
+              Pick “Website + App” to show this ad (photo or video) on both the
+              website and the mobile app, or restrict it to one.
             </p>
           </label>
 
@@ -144,7 +144,13 @@ function AdEditor({
             <span className="text-xs font-semibold text-slate-700">
               Image URL{" "}
               <span className="text-slate-400">
-                ({ad.style === "image" ? "required" : "optional"})
+                (
+                {ad.style === "image"
+                  ? "required"
+                  : ad.style === "video"
+                    ? "poster / fallback"
+                    : "optional"}
+                )
               </span>
             </span>
             <input
@@ -153,6 +159,24 @@ function AdEditor({
               onChange={(e) => set("imageUrl", e.target.value)}
               placeholder="https://…/banner.jpg"
             />
+          </label>
+          <label className="block">
+            <span className="text-xs font-semibold text-slate-700">
+              Video URL{" "}
+              <span className="text-slate-400">
+                ({ad.style === "video" ? "required" : "optional"})
+              </span>
+            </span>
+            <input
+              className={`mt-1 ${inputClass}`}
+              value={ad.videoUrl}
+              onChange={(e) => set("videoUrl", e.target.value)}
+              placeholder="https://…/promo.mp4"
+            />
+            <p className="mt-1 text-[11px] text-slate-400">
+              Choose the “Video banner” style above and paste a direct .mp4/.webm
+              link. It autoplays muted &amp; loops on the website and app.
+            </p>
           </label>
           <div className="grid grid-cols-2 gap-3">
             <label className="block">

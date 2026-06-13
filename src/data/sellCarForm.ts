@@ -4,7 +4,9 @@ import { carColors } from "@/data/searchPage";
 export const carBrands = [
   "Maruti", "Hyundai", "Tata", "Honda", "Toyota", "Mahindra",
   "Kia", "Ford", "Volkswagen", "Renault", "Skoda", "MG",
-  "Nissan", "BMW", "Mercedes", "Audi", "Other",
+  "Nissan", "Jeep", "Datsun", "Chevrolet", "Fiat",
+  "Mercedes-Benz", "BMW", "Audi", "Volvo", "Citroen",
+  "Land Rover", "Jaguar", "Mini", "Suzuki", "Other",
 ];
 
 export const fuelTypes = ["Petrol", "Diesel", "CNG", "Electric", "Hybrid", "LPG"];

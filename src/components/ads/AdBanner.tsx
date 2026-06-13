@@ -40,6 +40,45 @@ function AdWrapper({
  * the operator sees exactly what visitors get. Always labelled "Ad".
  */
 export default function AdBanner({ ad, preview = false }: AdBannerProps) {
+  if (ad.style === "video" && ad.videoUrl) {
+    return (
+      <AdWrapper ad={ad} preview={preview}>
+        <div className="group relative overflow-hidden rounded-2xl border border-gray-200 shadow-sm">
+          <span className="absolute right-2 top-2 z-10 rounded bg-black/55 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white">
+            Ad
+          </span>
+          <video
+            src={ad.videoUrl}
+            poster={ad.imageUrl || undefined}
+            className="h-32 w-full object-cover sm:h-40"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+          />
+          {(ad.title || ad.ctaLabel) && (
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center gap-3 bg-gradient-to-t from-black/70 to-transparent p-3">
+              <div className="min-w-0 flex-1">
+                {ad.title && (
+                  <p className="truncate text-sm font-bold text-white">{ad.title}</p>
+                )}
+                {ad.description && (
+                  <p className="truncate text-xs text-white/85">{ad.description}</p>
+                )}
+              </div>
+              {ad.ctaLabel && (
+                <span className="shrink-0 rounded-full bg-white px-4 py-1.5 text-xs font-semibold text-[#f75d34]">
+                  {ad.ctaLabel}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+      </AdWrapper>
+    );
+  }
+
   if (ad.style === "image" && ad.imageUrl) {
     return (
       <AdWrapper ad={ad} preview={preview}>

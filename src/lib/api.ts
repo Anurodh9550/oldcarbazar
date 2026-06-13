@@ -1147,6 +1147,14 @@ export const api = {
     return Array.isArray(data.ads) ? data.ads : [];
   },
 
+  async askAssistant(message: string) {
+    const data = await apiFetch<{ reply: string; configured?: boolean }>("/assistant/", {
+      method: "POST",
+      body: JSON.stringify({ message }),
+    });
+    return data;
+  },
+
   /** Read every ad (incl. disabled) for the admin editor, via app settings. */
   async fetchAllAdsForAdmin() {
     const data = await adminApiFetch<ApiSettings>("/admin-panel/settings/");

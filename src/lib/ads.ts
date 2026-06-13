@@ -12,7 +12,7 @@ export type AdPageKey =
   | "car-detail"
   | "dealers";
 
-export type AdStyle = "image" | "banner";
+export type AdStyle = "image" | "banner" | "video";
 
 /** Where the ad runs: the website, the mobile app, or both. */
 export type AdPlatform = "web" | "app" | "both";
@@ -25,6 +25,8 @@ export type Ad = {
   title: string;
   description: string;
   imageUrl: string;
+  /** Video URL (mp4/webm) shown when style = "video". */
+  videoUrl: string;
   ctaLabel: string;
   ctaHref: string;
   /** Pages this ad shows on. */
@@ -64,6 +66,7 @@ export const AD_PLACEMENTS: { key: AdPlacement; label: string }[] = [
 export const AD_STYLES: { key: AdStyle; label: string }[] = [
   { key: "banner", label: "Text banner" },
   { key: "image", label: "Image banner" },
+  { key: "video", label: "Video banner" },
 ];
 
 export const AD_PLATFORMS: { key: AdPlatform; label: string }[] = [
@@ -84,6 +87,7 @@ export function makeEmptyAd(): Ad {
     title: "Your ad headline here",
     description: "Short supporting line for the ad.",
     imageUrl: "",
+    videoUrl: "",
     ctaLabel: "Learn more",
     ctaHref: "/used-cars",
     pages: ["home"],
@@ -101,6 +105,7 @@ export const defaultAds: Ad[] = [
     title: "Sell your car at the best price 🚗",
     description: "List for free and reach thousands of verified buyers near you.",
     imageUrl: "",
+    videoUrl: "",
     ctaLabel: "Sell Now",
     ctaHref: "/sell-car",
     pages: ["home", "used-cars"],

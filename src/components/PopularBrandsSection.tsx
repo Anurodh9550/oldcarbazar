@@ -16,12 +16,23 @@ export default function PopularBrandsSection() {
         viewport={{ once: true }}
         variants={staggerContainer}
       >
-        <motion.h2 variants={fadeInUp} className="section-title">
-          Popular Brands
-        </motion.h2>
-        <motion.p variants={fadeInUp} className="mt-1 text-caption sm:text-sm">
-          Top brands buyers search on Old Car Bazar
-        </motion.p>
+        <motion.div
+          variants={fadeInUp}
+          className="flex items-start justify-between gap-3"
+        >
+          <div>
+            <h2 className="section-title">Popular Brands</h2>
+            <p className="mt-1 text-caption sm:text-sm">
+              Top brands buyers search on Old Car Bazar
+            </p>
+          </div>
+          <Link
+            href="/used-cars"
+            className="mt-1 shrink-0 whitespace-nowrap text-sm font-semibold text-[#f75d34] hover:underline"
+          >
+            View all →
+          </Link>
+        </motion.div>
 
         <motion.div
           variants={staggerContainer}

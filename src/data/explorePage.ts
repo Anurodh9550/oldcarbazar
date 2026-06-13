@@ -21,7 +21,20 @@ export const exploreBrands = [
   { name: "Volkswagen", slug: "volkswagen" },
   { name: "MG", slug: "mg" },
   { name: "Skoda", slug: "skoda" },
+  { name: "Nissan", slug: "nissan" },
+  { name: "Jeep", slug: "jeep" },
+  { name: "Datsun", slug: "datsun" },
+  { name: "Chevrolet", slug: "chevrolet" },
+  { name: "Fiat", slug: "fiat" },
   { name: "Mercedes-Benz", slug: "mercedes-benz" },
+  { name: "BMW", slug: "bmw" },
+  { name: "Audi", slug: "audi" },
+  { name: "Volvo", slug: "volvo" },
+  { name: "Citroen", slug: "citroen" },
+  { name: "Land Rover", slug: "land-rover" },
+  { name: "Jaguar", slug: "jaguar" },
+  { name: "Mini", slug: "mini" },
+  { name: "Suzuki", slug: "suzuki" },
 ];
 
 export function getBrandNameFromSlug(slug: string): string {

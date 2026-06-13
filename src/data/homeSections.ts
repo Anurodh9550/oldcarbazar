@@ -37,6 +37,10 @@ export const budgetRanges = [
 export const popularBrands = [
   "Maruti", "Hyundai", "Tata", "Honda", "Toyota",
   "Mahindra", "Kia", "Ford", "Volkswagen", "Renault",
+  "Skoda", "MG", "Nissan", "Jeep", "Datsun",
+  "Chevrolet", "Fiat", "Mercedes-Benz", "BMW", "Audi",
+  "Volvo", "Citroen", "Land Rover", "Jaguar", "Mini",
+  "Suzuki",
 ];
 
 export const whyChooseUs = [
