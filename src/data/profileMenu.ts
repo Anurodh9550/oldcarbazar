@@ -8,6 +8,7 @@ export type ProfileMenuItem = {
     | "car"
     | "garage"
     | "listings"
+    | "leads"
     | "settings"
     | "consent"
     | "pro"
@@ -17,6 +18,7 @@ export type ProfileMenuItem = {
 
 export const profileMenuItems: ProfileMenuItem[] = [
   { label: "My Listings", href: "/my-listings", icon: "listings" },
+  { label: "Leads & Inquiries", href: "/leads", icon: "leads" },
   { label: "Upgrade to Pro", href: "/pricing", icon: "pro" },
   { label: "Billing & Invoices", href: "/my-subscriptions", icon: "billing", dividerAfter: true },
   { label: "My Orders", href: "/my-orders", icon: "orders" },

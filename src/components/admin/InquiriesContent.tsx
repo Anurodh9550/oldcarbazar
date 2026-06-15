@@ -47,6 +47,7 @@ export default function InquiriesContent() {
         (i) =>
           i.listingTitle.toLowerCase().includes(q) ||
           i.buyerName.toLowerCase().includes(q) ||
+          (i.sellerName ?? "").toLowerCase().includes(q) ||
           i.message.toLowerCase().includes(q)
       );
     }
@@ -104,7 +105,7 @@ export default function InquiriesContent() {
           <SearchIcon className="h-4 w-4 text-slate-400" />
           <input
             type="search"
-            placeholder="Search by listing, buyer or message…"
+            placeholder="Search by listing, dealer, buyer or message…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400"
@@ -178,6 +179,14 @@ export default function InquiriesContent() {
                   >
                     {q.listingTitle}
                   </Link>
+                  {q.sellerName && (
+                    <p className="mt-1 text-[11px] font-medium text-slate-500">
+                      Dealer / Seller:{" "}
+                      <span className="font-semibold text-slate-700">
+                        {q.sellerName}
+                      </span>
+                    </p>
+                  )}
                   <p className="mt-2 text-sm text-slate-700">{q.message}</p>
                   <p className="mt-3 flex flex-wrap items-center gap-2 text-[11px] text-slate-500">
                     <span className="font-semibold text-slate-700">

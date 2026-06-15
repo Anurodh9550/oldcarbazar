@@ -102,6 +102,54 @@ type ApiInquiry = {
   updated_at: string;
 };
 
+export type SellerLeadType =
+  | "view"
+  | "inquiry"
+  | "whatsapp"
+  | "call"
+  | "offer"
+  | "test_drive";
+
+export type SellerLead = {
+  id: string;
+  type: SellerLeadType;
+  listing_id: string;
+  listing_title: string;
+  listing_price: string;
+  name: string;
+  phone: string;
+  email: string;
+  message: string;
+  amount: number | null;
+  status: string;
+  city: string;
+  created_at: string;
+};
+
+export type SellerLeadListing = {
+  listing_id: string;
+  listing_title: string;
+  listing_price: string;
+  views: number;
+  inquiries: number;
+  offers: number;
+  test_drives: number;
+  total: number;
+};
+
+export type SellerLeadsResponse = {
+  summary: {
+    views: number;
+    inquiries: number;
+    offers: number;
+    test_drives: number;
+    total: number;
+    new_inquiries: number;
+  };
+  per_listing: SellerLeadListing[];
+  leads: SellerLead[];
+};
+
 type ApiSettings = {
   auto_approve_listings: boolean;
   maintenance_mode: boolean;
@@ -1309,6 +1357,11 @@ export const api = {
       "/inquiries/mine/?limit=100"
     );
     return unwrapList(data).map(apiInquiryToInquiry);
+  },
+
+  // Unified dealer/seller leads feed (views + inquiries + offers + test drives).
+  async sellerLeads() {
+    return apiFetch<SellerLeadsResponse>("/leads/mine/");
   },
 
   async adminInquiries() {

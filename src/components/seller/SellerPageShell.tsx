@@ -7,6 +7,7 @@ const sellerNav = [
   { href: "/sell-car", label: "Sell Car Free", icon: "🚗" },
   { href: "/post-ad", label: "Post Ad", icon: "⚡" },
   { href: "/my-listings", label: "My Listings", icon: "📋" },
+  { href: "/leads", label: "Leads", icon: "🔔" },
   { href: "/seller", label: "Dashboard", icon: "📊" },
 ];
 
