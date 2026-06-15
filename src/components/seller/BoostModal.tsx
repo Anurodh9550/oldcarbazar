@@ -76,6 +76,7 @@ export default function BoostModal({
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState("");
+  const [gstin, setGstin] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -102,10 +103,15 @@ export default function BoostModal({
 
   const handlePay = async () => {
     if (!selected) return;
+    const cleanGstin = gstin.trim().toUpperCase();
+    if (cleanGstin && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(cleanGstin)) {
+      setError("Please enter a valid 15-character GST number, or leave it blank.");
+      return;
+    }
     setError("");
     setPaying(true);
     try {
-      const order = await api.createBoostOrder(listingId, selected);
+      const order = await api.createBoostOrder(listingId, selected, cleanGstin);
       await loadRazorpayScript();
       if (!window.Razorpay) {
         throw new Error("Razorpay checkout could not start.");
@@ -218,12 +224,39 @@ export default function BoostModal({
                       {pkg.perks[0] ?? `Top placement for ${pkg.duration_days} days`}
                     </p>
                   </div>
-                  <span className="text-base font-bold text-[#f75d34]">
-                    ₹{pkg.price_inr.toLocaleString("en-IN")}
-                  </span>
+                  <div className="text-right">
+                    <span className="block text-base font-bold text-[#f75d34]">
+                      ₹{Math.round(pkg.price_inr * 1.18).toLocaleString("en-IN")}
+                    </span>
+                    <span className="block text-[10px] text-gray-400">
+                      incl. 18% GST
+                    </span>
+                  </div>
                 </button>
               );
             })}
+          </div>
+        )}
+
+        {!loading && (
+          <div className="mt-4">
+            <label
+              htmlFor="boost-gstin"
+              className="block text-xs font-semibold text-gray-700"
+            >
+              GST number{" "}
+              <span className="font-normal text-gray-400">(optional)</span>
+            </label>
+            <input
+              id="boost-gstin"
+              type="text"
+              value={gstin}
+              onChange={(e) => setGstin(e.target.value.toUpperCase())}
+              placeholder="e.g. 09ABCDE1234F1Z5"
+              maxLength={15}
+              autoComplete="off"
+              className="mt-1.5 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-mono uppercase tracking-wide text-gray-900 outline-none focus:border-[#f75d34] focus:ring-2 focus:ring-[#f75d34]/20"
+            />
           </div>
         )}
 

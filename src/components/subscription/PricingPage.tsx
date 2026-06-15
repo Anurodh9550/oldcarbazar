@@ -88,6 +88,7 @@ export default function PricingPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [authOpen, setAuthOpen] = useState(false);
+  const [gstin, setGstin] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -114,11 +115,16 @@ export default function PricingPage() {
       setAuthOpen(true);
       return;
     }
+    const cleanGstin = gstin.trim().toUpperCase();
+    if (cleanGstin && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(cleanGstin)) {
+      setError("Please enter a valid 15-character GST number, or leave it blank.");
+      return;
+    }
     setError("");
     setSuccess("");
     setActivating(plan.code);
     try {
-      const order = await api.createRazorpayOrder(plan.code);
+      const order = await api.createRazorpayOrder(plan.code, cleanGstin);
       await loadRazorpayScript();
 
       if (!window.Razorpay) {
@@ -248,6 +254,13 @@ export default function PricingPage() {
                       </span>
                     )}
                   </div>
+                  {plan.price_inr > 0 && (
+                    <p className="mt-0.5 text-[11px] font-medium text-gray-400">
+                      + 18% GST · ₹
+                      {Math.round(plan.price_inr * 1.18).toLocaleString("en-IN")}{" "}
+                      total
+                    </p>
+                  )}
                   <p className="mt-1 text-xs text-gray-500">
                     {plan.listing_limit === null
                       ? "Unlimited listings"
@@ -302,6 +315,30 @@ export default function PricingPage() {
                 </article>
               );
             })}
+        </div>
+
+        <div className="mx-auto mt-8 max-w-md rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+          <label
+            htmlFor="gstin"
+            className="block text-sm font-semibold text-gray-900"
+          >
+            GST number{" "}
+            <span className="font-normal text-gray-400">(optional)</span>
+          </label>
+          <p className="mt-0.5 text-xs text-gray-500">
+            Add your business GSTIN to get it printed on the tax invoice for
+            input credit.
+          </p>
+          <input
+            id="gstin"
+            type="text"
+            value={gstin}
+            onChange={(e) => setGstin(e.target.value.toUpperCase())}
+            placeholder="e.g. 09ABCDE1234F1Z5"
+            maxLength={15}
+            autoComplete="off"
+            className="mt-3 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-mono uppercase tracking-wide text-gray-900 outline-none focus:border-[#f75d34] focus:ring-2 focus:ring-[#f75d34]/20"
+          />
         </div>
 
         {(error || success) && (

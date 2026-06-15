@@ -156,6 +156,11 @@ export default function InvoicePage({
               <p className="text-xs text-gray-300 print:text-gray-600">
                 {invoice.seller.email} · {invoice.seller.website}
               </p>
+              {invoice.seller.gstin && (
+                <p className="mt-1 text-xs font-semibold text-gray-200 print:text-gray-700">
+                  GSTIN: {invoice.seller.gstin}
+                </p>
+              )}
             </div>
             <div className="text-left sm:text-right">
               <p className="text-[11px] uppercase tracking-wider text-gray-400 print:text-gray-500">
@@ -194,6 +199,11 @@ export default function InvoicePage({
               )}
               {invoice.customer.city && (
                 <p className="text-xs text-gray-600">{invoice.customer.city}</p>
+              )}
+              {invoice.customer.gstin && (
+                <p className="mt-1 text-xs font-semibold text-gray-700">
+                  GSTIN: {invoice.customer.gstin}
+                </p>
               )}
             </div>
             <div className="sm:text-right">
@@ -242,17 +252,25 @@ export default function InvoicePage({
                     {formatDate(invoice.expires_at)}
                   </td>
                   <td className="py-4 pr-3 text-right font-semibold text-gray-900">
-                    ₹{invoice.amount_inr.toLocaleString("en-IN")}
+                    ₹{invoice.base_inr.toLocaleString("en-IN")}
                   </td>
                 </tr>
               </tbody>
               <tfoot>
                 <tr>
-                  <td className="py-3 pl-3 text-xs text-gray-500" colSpan={2}>
-                    Subtotal
+                  <td className="py-2 pl-3 text-xs text-gray-500" colSpan={2}>
+                    Taxable value
                   </td>
-                  <td className="py-3 pr-3 text-right text-sm text-gray-700">
-                    ₹{invoice.amount_inr.toLocaleString("en-IN")}
+                  <td className="py-2 pr-3 text-right text-sm text-gray-700">
+                    ₹{invoice.base_inr.toLocaleString("en-IN")}
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-2 pl-3 text-xs text-gray-500" colSpan={2}>
+                    GST ({invoice.gst_rate || 18}%)
+                  </td>
+                  <td className="py-2 pr-3 text-right text-sm text-gray-700">
+                    ₹{invoice.gst_inr.toLocaleString("en-IN")}
                   </td>
                 </tr>
                 <tr className="border-t border-gray-200">

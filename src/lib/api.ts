@@ -221,6 +221,9 @@ export type InvoicePayload = {
   plan_code: string;
   plan_name: string;
   amount_inr: number;
+  base_inr: number;
+  gst_inr: number;
+  gst_rate: number;
   currency: string;
   status: "active" | "expired" | "cancelled" | "pending";
   started_at: string;
@@ -233,12 +236,14 @@ export type InvoicePayload = {
     email: string;
     phone: string;
     city: string;
+    gstin: string;
   };
   seller: {
     name: string;
     address: string;
     email: string;
     website: string;
+    gstin: string;
   };
 };
 
@@ -247,6 +252,11 @@ export type RazorpayCheckoutOrder = {
   order_id: string;
   amount: number;
   amount_inr: number;
+  base_inr: number;
+  gst_inr: number;
+  gst_rate: number;
+  seller_gstin: string;
+  customer_gstin: string;
   currency: string;
   plan: ApiPlan;
   name: string;
@@ -273,6 +283,11 @@ export type BoostCheckoutOrder = {
   order_id: string;
   amount: number;
   amount_inr: number;
+  base_inr: number;
+  gst_inr: number;
+  gst_rate: number;
+  seller_gstin: string;
+  customer_gstin: string;
   currency: string;
   package: BoostPackage;
   listing_id: string;
@@ -290,6 +305,9 @@ export type BoostInvoicePayload = {
   package_name: string;
   duration_days: number;
   amount_inr: number;
+  base_inr: number;
+  gst_inr: number;
+  gst_rate: number;
   currency: string;
   status: "created" | "paid" | "failed";
   boosted_until: string | null;
@@ -303,12 +321,14 @@ export type BoostInvoicePayload = {
     email: string;
     phone: string;
     city: string;
+    gstin: string;
   };
   seller: {
     name: string;
     address: string;
     email: string;
     website: string;
+    gstin: string;
   };
 };
 
@@ -1476,10 +1496,10 @@ export const api = {
     return apiFetch<SubscriptionStatus>("/subscriptions/status/");
   },
 
-  async createRazorpayOrder(plan: string) {
+  async createRazorpayOrder(plan: string, customerGstin?: string) {
     return apiFetch<RazorpayCheckoutOrder>("/subscriptions/create-order/", {
       method: "POST",
-      body: JSON.stringify({ plan }),
+      body: JSON.stringify({ plan, customer_gstin: customerGstin ?? "" }),
     });
   },
 
@@ -1523,12 +1543,16 @@ export const api = {
     return data.packages;
   },
 
-  async createBoostOrder(listingId: string, pkg: string) {
+  async createBoostOrder(
+    listingId: string,
+    pkg: string,
+    customerGstin?: string
+  ) {
     return apiFetch<BoostCheckoutOrder>(
       `/listings/${listingId}/create-boost-order/`,
       {
         method: "POST",
-        body: JSON.stringify({ package: pkg }),
+        body: JSON.stringify({ package: pkg, customer_gstin: customerGstin ?? "" }),
       }
     );
   },
