@@ -89,6 +89,7 @@ export default function PricingPage() {
   const [success, setSuccess] = useState("");
   const [authOpen, setAuthOpen] = useState(false);
   const [gstin, setGstin] = useState("");
+  const [pendingPlan, setPendingPlan] = useState<ApiPlan | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -109,6 +110,18 @@ export default function PricingPage() {
     };
   }, []);
 
+  const openPayment = (plan: ApiPlan) => {
+    if (plan.code === "free") return;
+    if (!isLoggedIn) {
+      setAuthOpen(true);
+      return;
+    }
+    setError("");
+    setSuccess("");
+    setGstin("");
+    setPendingPlan(plan);
+  };
+
   const handleUpgrade = async (plan: ApiPlan) => {
     if (plan.code === "free") return;
     if (!isLoggedIn) {
@@ -122,6 +135,7 @@ export default function PricingPage() {
     }
     setError("");
     setSuccess("");
+    setPendingPlan(null);
     setActivating(plan.code);
     try {
       const order = await api.createRazorpayOrder(plan.code, cleanGstin);
@@ -298,7 +312,7 @@ export default function PricingPage() {
                     ) : (
                       <button
                         type="button"
-                        onClick={() => handleUpgrade(plan)}
+                        onClick={() => openPayment(plan)}
                         disabled={activating === plan.code}
                         className={`w-full rounded-full px-4 py-2.5 text-sm font-semibold shadow transition ${
                           isPopular
@@ -315,30 +329,6 @@ export default function PricingPage() {
                 </article>
               );
             })}
-        </div>
-
-        <div className="mx-auto mt-8 max-w-md rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-          <label
-            htmlFor="gstin"
-            className="block text-sm font-semibold text-gray-900"
-          >
-            GST number{" "}
-            <span className="font-normal text-gray-400">(optional)</span>
-          </label>
-          <p className="mt-0.5 text-xs text-gray-500">
-            Add your business GSTIN to get it printed on the tax invoice for
-            input credit.
-          </p>
-          <input
-            id="gstin"
-            type="text"
-            value={gstin}
-            onChange={(e) => setGstin(e.target.value.toUpperCase())}
-            placeholder="e.g. 09ABCDE1234F1Z5"
-            maxLength={15}
-            autoComplete="off"
-            className="mt-3 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-mono uppercase tracking-wide text-gray-900 outline-none focus:border-[#f75d34] focus:ring-2 focus:ring-[#f75d34]/20"
-          />
         </div>
 
         {(error || success) && (
@@ -393,6 +383,103 @@ export default function PricingPage() {
       </section>
 
       <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} />
+
+      {pendingPlan && (
+        <div
+          className="fixed inset-0 z-[120] flex items-center justify-center bg-black/55 p-4"
+          role="dialog"
+          aria-modal
+          aria-labelledby="pay-title"
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !activating) setPendingPlan(null);
+          }}
+        >
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 id="pay-title" className="text-lg font-bold text-gray-900">
+                  Confirm payment
+                </h2>
+                <p className="mt-1 text-sm text-gray-600">
+                  {pendingPlan.name} plan
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPendingPlan(null)}
+                disabled={!!activating}
+                aria-label="Close"
+                className="shrink-0 rounded-full bg-gray-100 px-2 py-0.5 text-lg font-bold text-gray-500 hover:bg-gray-200 disabled:opacity-50"
+              >
+                ×
+              </button>
+            </div>
+
+            <dl className="mt-4 space-y-1.5 rounded-xl bg-gray-50 p-4 text-sm">
+              <div className="flex justify-between">
+                <dt className="text-gray-500">Plan price</dt>
+                <dd className="font-medium text-gray-800">
+                  ₹{pendingPlan.price_inr.toLocaleString("en-IN")}
+                </dd>
+              </div>
+              <div className="flex justify-between">
+                <dt className="text-gray-500">GST (18%)</dt>
+                <dd className="font-medium text-gray-800">
+                  ₹{Math.round(pendingPlan.price_inr * 0.18).toLocaleString("en-IN")}
+                </dd>
+              </div>
+              <div className="flex justify-between border-t border-gray-200 pt-1.5">
+                <dt className="font-semibold text-gray-900">Total payable</dt>
+                <dd className="font-extrabold text-[#f75d34]">
+                  ₹{Math.round(pendingPlan.price_inr * 1.18).toLocaleString("en-IN")}
+                </dd>
+              </div>
+            </dl>
+
+            <label
+              htmlFor="gstin"
+              className="mt-5 block text-sm font-semibold text-gray-900"
+            >
+              GST number{" "}
+              <span className="font-normal text-gray-400">(optional)</span>
+            </label>
+            <p className="mt-0.5 text-xs text-gray-500">
+              Customer/dealer ke paas GSTIN ho to yahan daalein — invoice par
+              print hoga (input credit ke liye).
+            </p>
+            <input
+              id="gstin"
+              type="text"
+              value={gstin}
+              onChange={(e) => setGstin(e.target.value.toUpperCase())}
+              placeholder="e.g. 09ABCDE1234F1Z5"
+              maxLength={15}
+              autoComplete="off"
+              className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-mono uppercase tracking-wide text-gray-900 outline-none focus:border-[#f75d34] focus:ring-2 focus:ring-[#f75d34]/20"
+            />
+
+            {error && (
+              <p className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-700">
+                {error}
+              </p>
+            )}
+
+            <button
+              type="button"
+              onClick={() => handleUpgrade(pendingPlan)}
+              disabled={!!activating}
+              className="mt-5 w-full rounded-full bg-[#f75d34] px-4 py-2.5 text-sm font-semibold text-white shadow hover:bg-[#e54d24] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {activating
+                ? "Opening payment…"
+                : `Pay ₹${Math.round(pendingPlan.price_inr * 1.18).toLocaleString("en-IN")}`}
+            </button>
+            <p className="mt-3 text-center text-[11px] text-gray-400">
+              Secured by Razorpay · UPI, cards, net banking
+            </p>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
