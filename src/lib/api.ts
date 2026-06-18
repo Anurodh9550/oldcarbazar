@@ -1342,6 +1342,13 @@ export const api = {
     );
   },
 
+  async adminRevokeDealerOffer(subscriptionId: string) {
+    return adminApiFetch<{ ok: boolean; subscription_id: string; user_id: string }>(
+      `/admin-panel/dealer-offers/${subscriptionId}/revoke/`,
+      { method: "POST", body: JSON.stringify({}) }
+    );
+  },
+
   async adminListings() {
     const data = await adminApiFetch<ApiListing[] | Paginated<ApiListing>>(
       "/listings/?moderation=all&limit=200"

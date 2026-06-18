@@ -23,7 +23,8 @@ export type AdminActivityType =
   | "admin-login"
   | "settings-updated"
   | "dealer-offer-granted"
-  | "dealer-offer-updated";
+  | "dealer-offer-updated"
+  | "dealer-offer-revoked";
 
 export type AdminActivity = {
   id: string;

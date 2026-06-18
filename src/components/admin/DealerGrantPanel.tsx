@@ -7,6 +7,7 @@ import { formatExpiryLabel, type DealerOfferPlan } from "@/lib/dealerOffers";
 import { useAdmin } from "@/context/AdminContext";
 
 type GrantInfo = {
+  subscription_id: string;
   plan: string;
   plan_name: string;
   expires_at: string;
@@ -27,6 +28,7 @@ export default function DealerGrantPanel({
   const [activeGrant, setActiveGrant] = useState<GrantInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [granting, setGranting] = useState(false);
+  const [revoking, setRevoking] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
@@ -42,6 +44,7 @@ export default function DealerGrantPanel({
       const match = data.active_grants.find((g) => g.user_id === userId);
       if (match) {
         setActiveGrant({
+          subscription_id: match.subscription_id,
           plan: match.plan,
           plan_name: match.plan_name,
           expires_at: match.expires_at,
@@ -81,6 +84,24 @@ export default function DealerGrantPanel({
       setError(err instanceof Error ? err.message : "Could not grant offer.");
     } finally {
       setGranting(false);
+    }
+  };
+
+  const revoke = async () => {
+    if (!activeGrant) return;
+    if (!confirm(`${userName} ka dealer offer inactive karna hai?`)) return;
+    setRevoking(true);
+    setError("");
+    setMessage("");
+    try {
+      await api.adminRevokeDealerOffer(activeGrant.subscription_id);
+      setMessage(`Dealer offer inactive kar diya — ${userName}`);
+      logActivity("dealer-offer-revoked", `Revoked dealer offer for ${userName}`, userId);
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not deactivate offer.");
+    } finally {
+      setRevoking(false);
     }
   };
 
@@ -141,7 +162,7 @@ export default function DealerGrantPanel({
         <button
           type="button"
           onClick={grant}
-          disabled={granting || !campaignEnabled}
+          disabled={granting || revoking || !campaignEnabled}
           className="w-full rounded-xl bg-[#f75d34] py-3 text-sm font-bold text-white hover:bg-[#e54d24] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {granting
@@ -150,6 +171,17 @@ export default function DealerGrantPanel({
               ? "Extend / renew offer"
               : `Give ${defaultPlan === "dealer_trial_15" ? "15" : "20"}-day offer`}
         </button>
+
+        {activeGrant ? (
+          <button
+            type="button"
+            onClick={revoke}
+            disabled={granting || revoking}
+            className="w-full rounded-xl border border-red-200 bg-red-50 py-3 text-sm font-bold text-red-700 hover:bg-red-100 disabled:opacity-50"
+          >
+            {revoking ? "Deactivating…" : "Make inactive"}
+          </button>
+        ) : null}
 
         {!campaignEnabled ? (
           <p className="text-center text-[11px] text-amber-700">

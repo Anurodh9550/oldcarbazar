@@ -43,6 +43,7 @@ export default function DealerOffersContent() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
   const [promoSynced, setPromoSynced] = useState(false);
+  const [revokingId, setRevokingId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -89,6 +90,27 @@ export default function DealerOffersContent() {
     setPromoSynced(true);
     logActivity("dealer-offer-updated", "Synced dealer offer to site promo popup");
     setTimeout(() => setPromoSynced(false), 2500);
+  };
+
+  const revokeOffer = async (subscriptionId: string, dealerName: string) => {
+    if (
+      !confirm(
+        `${dealerName} ka dealer offer inactive karna hai? Unlimited listing band ho jayegi.`
+      )
+    ) {
+      return;
+    }
+    setRevokingId(subscriptionId);
+    setError("");
+    try {
+      await api.adminRevokeDealerOffer(subscriptionId);
+      logActivity("dealer-offer-revoked", `Revoked dealer offer for ${dealerName}`);
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not deactivate offer.");
+    } finally {
+      setRevokingId(null);
+    }
   };
 
   if (loading) {
@@ -315,12 +337,22 @@ export default function DealerOffersContent() {
                       </p>
                     </td>
                     <td className="px-5 py-3 text-right">
-                      <Link
-                        href={`/admin/users/${g.user_id}`}
-                        className="text-xs font-semibold text-[#f75d34] hover:underline"
-                      >
-                        View →
-                      </Link>
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => revokeOffer(g.subscription_id, g.user_name)}
+                          disabled={revokingId === g.subscription_id}
+                          className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100 disabled:opacity-50"
+                        >
+                          {revokingId === g.subscription_id ? "…" : "Inactive"}
+                        </button>
+                        <Link
+                          href={`/admin/users/${g.user_id}`}
+                          className="text-xs font-semibold text-[#f75d34] hover:underline"
+                        >
+                          View →
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 ))}
