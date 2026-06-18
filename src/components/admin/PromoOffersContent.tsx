@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   defaultPromoOffer,
@@ -198,7 +199,7 @@ export default function PromoOffersContent() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"
             onClick={handleSave}
@@ -206,6 +207,12 @@ export default function PromoOffersContent() {
           >
             Save & publish
           </button>
+          <Link
+            href="/admin/dealer-offers"
+            className="rounded-lg border border-orange-200 bg-orange-50 px-5 py-2.5 text-sm font-semibold text-[#c2410c] hover:bg-orange-100"
+          >
+            Dealer Offers →
+          </Link>
           <button
             type="button"
             onClick={handleReset}

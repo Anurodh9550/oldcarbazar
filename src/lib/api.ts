@@ -430,6 +430,49 @@ export type AdminPaymentsResponse = {
   };
 };
 
+export type AdminDealerOfferCampaign = {
+  enabled: boolean;
+  default_plan_code: string;
+  badge: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  cta_label: string;
+  cta_href: string;
+  max_grants: number;
+};
+
+export type AdminDealerOffersResponse = {
+  campaign: AdminDealerOfferCampaign;
+  plans: ApiPlan[];
+  active_grants: {
+    subscription_id: string;
+    user_id: string;
+    user_name: string;
+    user_phone: string;
+    user_email: string;
+    user_city: string;
+    plan: string;
+    plan_name: string;
+    listings_count: number;
+    started_at: string;
+    expires_at: string;
+    provider: string;
+  }[];
+  stats: {
+    grants_used: number;
+    max_grants: number;
+    slots_remaining: number | null;
+  };
+};
+
+export type AdminGrantSubscriptionResult = {
+  subscription_id: string;
+  plan: string;
+  plan_name: string;
+  expires_at: string;
+};
+
 export type ApiDealerCard = {
   id: string;
   name: string;
@@ -1272,6 +1315,31 @@ export const api = {
       body: JSON.stringify({ blocked }),
     });
     return apiUserToRegisteredUser(data);
+  },
+
+  async adminDealerOffers() {
+    return adminApiFetch<AdminDealerOffersResponse>("/admin-panel/dealer-offers/");
+  },
+
+  async adminUpdateDealerOfferCampaign(campaign: AdminDealerOfferCampaign) {
+    const data = await adminApiFetch<{ campaign: AdminDealerOfferCampaign }>(
+      "/admin-panel/dealer-offers/",
+      {
+        method: "PUT",
+        body: JSON.stringify(campaign),
+      }
+    );
+    return data.campaign;
+  },
+
+  async adminGrantSubscription(userId: string, plan: string, notes?: string) {
+    return adminApiFetch<AdminGrantSubscriptionResult>(
+      `/admin-panel/users/${userId}/grant-subscription/`,
+      {
+        method: "POST",
+        body: JSON.stringify({ plan, notes: notes ?? "" }),
+      }
+    );
   },
 
   async adminListings() {

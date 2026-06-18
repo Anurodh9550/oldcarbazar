@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Old Car Bazar — Sales Brochure</title>
+  <style>
+    @page { size: A4; margin: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      color: #0f172a;
+      background: #e2e8f0;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto 12px;
+      background: #fff;
+      position: relative;
+      overflow: hidden;
+      page-break-after: always;
+      break-after: page;
+    }
+    @media print {
+      body { background: #fff; }
+      .page { margin: 0; box-shadow: none; }
+    }
+    .cover {
+      background: linear-gradient(145deg, #0f172a 0%, #1e3a8a 55%, #0f172a 100%);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 28mm 22mm 20mm;
+    }
+    .cover-top { display: flex; justify-content: space-between; align-items: flex-start; }
+    .logo { height: 52px; }
+    .badge {
+      background: #f75d34;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 6px 12px;
+      border-radius: 999px;
+    }
+    .cover-hero { text-align: center; padding: 10mm 0; }
+    .cover-hero h1 {
+      font-size: 38px;
+      line-height: 1.15;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .cover-hero h1 span { color: #f75d34; }
+    .cover-hero p {
+      margin-top: 14px;
+      font-size: 16px;
+      color: #cbd5e1;
+      max-width: 140mm;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.5;
+    }
+    .cover-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 18mm;
+    }
+    .stat {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 14px 10px;
+      text-align: center;
+    }
+    .stat strong { display: block; font-size: 22px; color: #f75d34; }
+    .stat span { font-size: 10px; color: #94a3b8; margin-top: 4px; display: block; }
+    .cover-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-top: 1px solid rgba(255,255,255,0.15);
+      padding-top: 14px;
+    }
+    .cover-bottom .url { font-size: 20px; font-weight: 700; }
+    .qr { width: 88px; height: 88px; background: #fff; padding: 6px; border-radius: 10px; }
+    .qr img { width: 100%; height: 100%; display: block; }
+
+    .inner { padding: 18mm 20mm 16mm; }
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid #f75d34;
+      padding-bottom: 10px;
+      margin-bottom: 16px;
+    }
+    .page-header-brand { display: flex; align-items: center; gap: 12px; }
+    .page-logo { height: 36px; width: auto; }
+    .page-header h2 { font-size: 22px; font-weight: 800; color: #0f172a; }
+    .page-header .sub { font-size: 11px; color: #64748b; }
+    .page-num { font-size: 11px; color: #94a3b8; font-weight: 600; }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .card {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 14px;
+      background: #f8fafc;
+    }
+    .card h3 { font-size: 13px; font-weight: 800; margin-bottom: 6px; color: #0f172a; }
+    .card p, .card li { font-size: 11px; line-height: 1.55; color: #475569; }
+    .card ul { padding-left: 16px; margin-top: 6px; }
+    .card li { margin-bottom: 4px; }
+    .card.dark { background: #0f172a; border-color: #0f172a; color: #fff; }
+    .card.dark h3 { color: #f75d34; }
+    .card.dark p, .card.dark li { color: #cbd5e1; }
+    .card.accent { border-color: #f75d34; background: #fff7ed; }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #f75d34;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin: 14px 0 10px;
+    }
+    .lead { font-size: 12px; line-height: 1.65; color: #334155; margin-bottom: 12px; }
+    .hi { color: #1e3a8a; font-weight: 700; }
+
+    .feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .feature {
+      display: flex;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      background: #fff;
+    }
+    .feature .icon {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      background: #fff7ed;
+      color: #f75d34;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .feature h4 { font-size: 12px; font-weight: 800; }
+    .feature p { font-size: 10px; color: #64748b; margin-top: 3px; line-height: 1.45; }
+
+    .plan {
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      padding: 14px;
+      text-align: center;
+    }
+    .plan.popular { border: 2px solid #f75d34; background: #fff7ed; }
+    .plan .tier { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; }
+    .plan h3 { font-size: 16px; font-weight: 800; margin: 4px 0; }
+    .plan .price { font-size: 22px; font-weight: 800; color: #f75d34; }
+    .plan .price small { font-size: 11px; color: #64748b; font-weight: 600; }
+    .plan ul { list-style: none; text-align: left; margin-top: 10px; }
+    .plan li { font-size: 10px; color: #475569; padding: 4px 0; border-top: 1px solid #f1f5f9; }
+    .plan li::before { content: "✓ "; color: #f75d34; font-weight: 700; }
+
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .step {
+      text-align: center;
+      padding: 14px 10px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+    }
+    .step .num {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: #f75d34;
+      color: #fff;
+      font-weight: 800;
+      font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 8px;
+    }
+    .step h4 { font-size: 11px; font-weight: 800; }
+    .step p { font-size: 9.5px; color: #64748b; margin-top: 4px; line-height: 1.4; }
+
+    .pitch-box {
+      background: linear-gradient(135deg, #0f172a, #1e3a8a);
+      color: #fff;
+      border-radius: 14px;
+      padding: 16px;
+      margin-top: 12px;
+    }
+    .pitch-box h3 { font-size: 14px; font-weight: 800; color: #f75d34; margin-bottom: 8px; }
+    .pitch-box p { font-size: 11px; line-height: 1.6; color: #e2e8f0; }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 14px;
+      margin-top: 10px;
+    }
+    .contact-item {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 10px 0;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 11px;
+    }
+    .contact-item strong { display: block; font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+    .contact-item span { font-weight: 700; color: #0f172a; }
+
+    .sales-note {
+      border: 2px dashed #f75d34;
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 12px;
+      background: #fff7ed;
+    }
+    .sales-note h4 { font-size: 12px; font-weight: 800; color: #c2410c; margin-bottom: 8px; }
+    .sales-note .field {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 8px;
+      font-size: 11px;
+      margin-bottom: 6px;
+      align-items: end;
+    }
+    .sales-note .line { border-bottom: 1px solid #fdba74; min-height: 18px; }
+
+    .footer-bar {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: #0f172a;
+      color: #94a3b8;
+      font-size: 9px;
+      padding: 8px 20mm;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .footer-left, .footer-right { display: flex; align-items: center; gap: 10px; }
+    .footer-logo { height: 16px; width: auto; }
+    .footer-right span { white-space: nowrap; }
+    .cover-contact {
+      margin-top: 10px;
+      font-size: 11px;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+    .cover-contact strong { color: #e2e8f0; }
+    .company-card {
+      border: 2px solid #f75d34;
+      border-radius: 14px;
+      padding: 16px;
+      background: linear-gradient(135deg, #fff7ed, #fff);
+      margin-bottom: 12px;
+    }
+    .company-card .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #fed7aa;
+    }
+    .company-card .brand-logo { height: 44px; }
+    .company-card h3 { font-size: 16px; font-weight: 800; color: #0f172a; }
+    .company-card .tagline { font-size: 10px; color: #64748b; margin-top: 2px; }
+    .brands {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .brand-tag {
+      font-size: 9px;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      padding: 4px 8px;
+      border-radius: 6px;
+      color: #475569;
+      font-weight: 600;
+    }
+    .checklist li { font-size: 11px; margin-bottom: 6px; color: #334155; }
+    .checklist li::marker { color: #f75d34; }
+  </style>
+</head>
+<body>
+
+  <!-- PAGE 1: COVER -->
+  <section class="page cover">
+    <div class="cover-top">
+      <img src="logocarr-white.png" alt="Old Car Bazar" class="logo" />
+      <span class="badge">Sales Kit 2026</span>
+    </div>
+    <div class="cover-hero">
+      <h1>India's Trusted<br><span>Used Car Marketplace</span></h1>
+      <p>
+        <span class="hi">Old Car Bazar</span> — खरीदार और विक्रेता को बिना बिचौलिए के जोड़ने वाला
+        भारत का डिजिटल यूज़्ड कार प्लेटफॉर्म। Direct deals. Free listings. City-wise search.
+      </p>
+    </div>
+    <div class="cover-stats">
+      <div class="stat"><strong>10,000+</strong><span>Car Listings</span></div>
+      <div class="stat"><strong>50K+</strong><span>Monthly Users</span></div>
+      <div class="stat"><strong>12+</strong><span>Cities</span></div>
+      <div class="stat"><strong>100%</strong><span>Free to List</span></div>
+    </div>
+    <div class="cover-bottom">
+      <div>
+        <div class="url">oldcarbazar.com</div>
+        <div class="cover-contact">
+          <strong>Old Car Bazar</strong><br>
+          📍 Ahmedabad, Gujarat, India<br>
+          📞 <strong>+91 98765 43210</strong> &nbsp;|&nbsp; 📧 support@oldcarbazar.com<br>
+          ⏰ Mon–Sat, 9:00 AM – 8:00 PM IST
+        </div>
+      </div>
+      <div class="qr"><img src="oldcarbazar-qr.png" alt="QR Code" /></div>
+    </div>
+  </section>
+
+  <!-- PAGE 2: INTRODUCTION -->
+  <section class="page">
+    <div class="inner">
+      <div class="page-header">
+        <div class="page-header-brand">
+          <img src="logocarr-trans.png" alt="Old Car Bazar" class="page-logo" />
+          <div>
+            <h2>परिचय / Introduction</h2>
+            <div class="sub">Old Car Bazar क्या है और क्यों ज़रूरी है?</div>
+          </div>
+        </div>
+        <div class="page-num">02</div>
+      </div>
+
+      <p class="lead">
+        भारत में यूज़्ड कार बाज़ार तेज़ी से बढ़ रहा है, लेकिन खरीदार-विक्रेता अक्सर बिचौलियों, गलत जानकारी
+        और भरोसे की कमी से परेशान रहते हैं। <strong>Old Car Bazar</strong> इस समस्या का समाधान है —
+        एक पारदर्शी, आसान और भरोसेमंद ऑनलाइन मार्केटप्लेस जहाँ सीधा संपर्क, वेरिफाइड लिस्टिंग और
+        शहर-अनुसार स्मार्ट सर्च मिलती है।
+      </p>
+
+      <div class="two-col">
+        <div class="card dark">
+          <h3>हमारा मिशन</h3>
+          <p>
+            भारत का भरोसेमंद यूज़्ड कार मार्केटप्लेस बनाना जहाँ कार खरीदना या बेचना
+            <strong>सरल, पारदर्शी और सुरक्षित</strong> हो। 2024 से हज़ारों लिस्टिंग, मुफ्त सेलर टूल्स
+            और शहर-अनुसार खोज उपलब्ध है।
+          </p>
+        </div>
+        <div class="card accent">
+          <h3>Sales Team के लिए Elevator Pitch</h3>
+          <p style="font-size:11px;line-height:1.6;">
+            "Old Car Bazar पर आपकी गाड़ी <strong>मुफ्त</strong> में लिस्ट होती है, हज़ारों खरीदारों तक पहुँचती है,
+            और सीधा WhatsApp/कॉल पर बात होती है — कोई ब्रोकर कमीशन नहीं। डीलर के लिए verified badge,
+            lead dashboard और city-wise targeting भी मिलती है।"
+          </p>
+        </div>
+      </div>
+
+      <div class="section-title">Market Opportunity</div>
+      <div class="three-col">
+        <div class="card">
+          <h3>🚗 Growing Demand</h3>
+          <p>भारत में pre-owned car market हर साल दोगुनी गति से बढ़ रहा है। Online search पहली पसंद बन चुका है।</p>
+        </div>
+        <div class="card">
+          <h3>📱 Digital First</h3>
+          <p>खरीदार पहले phone पर search करते हैं — budget, city, brand filter के साथ। Old Car Bazar यहीं मिलता है।</p>
+        </div>
+        <div class="card">
+          <h3>🤝 Direct Deals</h3>
+          <p>Owner और buyer के बीच सीधा संपर्क — तेज़ deal, कम cost, ज़्यादा trust।</p>
+        </div>
+      </div>
+
+      <div class="pitch-box">
+        <h3>🎯 Target Customers — आप किसे approach करें?</h3>
+        <p>
+          <strong>Individual Sellers:</strong> जो अपनी पुरानी गाड़ी बेचना चाहते हैं &nbsp;|&nbsp;
+          <strong>Car Buyers:</strong> budget के अनुसार verified used cars ढूँढ रहे हैं &nbsp;|&nbsp;
+          <strong>Dealers/Showrooms:</strong> ज़्यादा leads और online visibility चाहते हैं &nbsp;|&nbsp;
+          <strong>Insurance/Loan Partners:</strong> used car buyers तक पहुँचना चाहते हैं
+        </p>
+      </div>
+    </div>
+    <div class="footer-bar">
+      <div class="footer-left">
+        <img src="logocarr-white.png" alt="" class="footer-logo" />
+        <span>Old Car Bazar · Ahmedabad, Gujarat</span>
+      </div>
+      <div class="footer-right">
+        <span>+91 98765 43210</span>
+        <span>oldcarbazar.com</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 3: PLATFORM FEATURES -->
+  <section class="page">
+    <div class="inner">
+      <div class="page-header">
+        <div class="page-header-brand">
+          <img src="logocarr-trans.png" alt="Old Car Bazar" class="page-logo" />
+          <div>
+            <h2>Platform Features</h2>
+            <div class="sub">खरीदार, विक्रेता और डीलर — सभी के लिए</div>
+          </div>
+        </div>
+        <div class="page-num">03</div>
+      </div>
+
+      <div class="section-title">खरीदारों के लिए / For Buyers</div>
+      <div class="feature-grid">
+        <div class="feature"><div class="icon">🔍</div><div><h4>Smart Search & Filters</h4><p>City, budget, brand, fuel type, kms — advanced filters से सही गाड़ी खोजें।</p></div></div>
+        <div class="feature"><div class="icon">✓</div><div><h4>Verified Listings</h4><p>हर listing live होने से पहले basic details check होती हैं।</p></div></div>
+        <div class="feature"><div class="icon">⚖</div><div><h4>Compare Cars</h4><p>Price, mileage, specs side-by-side compare करें — सही decision लें।</p></div></div>
+        <div class="feature"><div class="icon">💬</div><div><h4>Direct WhatsApp Chat</h4><p>Seller से सीधा बात — कोई hidden broker fee नहीं।</p></div></div>
+        <div class="feature"><div class="icon">🏦</div><div><h4>Used Car Loan</h4><p>Low EMI, quick approval — loan eligibility और EMI calculator।</p></div></div>
+        <div class="feature"><div class="icon">🛡</div><div><h4>Insurance & RC Guide</h4><p>Insurance options और RC transfer step-by-step guide।</p></div></div>
+      </div>
+
+      <div class="section-title">विक्रेताओं के लिए / For Sellers</div>
+      <div class="feature-grid">
+        <div class="feature"><div class="icon">🆓</div><div><h4>100% Free Listing</h4><p>3 cars तक मुफ्त — photos, price, details 2 minute में post करें।</p></div></div>
+        <div class="feature"><div class="icon">📊</div><div><h4>Free Car Valuation</h4><p>अपनी गाड़ी की सही market price जानें before listing।</p></div></div>
+        <div class="feature"><div class="icon">📱</div><div><h4>Seller Dashboard</h4><p>Listings manage करें, enquiries track करें, price update करें।</p></div></div>
+        <div class="feature"><div class="icon">🚀</div><div><h4>Boost Listings</h4><p>Top results में आने के लिए featured/boost options।</p></div></div>
+        <div class="feature"><div class="icon">📍</div><div><h4>City-wise Reach</h4><p>Ahmedabad, Mumbai, Delhi, Bangalore और 12+ शहरों में buyers।</p></div></div>
+        <div class="feature"><div class="icon">🤖</div><div><h4>AI Assistant</h4><p>Buy, sell, EMI, loan, RC — सभी सवालों के जवाब instantly।</p></div></div>
+      </div>
+
+      <div class="section-title">Popular Brands on Platform</div>
+      <div class="brands">
+        <span class="brand-tag">Maruti</span><span class="brand-tag">Hyundai</span><span class="brand-tag">Tata</span>
+        <span class="brand-tag">Honda</span><span class="brand-tag">Toyota</span><span class="brand-tag">Mahindra</span>
+        <span class="brand-tag">Kia</span><span class="brand-tag">Ford</span><span class="brand-tag">Volkswagen</span>
+        <span class="brand-tag">Renault</span><span class="brand-tag">Skoda</span><span class="brand-tag">MG</span>
+        <span class="brand-tag">Mercedes-Benz</span><span class="brand-tag">BMW</span><span class="brand-tag">Audi</span>
+        <span class="brand-tag">+15 more</span>
+      </div>
+    </div>
+    <div class="footer-bar">
+      <div class="footer-left">
+        <img src="logocarr-white.png" alt="" class="footer-logo" />
+        <span>Old Car Bazar · Ahmedabad, Gujarat</span>
+      </div>
+      <div class="footer-right">
+        <span>+91 98765 43210</span>
+        <span>oldcarbazar.com</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 4: DEALER PARTNERSHIP -->
+  <section class="page">
+    <div class="inner">
+      <div class="page-header">
+        <div class="page-header-brand">
+          <img src="logocarr-trans.png" alt="Old Car Bazar" class="page-logo" />
+          <div>
+            <h2>Dealer & Partnership</h2>
+            <div class="sub">Showrooms और business partners के लिए</div>
+          </div>
+        </div>
+        <div class="page-num">04</div>
+      </div>
+
+      <p class="lead">
+        Old Car Bazar पर <strong>Dealer / Showroom partners</strong> को verified badge, dedicated inventory listing,
+        lead dashboard और city-level targeting मिलती है। Insurance और service partners भी platform से जुड़ सकते हैं।
+      </p>
+
+      <div class="three-col">
+        <div class="card accent">
+          <h3>🏪 Dealers</h3>
+          <ul>
+            <li>Showroom listings online</li>
+            <li>Verified dealer badge</li>
+            <li>Lead & enquiry dashboard</li>
+            <li>Inventory management</li>
+            <li>Direct buyer contact</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>🛡 Insurance Partners</h3>
+          <ul>
+            <li>Used car insurance offers</li>
+            <li>Targeted buyer reach</li>
+            <li>Co-branded campaigns</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>🔧 Service Partners</h3>
+          <ul>
+            <li>Car inspection tie-ups</li>
+            <li>Servicing & warranty</li>
+            <li>Certified car programs</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section-title">Advertising Plans — Reach 50,000+ Buyers/Month</div>
+      <div class="three-col">
+        <div class="plan">
+          <div class="tier">Starter</div>
+          <h3>Starter</h3>
+          <div class="price">₹4,999<small>/month</small></div>
+          <ul>
+            <li>Featured listings (5)</li>
+            <li>City-level targeting</li>
+            <li>Basic analytics</li>
+          </ul>
+        </div>
+        <div class="plan popular">
+          <div class="tier" style="color:#f75d34;">Most Popular</div>
+          <h3>Growth</h3>
+          <div class="price">₹14,999<small>/month</small></div>
+          <ul>
+            <li>Featured listings (25)</li>
+            <li>Banner placements</li>
+            <li>Brand-level targeting</li>
+            <li>Priority support</li>
+          </ul>
+        </div>
+        <div class="plan">
+          <div class="tier">Enterprise</div>
+          <h3>Enterprise</h3>
+          <div class="price">Custom</div>
+          <ul>
+            <li>Unlimited listings</li>
+            <li>Homepage takeover</li>
+            <li>Custom integrations</li>
+            <li>Dedicated account manager</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pitch-box" style="margin-top:14px;">
+        <h3>💼 Dealer को क्या बोलें?</h3>
+        <p>
+          "आपकी पूरी inventory online होगी, verified badge मिलेगा, और हर महीने 50,000+ used car buyers
+          तक पहुँच — city और budget targeting के साथ। Starter plan सिर्फ ₹4,999/month से शुरू।"
+        </p>
+      </div>
+    </div>
+    <div class="footer-bar">
+      <div class="footer-left">
+        <img src="logocarr-white.png" alt="" class="footer-logo" />
+        <span>Old Car Bazar · Ahmedabad, Gujarat</span>
+      </div>
+      <div class="footer-right">
+        <span>+91 98765 43210</span>
+        <span>oldcarbazar.com</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 5: HOW IT WORKS -->
+  <section class="page">
+    <div class="inner">
+      <div class="page-header">
+        <div class="page-header-brand">
+          <img src="logocarr-trans.png" alt="Old Car Bazar" class="page-logo" />
+          <div>
+            <h2>How It Works</h2>
+            <div class="sub">3 आसान steps — Buy या Sell</div>
+          </div>
+        </div>
+        <div class="page-num">05</div>
+      </div>
+
+      <div class="two-col">
+        <div>
+          <div class="section-title">गाड़ी खरीदना / Buy a Car</div>
+          <div class="steps" style="grid-template-columns:1fr;">
+            <div class="step" style="display:flex;gap:12px;text-align:left;align-items:flex-start;">
+              <div class="num" style="margin:0;flex-shrink:0;">1</div>
+              <div><h4>Search & Filter</h4><p>City, budget, brand या fuel type से गाड़ी खोजें।</p></div>
+            </div>
+            <div class="step" style="display:flex;gap:12px;text-align:left;align-items:flex-start;">
+              <div class="num" style="margin:0;flex-shrink:0;">2</div>
+              <div><h4>Compare & Chat</h4><p>Models compare करें, seller से WhatsApp पर बात करें।</p></div>
+            </div>
+            <div class="step" style="display:flex;gap:12px;text-align:left;align-items:flex-start;">
+              <div class="num" style="margin:0;flex-shrink:0;">3</div>
+              <div><h4>Inspect & Buy</h4><p>Test drive लें, deal finalize करें, RC transfer complete करें।</p></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="section-title">गाड़ी बेचना / Sell a Car</div>
+          <div class="steps" style="grid-template-columns:1fr;">
+            <div class="step" style="display:flex;gap:12px;text-align:left;align-items:flex-start;">
+              <div class="num" style="margin:0;flex-shrink:0;background:#0f172a;">1</div>
+              <div><h4>Post Your Ad</h4><p>Photos, price और car details 2 minute में add करें — मुफ्त!</p></div>
+            </div>
+            <div class="step" style="display:flex;gap:12px;text-align:left;align-items:flex-start;">
+              <div class="num" style="margin:0;flex-shrink:0;background:#0f172a;">2</div>
+              <div><h4>Get Enquiries</h4><p>Buyers सीधे chat या call पर contact करेंगे।</p></div>
+            </div>
+            <div class="step" style="display:flex;gap:12px;text-align:left;align-items:flex-start;">
+              <div class="num" style="margin:0;flex-shrink:0;background:#0f172a;">3</div>
+              <div><h4>Sell & Transfer</h4><p>Deal close करें और RC transfer पूरा करें।</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title">Budget-wise Inventory</div>
+      <div class="three-col">
+        <div class="card"><h3>Under ₹2 Lakh</h3><p>400+ cars available across cities</p></div>
+        <div class="card"><h3>₹2 – ₹5 Lakh</h3><p>650+ cars — most popular segment</p></div>
+        <div class="card"><h3>₹5 – ₹10 Lakh</h3><p>380+ premium used cars</p></div>
+      </div>
+      <div class="three-col" style="margin-top:10px;">
+        <div class="card"><h3>₹10 – ₹15 Lakh</h3><p>120+ cars</p></div>
+        <div class="card"><h3>Above ₹15 Lakh</h3><p>80+ cars</p></div>
+        <div class="card"><h3>Luxury Cars</h3><p>45+ BMW, Mercedes, Audi & more</p></div>
+      </div>
+
+      <div class="section-title">Sales Team — Field Visit Checklist</div>
+      <ul class="checklist" style="columns:2;column-gap:24px;padding-left:18px;">
+        <li>Website demo दिखाएँ — oldcarbazar.com</li>
+        <li>QR code scan करवाएँ — instant access</li>
+        <li>Free listing का फायदा समझाएँ</li>
+        <li>Dealer plans की pricing बताएँ</li>
+        <li>WhatsApp direct contact feature दिखाएँ</li>
+        <li>Valuation tool try करवाएँ</li>
+        <li>Partner inquiry form भरवाएँ</li>
+        <li>Follow-up date fix करें</li>
+      </ul>
+    </div>
+    <div class="footer-bar">
+      <div class="footer-left">
+        <img src="logocarr-white.png" alt="" class="footer-logo" />
+        <span>Old Car Bazar · Ahmedabad, Gujarat</span>
+      </div>
+      <div class="footer-right">
+        <span>+91 98765 43210</span>
+        <span>oldcarbazar.com</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 6: CONTACT & CTA -->
+  <section class="page">
+    <div class="inner">
+      <div class="page-header">
+        <div class="page-header-brand">
+          <img src="logocarr-trans.png" alt="Old Car Bazar" class="page-logo" />
+          <div>
+            <h2>Contact & Next Steps</h2>
+            <div class="sub">आज ही जुड़ें — Old Car Bazar</div>
+          </div>
+        </div>
+        <div class="page-num">06</div>
+      </div>
+
+      <div class="company-card">
+        <div class="brand-row">
+          <img src="logocarr-trans.png" alt="Old Car Bazar" class="brand-logo" />
+          <div>
+            <h3>Old Car Bazar</h3>
+            <div class="tagline">India's Trusted Marketplace for Used Cars</div>
+          </div>
+        </div>
+        <div class="two-col" style="gap:12px;">
+          <div>
+            <div class="contact-item" style="border:none;padding:4px 0;"><div><strong>Office Address</strong><span>Ahmedabad, Gujarat, India</span></div></div>
+            <div class="contact-item" style="border:none;padding:4px 0;"><div><strong>Working Hours</strong><span>Mon–Sat, 9:00 AM – 8:00 PM IST</span></div></div>
+          </div>
+          <div>
+            <div class="contact-item" style="border:none;padding:4px 0;"><div><strong>Sales / Support</strong><span>+91 98765 43210</span></div></div>
+            <div class="contact-item" style="border:none;padding:4px 0;"><div><strong>Email</strong><span>support@oldcarbazar.com</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-grid">
+        <div>
+          <div class="card" style="background:#fff;">
+            <h3 style="font-size:15px;margin-bottom:12px;">📞 Get in Touch</h3>
+            <div class="contact-item"><div><strong>Website</strong><span>www.oldcarbazar.com</span></div></div>
+            <div class="contact-item"><div><strong>Office</strong><span>Ahmedabad, Gujarat, India</span></div></div>
+            <div class="contact-item"><div><strong>Phone</strong><span>+91 98765 43210</span></div></div>
+            <div class="contact-item"><div><strong>Email (Support)</strong><span>support@oldcarbazar.com</span></div></div>
+            <div class="contact-item"><div><strong>Email (Ads)</strong><span>ads@oldcarbazar.in</span></div></div>
+            <div class="contact-item"><div><strong>Hours</strong><span>Mon–Sat, 9:00 AM – 8:00 PM IST</span></div></div>
+            <div class="contact-item" style="border:none;"><div><strong>Partner Page</strong><span>oldcarbazar.com/partner</span></div></div>
+          </div>
+
+          <div class="sales-note">
+            <h4>📝 Sales Visit Form — Field Team</h4>
+            <div class="field"><span>Customer Name:</span><div class="line"></div></div>
+            <div class="field"><span>Business/Showroom:</span><div class="line"></div></div>
+            <div class="field"><span>Phone:</span><div class="line"></div></div>
+            <div class="field"><span>City:</span><div class="line"></div></div>
+            <div class="field"><span>Interest:</span><div class="line"></div></div>
+            <div class="field"><span>Sales Executive:</span><div class="line"></div></div>
+            <div class="field"><span>Follow-up Date:</span><div class="line"></div></div>
+          </div>
+        </div>
+
+        <div style="text-align:center;">
+          <div class="card dark" style="padding:20px;">
+            <h3 style="font-size:14px;color:#fff;margin-bottom:12px;">Scan & Visit</h3>
+            <div style="background:#fff;padding:12px;border-radius:12px;display:inline-block;">
+              <img src="oldcarbazar-qr.png" alt="QR" style="width:120px;height:120px;display:block;" />
+            </div>
+            <p style="margin-top:12px;font-size:12px;color:#94a3b8;">oldcarbazar.com</p>
+          </div>
+
+          <div class="card accent" style="margin-top:12px;text-align:left;">
+            <h3>Quick Links</h3>
+            <ul style="list-style:none;padding:0;margin-top:8px;">
+              <li style="font-size:10px;padding:4px 0;border-bottom:1px solid #fed7aa;">🏠 Home — oldcarbazar.com</li>
+              <li style="font-size:10px;padding:4px 0;border-bottom:1px solid #fed7aa;">🚗 Buy — /used-cars</li>
+              <li style="font-size:10px;padding:4px 0;border-bottom:1px solid #fed7aa;">💰 Sell — /sell-car</li>
+              <li style="font-size:10px;padding:4px 0;border-bottom:1px solid #fed7aa;">📊 Valuation — /valuation</li>
+              <li style="font-size:10px;padding:4px 0;border-bottom:1px solid #fed7aa;">🤝 Partner — /partner</li>
+              <li style="font-size:10px;padding:4px 0;">📢 Advertise — /advertise</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="pitch-box" style="margin-top:16px;text-align:center;">
+        <h3>Old Car Bazar — Buy Smart. Sell Free. Deal Direct.</h3>
+        <p style="margin-top:6px;">© 2026 Old Car Bazar. All rights reserved. | India's Trusted Marketplace for Used Cars</p>
+      </div>
+    </div>
+    <div class="footer-bar">
+      <div class="footer-left">
+        <img src="logocarr-white.png" alt="" class="footer-logo" />
+        <span>Old Car Bazar · Ahmedabad, Gujarat</span>
+      </div>
+      <div class="footer-right">
+        <span>+91 98765 43210</span>
+        <span>oldcarbazar.com</span>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>

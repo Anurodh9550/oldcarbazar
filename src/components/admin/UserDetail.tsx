@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { useAdmin } from "@/context/AdminContext";
 import { useAuth } from "@/context/AuthContext";
 import { useListings } from "@/context/ListingsContext";
+import DealerGrantPanel from "@/components/admin/DealerGrantPanel";
 import ListingImage from "@/components/ListingImage";
 import { MailIcon, PhoneIcon, ShieldIcon } from "./icons";
 
@@ -154,6 +155,8 @@ export default function UserDetail({ userId }: { userId: string }) {
               </motion.button>
             </div>
           </div>
+
+          <DealerGrantPanel userId={user.id} userName={user.name} />
 
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <h3 className="text-base font-bold text-slate-900">Admin note</h3>

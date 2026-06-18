@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Old Car Bazar - QR Code Generator</title>
+  <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: #0f172a;
+    }
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 32px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+    h1 { font-size: 22px; margin-bottom: 4px; color: #1e3a8a; }
+    p.sub { font-size: 14px; color: #64748b; margin-bottom: 24px; }
+    label { display: block; text-align: left; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #334155; }
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus { border-color: #1e3a8a; }
+    button {
+      width: 100%;
+      margin-top: 16px;
+      padding: 13px;
+      border: none;
+      border-radius: 10px;
+      background: #1e3a8a;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover { background: #1d4ed8; }
+    button.secondary { background: #16a34a; }
+    button.secondary:hover { background: #15803d; }
+    #qrcode {
+      margin: 28px auto 8px;
+      display: inline-block;
+      padding: 16px;
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      min-height: 40px;
+    }
+    #qrcode img, #qrcode canvas { display: block; }
+    .hint { font-size: 12px; color: #94a3b8; margin-top: 14px; word-break: break-all; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Old Car Bazar</h1>
+    <p class="sub">Website ka QR Code banayein</p>
+
+    <label for="url">Website Link (URL)</label>
+    <input id="url" type="text" placeholder="https://oldcarbazar.com/"
+           value="https://oldcarbazar.com/" />
+
+    <button onclick="generate()">QR Code Banayein</button>
+
+    <div id="qrcode"></div>
+
+    <button class="secondary" onclick="download()" id="dlBtn" style="display:none;">
+      QR Code Download Karein (PNG)
+    </button>
+
+    <p class="hint" id="hint"></p>
+  </div>
+
+  <script>
+    let qr = null;
+
+    function generate() {
+      const url = document.getElementById('url').value.trim();
+      const box = document.getElementById('qrcode');
+      const hint = document.getElementById('hint');
+      const dlBtn = document.getElementById('dlBtn');
+
+      if (!url) {
+        hint.textContent = 'Pehle website ka link daalein.';
+        return;
+      }
+
+      box.innerHTML = '';
+      qr = new QRCode(box, {
+        text: url,
+        width: 256,
+        height: 256,
+        colorDark: '#0f172a',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+      });
+
+      hint.textContent = 'Scan karne par khulega: ' + url;
+      dlBtn.style.display = 'block';
+    }
+
+    function download() {
+      const canvas = document.querySelector('#qrcode canvas');
+      const img = document.querySelector('#qrcode img');
+      let dataUrl;
+
+      if (canvas) {
+        dataUrl = canvas.toDataURL('image/png');
+      } else if (img) {
+        dataUrl = img.src;
+      } else {
+        return;
+      }
+
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = 'old-car-bazar-qr.png';
+      a.click();
+    }
+
+    window.addEventListener('load', generate);
+  </script>
+</body>
+</html>

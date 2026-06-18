@@ -49,6 +49,7 @@ const navItems: NavItem[] = [
   { href: "/admin/payments", label: "Payments", Icon: PaymentsIcon },
   { href: "/admin/loan-tools", label: "Loan & Tools", Icon: LoanToolsIcon },
   { href: "/admin/promo", label: "Promo & Offers", Icon: PromoIcon },
+  { href: "/admin/dealer-offers", label: "Dealer Offers", Icon: SellerIcon },
   { href: "/admin/ads", label: "Ads Manager", Icon: AdsIcon },
   { href: "/admin/analytics", label: "Analytics", Icon: AnalyticsIcon },
   { href: "/admin/cities", label: "Cities", Icon: CitiesIcon },
@@ -96,6 +97,10 @@ const titleMap: Record<string, { title: string; subtitle: string }> = {
   "/admin/promo": {
     title: "Promo & Offers",
     subtitle: "Edit the offer/feature popup shown across the site",
+  },
+  "/admin/dealer-offers": {
+    title: "Dealer Offers",
+    subtitle: "15/20 day unlimited listing offers — control & track dealers",
   },
   "/admin/ads": {
     title: "Ads Manager",

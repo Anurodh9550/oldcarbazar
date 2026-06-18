@@ -21,7 +21,9 @@ export type AdminActivityType =
   | "user-unblocked"
   | "user-verified"
   | "admin-login"
-  | "settings-updated";
+  | "settings-updated"
+  | "dealer-offer-granted"
+  | "dealer-offer-updated";
 
 export type AdminActivity = {
   id: string;
