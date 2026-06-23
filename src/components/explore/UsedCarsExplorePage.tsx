@@ -27,6 +27,10 @@ import PageLoader from "@/components/ui/PageLoader";
 import FindMyCarWizard from "./FindMyCarWizard";
 
 const POPULAR_CITY_ROWS_VISIBLE = 12;
+/** 2 rows × 6 columns on large screens */
+const BRANDS_ROWS_VISIBLE = 2;
+const BRANDS_COLS_LG = 6;
+const INITIAL_BRANDS_VISIBLE = BRANDS_ROWS_VISIBLE * BRANDS_COLS_LG;
 
 export default function UsedCarsExplorePage() {
   const router = useRouter();
@@ -38,6 +42,7 @@ export default function UsedCarsExplorePage() {
   const [showAllNearby, setShowAllNearby] = useState(false);
   const [citySearch, setCitySearch] = useState("");
   const [showAllCities, setShowAllCities] = useState(false);
+  const [showAllBrands, setShowAllBrands] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
 
   useEffect(() => {
@@ -71,6 +76,11 @@ export default function UsedCarsExplorePage() {
     cityCars.filter((c) => c.fuel === fuel).slice(0, 8);
 
   const visibleNearby = showAllNearby ? nearbyCities : nearbyCities.slice(0, 12);
+
+  const visibleBrands = showAllBrands
+    ? exploreBrands
+    : exploreBrands.slice(0, INITIAL_BRANDS_VISIBLE);
+  const hasMoreBrands = exploreBrands.length > INITIAL_BRANDS_VISIBLE;
 
   const filteredPopularCities = useMemo(() => {
     const q = citySearch.trim().toLowerCase();
@@ -334,11 +344,11 @@ export default function UsedCarsExplorePage() {
               Used Cars by Brand
             </h2>
             <ul className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-6">
-              {exploreBrands.map((brand) => (
+              {visibleBrands.map((brand) => (
                 <li key={brand.slug}>
                   <Link
                     href={`/used-cars/search?brand=${brand.slug}`}
-                    className="flex min-h-[128px] flex-col items-center justify-between rounded-2xl border border-gray-200 bg-white px-3 py-4 shadow-sm sm:px-4 sm:py-5"
+                    className="flex min-h-[128px] flex-col items-center justify-between rounded-2xl border border-gray-200 bg-white px-3 py-4 shadow-sm transition hover:border-[#f75d34] hover:shadow-md sm:px-4 sm:py-5"
                   >
                     <BrandLogo slug={brand.slug} name={brand.name} />
                     <span className="card-title mt-3 line-clamp-2 min-h-[2rem] text-center leading-snug">
@@ -348,12 +358,24 @@ export default function UsedCarsExplorePage() {
                 </li>
               ))}
             </ul>
-            <Link
-              href="/used-cars/search"
-              className="mt-4 inline-block text-sm font-semibold text-[#f75d34] hover:underline"
-            >
-              View All Brands
-            </Link>
+            {hasMoreBrands && (
+              <button
+                type="button"
+                onClick={() => setShowAllBrands((v) => !v)}
+                className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-[#f75d34] hover:text-[#f75d34]"
+              >
+                {showAllBrands ? "Show Less" : "More Brands"}
+                <svg
+                  className={`h-4 w-4 transition-transform ${showAllBrands ? "rotate-180" : ""}`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            )}
           </section>
 
           {/* Budget */}
