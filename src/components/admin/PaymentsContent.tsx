@@ -7,6 +7,7 @@ import {
   type AdminPaymentsResponse,
   type AdminSubscriptionPayment,
 } from "@/lib/api";
+import { openPrintableInvoice } from "@/lib/printInvoice";
 
 type Tab = "subscriptions" | "boosts";
 
@@ -69,79 +70,6 @@ function TxnId({ value }: { value: string }) {
   );
 }
 
-type InvoiceData = {
-  title: string;
-  invoiceNumber: string;
-  customerName: string;
-  customerPhone: string;
-  customerEmail: string;
-  itemLabel: string;
-  amount: number;
-  status: string;
-  orderId: string;
-  paymentId: string;
-  receipt: string;
-  date: string;
-  extra?: { label: string; value: string }[];
-};
-
-function openInvoiceWindow(data: InvoiceData) {
-  const win = window.open("", "_blank", "width=820,height=900");
-  if (!win) return;
-  const rows = (data.extra ?? [])
-    .map(
-      (e) =>
-        `<tr><td class="k">${e.label}</td><td class="v">${e.value}</td></tr>`
-    )
-    .join("");
-  win.document.write(`<!doctype html><html><head><meta charset="utf-8" />
-  <title>${data.invoiceNumber}</title>
-  <style>
-    *{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
-    body{margin:0;padding:40px;color:#111827}
-    .brand{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #f75d34;padding-bottom:16px}
-    .brand h1{margin:0;color:#f75d34;font-size:24px}
-    .muted{color:#6b7280;font-size:12px}
-    h2{font-size:15px;margin:24px 0 8px}
-    table{width:100%;border-collapse:collapse;margin-top:8px}
-    td{padding:8px 10px;border-bottom:1px solid #eee;font-size:13px;vertical-align:top}
-    td.k{color:#6b7280;width:200px}
-    td.v{font-weight:600}
-    .total{margin-top:18px;text-align:right;font-size:20px;font-weight:800;color:#111827}
-    .pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;background:#ecfdf5;color:#047857}
-    .foot{margin-top:32px;color:#9ca3af;font-size:11px;text-align:center}
-    @media print{body{padding:20px}}
-  </style></head><body>
-    <div class="brand">
-      <div><h1>Old Car Bazar</h1><p class="muted">Old Car Bazar, India · support@oldcarbazar.com</p></div>
-      <div style="text-align:right">
-        <p class="muted">Invoice</p>
-        <p style="font-weight:700;margin:2px 0">${data.invoiceNumber}</p>
-        <p class="muted">${data.date}</p>
-      </div>
-    </div>
-    <h2>${data.title}</h2>
-    <table>
-      <tr><td class="k">Billed to</td><td class="v">${data.customerName}</td></tr>
-      <tr><td class="k">Phone</td><td class="v">${data.customerPhone || "—"}</td></tr>
-      <tr><td class="k">Email</td><td class="v">${data.customerEmail || "—"}</td></tr>
-      <tr><td class="k">Item</td><td class="v">${data.itemLabel}</td></tr>
-      <tr><td class="k">Status</td><td class="v"><span class="pill">${data.status}</span></td></tr>
-      ${rows}
-    </table>
-    <h2>Payment / Transaction</h2>
-    <table>
-      <tr><td class="k">Razorpay Order ID</td><td class="v">${data.orderId || "—"}</td></tr>
-      <tr><td class="k">Razorpay Payment ID</td><td class="v">${data.paymentId || "—"}</td></tr>
-      <tr><td class="k">Receipt</td><td class="v">${data.receipt || "—"}</td></tr>
-    </table>
-    <p class="total">Total Paid: ${formatINR(data.amount)}</p>
-    <p class="foot">This is a system-generated invoice from Old Car Bazar.</p>
-    <script>window.onload=function(){window.print();}</script>
-  </body></html>`);
-  win.document.close();
-}
-
 export default function PaymentsContent() {
   const [data, setData] = useState<AdminPaymentsResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -199,14 +127,19 @@ export default function PaymentsContent() {
   }, [data, query]);
 
   const printSubscription = (r: AdminSubscriptionPayment) =>
-    openInvoiceWindow({
+    openPrintableInvoice({
       title: "Subscription Invoice",
       invoiceNumber: r.invoice_number,
       customerName: r.user_name,
       customerPhone: r.user_phone,
       customerEmail: r.user_email,
+      customerGstin: r.customer_gstin,
+      sellerGstin: r.seller_gstin,
       itemLabel: `${r.plan_name} plan`,
-      amount: r.amount_inr,
+      amountInr: r.amount_inr,
+      baseInr: r.base_inr,
+      gstInr: r.gst_inr,
+      gstRate: r.gst_rate,
       status: r.status,
       orderId: r.razorpay_order_id,
       paymentId: r.razorpay_payment_id,
@@ -220,14 +153,19 @@ export default function PaymentsContent() {
     });
 
   const printBoost = (r: AdminBoostPayment) =>
-    openInvoiceWindow({
+    openPrintableInvoice({
       title: "Listing Boost Invoice",
       invoiceNumber: r.invoice_number,
       customerName: r.user_name,
       customerPhone: r.user_phone,
       customerEmail: r.user_email,
+      customerGstin: r.customer_gstin,
+      sellerGstin: r.seller_gstin,
       itemLabel: `Boost (${r.duration_days} days) · ${r.listing_title}`,
-      amount: r.amount_inr,
+      amountInr: r.amount_inr,
+      baseInr: r.base_inr,
+      gstInr: r.gst_inr,
+      gstRate: r.gst_rate,
       status: r.status,
       orderId: r.razorpay_order_id,
       paymentId: r.razorpay_payment_id,

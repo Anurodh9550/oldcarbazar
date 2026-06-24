@@ -388,6 +388,11 @@ export type AdminSubscriptionPayment = {
   plan: string;
   plan_name: string;
   amount_inr: number;
+  base_inr: number;
+  gst_inr: number;
+  gst_rate: number;
+  seller_gstin: string;
+  customer_gstin: string;
   status: "active" | "expired" | "cancelled" | "pending";
   provider: string;
   razorpay_order_id: string;
@@ -409,6 +414,11 @@ export type AdminBoostPayment = {
   package: string;
   duration_days: number;
   amount_inr: number;
+  base_inr: number;
+  gst_inr: number;
+  gst_rate: number;
+  seller_gstin: string;
+  customer_gstin: string;
   status: "created" | "paid" | "failed";
   razorpay_order_id: string;
   razorpay_payment_id: string;

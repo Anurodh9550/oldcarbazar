@@ -9,6 +9,7 @@ import {
   type BoostInvoicePayload,
   type InvoicePayload,
 } from "@/lib/api";
+import { openPrintableInvoice } from "@/lib/printInvoice";
 
 function formatDate(value: string | null): string {
   if (!value) return "—";
@@ -22,56 +23,29 @@ function formatDate(value: string | null): string {
 }
 
 function openBoostInvoiceWindow(inv: BoostInvoicePayload) {
-  const win = window.open("", "_blank", "width=820,height=900");
-  if (!win) return;
-  const amount = `₹${inv.amount_inr.toLocaleString("en-IN")}`;
-  win.document.write(`<!doctype html><html><head><meta charset="utf-8" />
-  <title>${inv.invoice_number}</title>
-  <style>
-    *{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
-    body{margin:0;padding:40px;color:#111827}
-    .brand{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #f75d34;padding-bottom:16px}
-    .brand h1{margin:0;color:#f75d34;font-size:24px}
-    .muted{color:#6b7280;font-size:12px}
-    h2{font-size:15px;margin:24px 0 8px}
-    table{width:100%;border-collapse:collapse;margin-top:8px}
-    td{padding:8px 10px;border-bottom:1px solid #eee;font-size:13px;vertical-align:top}
-    td.k{color:#6b7280;width:200px}
-    td.v{font-weight:600}
-    .total{margin-top:18px;text-align:right;font-size:20px;font-weight:800}
-    .pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;background:#ecfdf5;color:#047857}
-    .foot{margin-top:32px;color:#9ca3af;font-size:11px;text-align:center}
-    @media print{body{padding:20px}}
-  </style></head><body>
-    <div class="brand">
-      <div><h1>Old Car Bazar</h1><p class="muted">${inv.seller.address} · ${inv.seller.email}</p></div>
-      <div style="text-align:right">
-        <p class="muted">Invoice</p>
-        <p style="font-weight:700;margin:2px 0">${inv.invoice_number}</p>
-        <p class="muted">${formatDate(inv.issued_at)}</p>
-      </div>
-    </div>
-    <h2>Listing Boost Invoice</h2>
-    <table>
-      <tr><td class="k">Billed to</td><td class="v">${inv.customer.name}</td></tr>
-      <tr><td class="k">Phone</td><td class="v">${inv.customer.phone || "—"}</td></tr>
-      <tr><td class="k">Email</td><td class="v">${inv.customer.email || "—"}</td></tr>
-      <tr><td class="k">Item</td><td class="v">${inv.package_name} (${inv.duration_days} days)</td></tr>
-      <tr><td class="k">Listing</td><td class="v">${inv.listing_title}</td></tr>
-      <tr><td class="k">Boosted until</td><td class="v">${formatDate(inv.boosted_until)}</td></tr>
-      <tr><td class="k">Status</td><td class="v"><span class="pill">${inv.status}</span></td></tr>
-    </table>
-    <h2>Payment / Transaction</h2>
-    <table>
-      <tr><td class="k">Razorpay Order ID</td><td class="v">${inv.razorpay_order_id || "—"}</td></tr>
-      <tr><td class="k">Razorpay Payment ID</td><td class="v">${inv.razorpay_payment_id || "—"}</td></tr>
-      <tr><td class="k">Receipt</td><td class="v">${inv.receipt || "—"}</td></tr>
-    </table>
-    <p class="total">Total Paid: ${amount}</p>
-    <p class="foot">This is a system-generated invoice from Old Car Bazar.</p>
-    <script>window.onload=function(){window.print();}</script>
-  </body></html>`);
-  win.document.close();
+  openPrintableInvoice({
+    title: "Listing Boost Invoice",
+    invoiceNumber: inv.invoice_number,
+    date: formatDate(inv.issued_at),
+    customerName: inv.customer.name,
+    customerPhone: inv.customer.phone,
+    customerEmail: inv.customer.email,
+    customerGstin: inv.customer.gstin,
+    sellerName: inv.seller.name,
+    sellerAddress: inv.seller.address,
+    sellerEmail: inv.seller.email,
+    sellerGstin: inv.seller.gstin,
+    itemLabel: `${inv.package_name} (${inv.duration_days} days) · ${inv.listing_title}`,
+    status: inv.status,
+    orderId: inv.razorpay_order_id,
+    paymentId: inv.razorpay_payment_id,
+    receipt: inv.receipt,
+    amountInr: inv.amount_inr,
+    baseInr: inv.base_inr,
+    gstInr: inv.gst_inr,
+    gstRate: inv.gst_rate,
+    extra: [{ label: "Boosted until", value: formatDate(inv.boosted_until) }],
+  });
 }
 
 function statusStyle(status: string): string {
