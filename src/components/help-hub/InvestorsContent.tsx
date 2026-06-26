@@ -47,7 +47,7 @@ export default function InvestorsContent() {
 
   return (
     <div className="space-y-8">
-      <section className="rounded-2xl bg-slate-900 p-6 text-white">
+      <section className="dark-surface rounded-2xl bg-slate-900 p-6">
         <h2 className="text-xl font-bold">{c.heroTitle}</h2>
         <p className="mt-2 text-sm text-slate-300">{c.heroSubtitle}</p>
         <ul className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">

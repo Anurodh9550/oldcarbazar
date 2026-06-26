@@ -58,7 +58,7 @@ export default function PromoCard({
             {offer.badge}
           </span>
         )}
-        <h2 className="mt-3 text-2xl font-extrabold leading-tight">
+        <h2 className={`mt-3 text-2xl font-extrabold leading-tight ${theme.text}`}>
           {offer.title}
         </h2>
         {offer.subtitle && (

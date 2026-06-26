@@ -237,7 +237,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         </div>
 
         <nav className="flex-1 overflow-y-auto px-3 py-5">
-          <p className="px-2 pb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
+          <p className="px-2 pb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
             Main
           </p>
           <ul className="space-y-1">

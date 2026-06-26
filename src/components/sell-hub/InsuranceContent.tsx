@@ -45,7 +45,7 @@ export default function InsuranceContent() {
           </li>
         ))}
       </ul>
-      <div className="mt-8 rounded-2xl bg-gray-900 p-6 text-white sm:p-8">
+      <div className="dark-surface mt-8 rounded-2xl bg-gray-900 p-6 sm:p-8">
         <h3 className="font-bold">Get Insurance Quote</h3>
         <p className="mt-2 text-sm text-gray-300">
           Enter your details — we&apos;ll connect you with top insurers

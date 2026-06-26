@@ -44,7 +44,7 @@
   h4,
   h5,
   h6 {
-    color: #111827;
+    color: inherit;
     font-weight: 600;
     letter-spacing: -0.02em;
     line-height: 1.25;
@@ -144,10 +144,10 @@
     color: #ffb199;
   }
 
-  /* Section headings */
+  /* Section headings (light surfaces) */
   .section-title {
     font-size: 1.125rem;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: -0.02em;
     line-height: 1.35;
     color: #111827;
@@ -155,8 +155,8 @@
 
   .section-title-lg {
     font-size: 1.25rem;
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    font-weight: 700;
+    letter-spacing: -0.025em;
     line-height: 1.35;
     color: #111827;
   }
@@ -186,6 +186,38 @@
   }
 
   /* Hero / dark shells */
+  .page-hero,
+  .dark-surface {
+    color: #f8fafc;
+  }
+
+  .page-hero h1,
+  .page-hero h2,
+  .page-hero h3,
+  .page-hero h4,
+  .page-hero h5,
+  .page-hero h6,
+  .dark-surface h1,
+  .dark-surface h2,
+  .dark-surface h3,
+  .dark-surface h4,
+  .dark-surface h5,
+  .dark-surface h6 {
+    color: inherit;
+  }
+
+  .dark-surface .section-title,
+  .dark-surface .section-title-lg,
+  .page-hero .section-title,
+  .page-hero .section-title-lg {
+    color: #fff;
+  }
+
+  .dark-surface label,
+  .page-hero label {
+    color: #cbd5e1;
+  }
+
   .hero-title {
     font-size: 1.875rem;
     font-weight: 700;

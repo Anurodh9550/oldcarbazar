@@ -30,7 +30,7 @@ export default function SellerPageShell({
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-[#f0f2f5]">
-      <div className="relative overflow-hidden border-b border-orange-200/30 bg-[#1a1a2e]">
+      <div className="page-hero relative overflow-hidden border-b border-orange-200/30 bg-[#1a1a2e]">
         <div
           aria-hidden
           className="absolute inset-0 bg-cover bg-center opacity-40"

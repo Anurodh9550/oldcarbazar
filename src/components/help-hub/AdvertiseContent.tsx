@@ -33,7 +33,7 @@ export default function AdvertiseContent() {
 
   return (
     <div className="space-y-8">
-      <section className="rounded-2xl bg-slate-900 p-6 text-white">
+      <section className="dark-surface rounded-2xl bg-slate-900 p-6">
         <h2 className="text-xl font-bold">Reach 50,000+ Used Car Buyers Every Month</h2>
         <p className="mt-2 text-sm text-slate-300">
           Targeted advertising for dealers, OEMs, insurance partners and service brands. Pay only for

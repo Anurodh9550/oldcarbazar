@@ -30,7 +30,7 @@ export default function UpgradeRequiredModal({ open, onClose, status }: Props) {
             onClick={(e) => e.stopPropagation()}
             className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl"
           >
-            <div className="bg-gradient-to-br from-[#f75d34] to-[#e54d24] px-6 py-5 text-white">
+            <div className="dark-surface bg-gradient-to-br from-[#f75d34] to-[#e54d24] px-6 py-5">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
                   <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>

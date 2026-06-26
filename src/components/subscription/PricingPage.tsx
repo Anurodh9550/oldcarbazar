@@ -6,6 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useSubscription } from "@/context/SubscriptionContext";
 import { ApiError, api, type ApiPlan } from "@/lib/api";
 import AuthModal from "@/components/AuthModal";
+import PageHero from "@/components/ui/PageHero";
 
 type RazorpaySuccessResponse = {
   razorpay_order_id: string;
@@ -205,22 +206,20 @@ export default function PricingPage() {
 
   return (
     <main className="bg-[#f7f7f7]">
-      <section className="bg-gradient-to-br from-[#1a1a1a] via-[#222] to-[#0f0f0f] px-4 pb-16 pt-12 text-white sm:px-8 lg:px-12">
-        <div className="mx-auto max-w-5xl text-center">
-          <p className="inline-block rounded-full border border-[#f75d34]/40 bg-[#f75d34]/10 px-4 py-1 text-xs font-semibold tracking-wider text-[#ffb59a] uppercase">
-            Seller Plans
-          </p>
-          <h1 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">
-            Simple, honest pricing
-          </h1>
-          <p className="mx-auto mt-3 max-w-2xl text-base text-gray-300">
-            Post up to <span className="font-semibold text-white">3 cars free</span>{" "}
-            for life. Upgrade to <span className="font-semibold text-[#f75d34]">Pro</span>{" "}
-            when you need more.
-          </p>
-
+      <PageHero
+        badge="Seller Plans"
+        title="Simple, honest pricing"
+        align="center"
+        className="pb-16 pt-12"
+      >
+        <p className="mx-auto mt-3 max-w-2xl text-base text-slate-300 sm:text-lg">
+          Post up to <span className="font-semibold text-white">3 cars free</span>{" "}
+          for life. Upgrade to{" "}
+          <span className="font-semibold text-[#ffb199]">Pro</span> when you need
+          more.
+        </p>
           {status && (
-            <div className="mx-auto mt-6 inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-gray-200">
+            <div className="mx-auto mt-6 inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-gray-200 backdrop-blur-sm">
               <span className="h-2 w-2 rounded-full bg-[#f75d34]" />
               You&apos;re on{" "}
               <span className="font-semibold text-white">{status.plan_name}</span>{" "}
@@ -228,8 +227,7 @@ export default function PricingPage() {
               {status.is_unlimited ? "" : `/${status.listings_limit}`} listings used
             </div>
           )}
-        </div>
-      </section>
+      </PageHero>
 
       <section className="-mt-10 px-4 pb-20 sm:px-8 lg:px-12">
         <div className="mx-auto grid max-w-5xl gap-5 sm:grid-cols-2 lg:grid-cols-3">

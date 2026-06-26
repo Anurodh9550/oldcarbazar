@@ -212,7 +212,7 @@ export default function UsedCarLoanContent() {
         </div>
       </section>
 
-      <section className="rounded-2xl bg-[#0f172a] p-6 text-white sm:p-8">
+      <section className="dark-surface rounded-2xl bg-[#0f172a] p-6 sm:p-8">
         <h2 className="text-xl font-bold sm:text-2xl">Documents Required</h2>
         <p className="mt-1 text-sm text-slate-300">
           That&apos;s all we need — fully digital submission.

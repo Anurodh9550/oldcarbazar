@@ -9,6 +9,8 @@ export const type = {
   sectionTitle: "section-title",
   sectionTitleLg: "section-title-lg",
   pageTitle: "page-title",
+  pageHero: "page-hero",
+  darkSurface: "dark-surface",
   heroTitle: "hero-title",
   heroLead: "hero-lead",
   shellTitle: "shell-title",

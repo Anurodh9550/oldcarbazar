@@ -22,7 +22,7 @@ export default function SellHubShell({
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-[#f0f2f5]">
-      <div className="relative overflow-hidden border-b border-orange-900/20 bg-[#0f172a]">
+      <div className="page-hero relative overflow-hidden border-b border-orange-900/20 bg-[#0f172a]">
         <div
           aria-hidden
           className="absolute inset-0 bg-cover bg-center opacity-40"

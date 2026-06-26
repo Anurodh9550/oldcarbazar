@@ -142,7 +142,7 @@ export default function InvoicePage({
         </div>
 
         <article className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm print:rounded-none print:border-0 print:shadow-none">
-          <header className="flex flex-col gap-4 border-b border-gray-200 bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] px-8 py-7 text-white sm:flex-row sm:items-start sm:justify-between print:bg-white print:text-gray-900">
+          <header className="dark-surface flex flex-col gap-4 border-b border-gray-200 bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] px-8 py-7 sm:flex-row sm:items-start sm:justify-between print:bg-white print:text-gray-900">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ffb59a] print:text-[#f75d34]">
                 Tax Invoice

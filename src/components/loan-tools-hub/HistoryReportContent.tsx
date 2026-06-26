@@ -190,7 +190,7 @@ export default function HistoryReportContent() {
         </ul>
       </section>
 
-      <section className="flex flex-col items-start justify-between gap-4 rounded-2xl bg-[#0f172a] p-6 text-white sm:flex-row sm:items-center sm:p-7">
+      <section className="dark-surface flex flex-col items-start justify-between gap-4 rounded-2xl bg-[#0f172a] p-6 sm:flex-row sm:items-center sm:p-7">
         <div>
           <h3 className="text-lg font-bold">Buying a car? Pair with Assured</h3>
           <p className="mt-1 text-sm text-slate-300">

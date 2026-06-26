@@ -170,7 +170,7 @@ export default function LoanToolsContent() {
   return (
     <div className="space-y-6">
       <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div className="border-b border-slate-100 bg-gradient-to-r from-[#0f172a] via-[#1e1b4b] to-[#312e81] px-6 py-6 text-white">
+        <div className="dark-surface border-b border-slate-100 bg-gradient-to-r from-[#0f172a] via-[#1e1b4b] to-[#312e81] px-6 py-6">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-orange-300">
             Public site
           </p>

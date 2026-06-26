@@ -35,7 +35,7 @@ export default function SettingsContent() {
     <div className="space-y-6">
       {/* Admin profile */}
       <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div className="border-b border-slate-100 bg-gradient-to-r from-[#0f172a] to-[#1e1b4b] px-6 py-5 text-white">
+        <div className="dark-surface border-b border-slate-100 bg-gradient-to-r from-[#0f172a] to-[#1e1b4b] px-6 py-5">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-orange-300">
             Your account
           </p>

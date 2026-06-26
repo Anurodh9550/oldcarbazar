@@ -40,7 +40,7 @@ export default function HelpHubShell({
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-[#f0f2f5]">
-      <div className="relative overflow-hidden border-b border-slate-700/50 bg-[#0f172a]">
+      <div className="page-hero relative overflow-hidden border-b border-slate-700/50 bg-[#0f172a]">
         <div
           aria-hidden
           className="absolute inset-0 bg-cover bg-center opacity-35"

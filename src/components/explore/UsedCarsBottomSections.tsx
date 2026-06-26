@@ -135,7 +135,7 @@ export default function UsedCarsBottomSections({
       </section>
 
       {/* Partner banner */}
-      <section className="mb-6 overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-700 via-purple-700 to-blue-600 px-6 py-8 text-white sm:px-10">
+      <section className="dark-surface mb-6 overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-700 via-purple-700 to-blue-600 px-6 py-8 sm:px-10">
         <div className="flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-white/80">

@@ -47,7 +47,7 @@ export default function LoanToolsHubShell({
   return (
     <div className="min-h-[calc(100vh-64px)] bg-[#f0f2f5]">
       {/* Hero banner — only this section uses the car image as background. */}
-      <div className="relative overflow-hidden border-b border-slate-700/40 bg-[#0b1e3f]">
+      <div className="page-hero relative overflow-hidden border-b border-slate-700/40 bg-[#0b1e3f]">
         <div
           aria-hidden
           className="absolute inset-0 bg-cover bg-center"

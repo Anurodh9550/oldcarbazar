@@ -130,7 +130,7 @@ export default function UsedCarsExplorePage() {
   return (
     <main className="bg-white">
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gray-900">
+      <section className="page-hero relative overflow-hidden bg-gray-900">
         <Image
           src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=1400&h=500&fit=crop"
           alt="Family with car"
@@ -144,10 +144,10 @@ export default function UsedCarsExplorePage() {
         />
         <div className="relative z-10 mx-auto flex max-w-[1280px] flex-col items-start gap-6 px-4 py-14 lg:flex-row lg:items-center lg:justify-between lg:px-6 lg:py-20">
           <div className="max-w-lg">
-            <h1 className="hero-title text-3xl sm:text-4xl lg:text-5xl !text-white">
+            <h1 className="hero-title">
               Your Dream Car Just One Click Away!
             </h1>
-            <p className="mt-3 text-base !text-white">
+            <p className="hero-lead mt-3">
               Find the right car from our extensive collection in {selectedCity}
             </p>
             <div className="mt-6 flex flex-wrap gap-3">

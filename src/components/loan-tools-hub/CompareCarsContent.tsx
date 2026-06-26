@@ -330,7 +330,7 @@ export default function CompareCarsContent() {
         </div>
       </div>
 
-      <div className="rounded-2xl bg-[#0f172a] p-6 text-white sm:p-7">
+      <div className="dark-surface rounded-2xl bg-[#0f172a] p-6 sm:p-7">
         <h3 className="text-lg font-bold">Smart Comparison Tips</h3>
         <ul className="mt-3 grid gap-2 sm:grid-cols-2">
           {compareTips.map((tip) => (

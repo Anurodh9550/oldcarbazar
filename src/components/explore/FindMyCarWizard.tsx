@@ -148,7 +148,7 @@ export default function FindMyCarWizard({
         className="w-full max-w-lg overflow-hidden rounded-t-2xl bg-white shadow-2xl sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="relative bg-gradient-to-r from-[#f75d34] to-[#ff8a5c] px-5 py-4 text-white">
+        <div className="dark-surface relative bg-gradient-to-r from-[#f75d34] to-[#ff8a5c] px-5 py-4">
           <button
             type="button"
             onClick={onClose}

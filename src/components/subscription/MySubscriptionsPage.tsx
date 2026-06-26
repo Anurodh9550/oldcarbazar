@@ -10,6 +10,7 @@ import {
   type InvoicePayload,
 } from "@/lib/api";
 import { openPrintableInvoice } from "@/lib/printInvoice";
+import PageHero from "@/components/ui/PageHero";
 
 function formatDate(value: string | null): string {
   if (!value) return "—";
@@ -100,20 +101,11 @@ export default function MySubscriptionsPage() {
 
   return (
     <main className="bg-[#f7f7f7]">
-      <section className="bg-gradient-to-br from-[#1a1a1a] via-[#222] to-[#0f0f0f] px-4 pb-12 pt-10 text-white sm:px-8 lg:px-12">
-        <div className="mx-auto max-w-5xl">
-          <p className="inline-block rounded-full border border-[#f75d34]/40 bg-[#f75d34]/10 px-4 py-1 text-xs font-semibold tracking-wider text-[#ffb59a] uppercase">
-            Billing
-          </p>
-          <h1 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">
-            Your subscriptions &amp; invoices
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm text-gray-300 sm:text-base">
-            Every payment with full transaction ID. Click a row to view or
-            download the invoice as a PDF.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        badge="Billing"
+        title="Your subscriptions & invoices"
+        subtitle="Every payment with full transaction ID. Click a row to view or download the invoice as a PDF."
+      />
 
       <section className="px-4 py-10 sm:px-8 lg:px-12">
         <div className="mx-auto max-w-5xl">

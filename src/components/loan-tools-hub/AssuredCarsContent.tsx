@@ -91,7 +91,7 @@ export default function AssuredCarsContent() {
         </ul>
       </section>
 
-      <section className="grid gap-6 rounded-2xl bg-[#0f172a] p-6 text-white sm:grid-cols-3 sm:p-8">
+      <section className="dark-surface grid gap-6 rounded-2xl bg-[#0f172a] p-6 sm:grid-cols-3 sm:p-8">
         <div className="sm:col-span-2">
           <p className="eyebrow-dark">How It Works</p>
           <h3 className="mt-3 text-xl font-bold sm:text-2xl">

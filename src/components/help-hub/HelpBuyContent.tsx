@@ -18,7 +18,7 @@ export default function HelpBuyContent() {
           </li>
         ))}
       </ul>
-      <div className="mt-10 flex flex-col items-center justify-between gap-4 rounded-2xl bg-slate-900 p-6 sm:flex-row sm:p-8">
+      <div className="dark-surface mt-10 flex flex-col items-center justify-between gap-4 rounded-2xl bg-slate-900 p-6 sm:flex-row sm:p-8">
         <p className="text-center text-white sm:text-left">
           <span className="font-bold">Ready to find your car?</span>
           <span className="mt-1 block text-sm text-slate-300">Browse thousands of listings</span>

@@ -196,7 +196,7 @@ export default function DashboardContent() {
 
       <Link
         href="/admin/loan-tools"
-        className="group flex flex-wrap items-center justify-between gap-4 overflow-hidden rounded-2xl border border-indigo-200/80 bg-gradient-to-r from-[#0f172a] via-[#1e1b4b] to-[#312e81] p-5 text-white shadow-sm transition hover:shadow-md sm:p-6"
+        className="dark-surface group flex flex-wrap items-center justify-between gap-4 overflow-hidden rounded-2xl border border-indigo-200/80 bg-gradient-to-r from-[#0f172a] via-[#1e1b4b] to-[#312e81] p-5 shadow-sm transition hover:shadow-md sm:p-6"
       >
         <div className="flex min-w-0 items-start gap-4">
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/10">
@@ -530,7 +530,7 @@ export default function DashboardContent() {
         </section>
       </div>
 
-      <section className="rounded-2xl border border-slate-200 bg-gradient-to-r from-[#0f172a] to-[#1e1b4b] p-6 text-white shadow-sm sm:p-8">
+      <section className="dark-surface rounded-2xl border border-slate-200 bg-gradient-to-r from-[#0f172a] to-[#1e1b4b] p-6 shadow-sm sm:p-8">
         <div className="grid items-center gap-6 sm:grid-cols-[2fr_1fr]">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-orange-300">
