@@ -5,11 +5,14 @@ import Link from "next/link";
 import type { EnrichedCar } from "@/lib/carMeta";
 import { getCarDetailPath } from "@/lib/carDetail";
 import { toggleShortlist, isShortlisted } from "@/lib/shortlist";
-import { useState } from "react";
+import { useState, type MouseEvent } from "react";
 import { HeartIcon } from "../icons";
 import WhatsAppIcon from "../WhatsAppIcon";
 import DealBadge from "@/components/ui/DealBadge";
+import TrustBadges from "@/components/ui/TrustBadges";
 import { formatEmi, getCarEmi, type DealRating } from "@/lib/smartCar";
+import { openWhatsAppShare } from "@/lib/whatsappShare";
+import { isUserListing } from "@/types/listing";
 
 function formatOriginalPrice(lakh: number) {
   return lakh >= 100
@@ -40,9 +43,25 @@ export default function ExploreCarCard({
 }: ExploreCarCardProps) {
   const showDeal = showDiscount && car.isDiscounted && car.originalPriceLakh;
   const detailHref = getCarDetailPath(car.id);
-  const whatsappHref = `https://wa.me/919876543210?text=${encodeURIComponent(`Hi, I'm interested in ${car.title} on Old Car Bazar.`)}`;
+  const userListing = isUserListing(car) ? car : null;
   const [saved, setSaved] = useState(() => isShortlisted(car.id));
   const emi = showEmi ? getCarEmi(car) : 0;
+
+  const handleWhatsAppShare = (e: MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openWhatsAppShare({
+      id: car.id,
+      title: car.title,
+      price: car.price,
+      location: car.location,
+      area: car.area,
+      kms: userListing?.kms,
+      fuel: userListing?.fuel ?? car.fuel,
+      transmission: userListing?.transmission,
+      sellerPhone: userListing?.phone,
+    });
+  };
 
   return (
     <article
@@ -93,6 +112,14 @@ export default function ExploreCarCard({
 
           <p className="mt-1 text-caption">{car.specs}</p>
 
+          <TrustBadges
+            compact
+            className="mt-2"
+            hasVideoProof={userListing?.hasVideoProof}
+            truthDeclared={userListing?.truthDeclared}
+            sellerResponseTier={userListing?.sellerResponseTier}
+          />
+
           <div className="mt-2">
             <p className="text-base font-bold text-gray-900">{car.price}</p>
             {showEmi && emi > 0 && (
@@ -124,15 +151,14 @@ export default function ExploreCarCard({
 
       {showActions && (
         <div className="flex gap-2 px-3 pb-3">
-          <a
-            href={whatsappHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-gray-200 py-2 text-xs font-semibold text-gray-800 hover:bg-gray-50"
+          <button
+            type="button"
+            onClick={handleWhatsAppShare}
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 py-2 text-xs font-semibold text-emerald-800 hover:bg-emerald-100"
           >
             <WhatsAppIcon size={16} />
-            Chat
-          </a>
+            Share
+          </button>
           <Link
             href={detailHref}
             className="flex flex-1 items-center justify-center rounded-lg bg-[#f75d34] py-2 text-xs font-semibold text-white hover:bg-[#e54d24]"

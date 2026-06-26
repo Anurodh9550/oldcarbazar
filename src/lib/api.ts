@@ -218,6 +218,13 @@ export type ApiListing = {
   boosted_until?: string | null;
   is_boosted?: boolean;
   created_at?: string;
+  video_url?: string;
+  has_video_proof?: boolean;
+  truth_declaration?: Record<string, boolean>;
+  truth_declared?: boolean;
+  truth_declared_at?: string | null;
+  seller_response_tier?: "new" | "fast" | "good" | "slow";
+  seller_avg_response_hours?: number | null;
 };
 
 type Paginated<T> = {
@@ -1022,6 +1029,12 @@ export function apiListingToCarListing(item: ApiListing): UserCarListing {
       (item.boosted_until
         ? new Date(item.boosted_until).getTime() > Date.now()
         : false),
+    videoUrl: item.video_url || "",
+    hasVideoProof: item.has_video_proof ?? Boolean(item.video_url),
+    truthDeclared: item.truth_declared ?? false,
+    truthDeclaration: item.truth_declaration,
+    sellerResponseTier: item.seller_response_tier ?? "new",
+    sellerAvgResponseHours: item.seller_avg_response_hours ?? null,
   };
 }
 
@@ -1053,6 +1066,8 @@ function formToApiPayload(form: SellCarFormData, photos: string[]) {
     email: form.email,
     whatsapp: form.whatsapp,
     photos,
+    video_url: form.videoUrl || "",
+    truth_declaration: form.truthDeclaration,
   };
 }
 
@@ -1447,6 +1462,13 @@ export const api = {
   // Unified dealer/seller leads feed (views + inquiries + offers + test drives).
   async sellerLeads() {
     return apiFetch<SellerLeadsResponse>("/leads/mine/");
+  },
+
+  async markInquiryResponded(inquiryId: string) {
+    return apiFetch<{ ok: boolean }>(
+      `/inquiries/${encodeURIComponent(inquiryId)}/mark-responded/`,
+      { method: "POST" }
+    );
   },
 
   async adminInquiries() {

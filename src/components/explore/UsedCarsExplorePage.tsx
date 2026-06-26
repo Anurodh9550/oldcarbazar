@@ -25,6 +25,7 @@ import { PinIcon, SearchIcon } from "@/components/icons";
 import { uniqueIndianCities } from "@/data/indianCities";
 import PageLoader from "@/components/ui/PageLoader";
 import FindMyCarWizard from "./FindMyCarWizard";
+import VoiceCarSearchButton from "@/components/search/VoiceCarSearchButton";
 
 const POPULAR_CITY_ROWS_VISIBLE = 12;
 /** 2 rows × 6 columns on large screens */
@@ -150,7 +151,7 @@ export default function UsedCarsExplorePage() {
             <p className="hero-lead mt-3">
               Find the right car from our extensive collection in {selectedCity}
             </p>
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-6 flex flex-wrap items-center gap-3">
               <Link
                 href="#explore-listings"
                 className="inline-block rounded-lg bg-[#f75d34] px-8 py-3 text-sm font-semibold text-white hover:bg-[#e54d24]"
@@ -164,6 +165,7 @@ export default function UsedCarsExplorePage() {
               >
                 <span aria-hidden>✨</span> Find My Car
               </button>
+              <VoiceCarSearchButton label="Voice se dhoondo" />
             </div>
           </div>
           <div className="hidden lg:block lg:w-1/2" />

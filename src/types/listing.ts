@@ -1,4 +1,6 @@
 import type { CarListing } from "@/data/cars";
+import type { TruthDeclaration } from "@/data/truthDeclaration";
+import type { SellerResponseTier } from "@/components/ui/TrustBadges";
 
 export type ListingStatus = "active" | "sold" | "draft";
 
@@ -56,6 +58,12 @@ export type UserCarListing = CarListing &
     createdAt: number;
     views: number;
     inquiries: number;
+    videoUrl?: string;
+    hasVideoProof?: boolean;
+    truthDeclared?: boolean;
+    truthDeclaration?: TruthDeclaration | Record<string, boolean>;
+    sellerResponseTier?: SellerResponseTier;
+    sellerAvgResponseHours?: number | null;
   };
 
 export function isUserListing(

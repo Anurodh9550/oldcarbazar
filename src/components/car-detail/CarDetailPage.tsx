@@ -20,6 +20,12 @@ import TestDriveModal from "@/components/car-detail/TestDriveModal";
 import MakeOfferModal from "@/components/car-detail/MakeOfferModal";
 import RecentlyViewedWidget from "@/components/car-detail/RecentlyViewedWidget";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
+import TrustBadges from "@/components/ui/TrustBadges";
+import {
+  copyListingShareLink,
+  openWhatsAppShare,
+} from "@/lib/whatsappShare";
+import { isUserListing } from "@/types/listing";
 import { HeartIcon } from "@/components/icons";
 import { isShortlisted, toggleShortlist } from "@/lib/shortlist";
 import { isInCompare, toggleCompare } from "@/lib/compareList";
@@ -86,29 +92,44 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
   };
 
   const handleShare = async () => {
+    if (!detail) return;
+    const copied = await copyListingShareLink(detail.id);
+    if (copied) {
+      setShareToast("Listing link copied — WhatsApp par paste karein");
+      setTimeout(() => setShareToast(""), 2500);
+      return;
+    }
     if (typeof window === "undefined") return;
     const url = window.location.href;
-    const shareData = {
-      title: detail?.title ?? "Old Car Bazar",
-      text: detail ? `Check out this ${detail.title} on Old Car Bazar` : "",
-      url,
-    };
     try {
       if (navigator.share) {
-        await navigator.share(shareData);
+        await navigator.share({
+          title: detail.title,
+          text: `Check out this ${detail.title} on Old Car Bazar`,
+          url,
+        });
         return;
       }
     } catch {
-      /* user cancelled — fall through to clipboard */
+      /* user cancelled */
     }
-    try {
-      await navigator.clipboard.writeText(url);
-      setShareToast("Link copied to clipboard");
-      setTimeout(() => setShareToast(""), 2000);
-    } catch {
-      setShareToast("Could not share — please copy URL manually");
-      setTimeout(() => setShareToast(""), 2500);
-    }
+    setShareToast("Could not copy link — URL manually share karein");
+    setTimeout(() => setShareToast(""), 2500);
+  };
+
+  const handleWhatsAppShareKit = () => {
+    if (!detail) return;
+    openWhatsAppShare({
+      id: detail.id,
+      title: detail.title,
+      price: detail.price,
+      location: detail.location,
+      area: detail.area,
+      kms: detail.kms,
+      fuel: detail.fuel,
+      transmission: detail.transmission,
+      sellerPhone: detail.sellerPhone,
+    });
   };
 
   const handleReportAd = () => {
@@ -196,6 +217,14 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
       : Math.round((principal * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1));
 
   const whatsappHref = `https://wa.me/91${detail.sellerPhone.replace(/\D/g, "")}?text=${encodeURIComponent(`Hi, I'm interested in ${detail.title} listed on Old Car Bazar.`)}`;
+
+  const userListing = listing && isUserListing(listing) ? listing : null;
+  const videoUrl = userListing?.videoUrl;
+  const trustBadges = {
+    hasVideoProof: userListing?.hasVideoProof,
+    truthDeclared: userListing?.truthDeclared,
+    sellerResponseTier: userListing?.sellerResponseTier,
+  };
 
   const quickLine = `${detail.transmission} • ${detail.fuel} • ${detail.ownership} • ${detail.kms.toLocaleString("en-IN")} kms`;
 
@@ -341,6 +370,20 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
                 </li>
               ))}
             </ul>
+            {videoUrl && (
+              <div className="mt-5 rounded-2xl border border-violet-200 bg-violet-50/40 p-4">
+                <p className="mb-2 text-sm font-bold text-gray-900">
+                  ▶ Owner Video Proof
+                </p>
+                <video
+                  src={videoUrl}
+                  controls
+                  playsInline
+                  className="w-full rounded-xl bg-black"
+                  preload="metadata"
+                />
+              </div>
+            )}
           </div>
 
           {/* Sticky sidebar */}
@@ -368,6 +411,7 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
                 </button>
               </div>
               <p className="text-caption mt-3">{quickLine}</p>
+              <TrustBadges className="mt-3" {...trustBadges} />
               <p className="mt-4 text-2xl font-bold text-gray-900">{detail.price}</p>
               <p className="text-caption mt-1">
                 EMI starts @ ₹{detail.emiMonthly.toLocaleString("en-IN")} /mo
@@ -423,10 +467,18 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
                 </a>
                 <button
                   type="button"
+                  onClick={handleWhatsAppShareKit}
+                  className="inline-flex items-center gap-1.5 font-semibold text-emerald-700 hover:underline"
+                >
+                  <WhatsAppIcon size={18} />
+                  Share on WhatsApp
+                </button>
+                <button
+                  type="button"
                   onClick={handleShare}
                   className="hover:text-[#f75d34]"
                 >
-                  Share
+                  Copy link
                 </button>
                 <label className="ml-auto flex items-center gap-1.5 cursor-pointer">
                   <input

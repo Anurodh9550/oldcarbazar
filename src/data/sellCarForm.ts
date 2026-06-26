@@ -1,5 +1,9 @@
 import { bodyTypes } from "@/data/explorePage";
 import { carColors } from "@/data/searchPage";
+import {
+  initialTruthDeclaration,
+  type TruthDeclaration,
+} from "@/data/truthDeclaration";
 
 export const carBrands = [
   "Maruti", "Hyundai", "Tata", "Honda", "Toyota", "Mahindra",
@@ -90,6 +94,8 @@ export type SellCarFormData = {
   phone: string;
   email: string;
   whatsapp: boolean;
+  videoUrl: string;
+  truthDeclaration: TruthDeclaration;
 };
 
 export const initialSellForm: SellCarFormData = {
@@ -118,6 +124,8 @@ export const initialSellForm: SellCarFormData = {
   phone: "",
   email: "",
   whatsapp: true,
+  videoUrl: "",
+  truthDeclaration: { ...initialTruthDeclaration },
 };
 
 export const MIN_LISTING_PHOTOS = 3;
@@ -127,7 +135,8 @@ export const MAX_LISTING_PHOTO_BYTES = 2 * 1024 * 1024;
 export const sellSteps = [
   { id: 1, title: "Car & Contact", desc: "Car specs + your contact info" },
   { id: 2, title: "Price, Photos & More", desc: "Price, city, photos & features" },
-  { id: 3, title: "Review", desc: "Check & publish listing" },
+  { id: 3, title: "Gaadi Ki Sachchai", desc: "Honest declaration + optional video" },
+  { id: 4, title: "Review", desc: "Check & publish listing" },
 ];
 
 export function insuranceToOverviewLabel(insurance: string): string {

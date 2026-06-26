@@ -6,7 +6,14 @@ import { motion } from "framer-motion";
 import SellCarForm from "@/components/SellCarForm";
 import { useAuth } from "@/context/AuthContext";
 import { useListings } from "@/context/ListingsContext";
-import { initialSellForm, type SellCarFormData } from "@/data/sellCarForm";
+import {
+  initialSellForm,
+  type SellCarFormData,
+} from "@/data/sellCarForm";
+import {
+  initialTruthDeclaration,
+  type TruthDeclaration,
+} from "@/data/truthDeclaration";
 import PageLoader from "@/components/ui/PageLoader";
 import type { UserCarListing } from "@/types/listing";
 
@@ -49,6 +56,11 @@ function listingToFormData(
     phone: listing.phone || fallbackContact.phone,
     email: listing.email ?? fallbackContact.email,
     whatsapp: listing.whatsapp ?? true,
+    videoUrl: listing.videoUrl ?? "",
+    truthDeclaration: {
+      ...initialTruthDeclaration,
+      ...(listing.truthDeclaration as TruthDeclaration | undefined),
+    },
   };
 }
 

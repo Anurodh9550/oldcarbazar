@@ -28,6 +28,9 @@ import {
 } from "@/data/sellCarForm";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import ListingPhotoUpload from "@/components/seller/ListingPhotoUpload";
+import ListingVideoUpload from "@/components/seller/ListingVideoUpload";
+import TruthDeclarationForm from "@/components/seller/TruthDeclarationForm";
+import { isTruthDeclarationComplete } from "@/data/truthDeclaration";
 import LocationModal from "@/components/LocationModal";
 import Spinner from "@/components/ui/Spinner";
 import { validatePhotoCount } from "@/lib/listingPhotos";
@@ -131,6 +134,12 @@ export default function SellCarForm({
         return "Write at least 20 characters in description (Seller's Note).";
       const photoErr = validatePhotoCount(photos.length);
       if (photoErr) return photoErr;
+      return "";
+    }
+    if (s === 3) {
+      if (!isTruthDeclarationComplete(form.truthDeclaration)) {
+        return "Gaadi Ki Sachchai — sab statements confirm karein.";
+      }
       return "";
     }
     return "";
@@ -725,6 +734,23 @@ export default function SellCarForm({
             )}
 
             {step === 3 && (
+              <div className="space-y-5">
+                <TruthDeclarationForm
+                  value={form.truthDeclaration}
+                  onChange={(truthDeclaration) => {
+                    setForm((f) => ({ ...f, truthDeclaration }));
+                    setError("");
+                  }}
+                />
+                <ListingVideoUpload
+                  videoUrl={form.videoUrl}
+                  onChange={(videoUrl) => update("videoUrl", videoUrl)}
+                  onError={(msg) => (msg ? setError(msg) : setError(""))}
+                />
+              </div>
+            )}
+
+            {step === 4 && (
               <div className="space-y-4 rounded-xl bg-gray-50 p-4 text-sm">
                 <h3 className="font-bold text-gray-900">Review your listing</h3>
                 <div className="grid gap-2 sm:grid-cols-2">
@@ -771,6 +797,16 @@ export default function SellCarForm({
                   <p className="sm:col-span-2">
                     <span className="text-gray-500">Photos:</span>{" "}
                     {photos.length} uploaded
+                  </p>
+                  <p className="sm:col-span-2">
+                    <span className="text-gray-500">Gaadi Ki Sachchai:</span>{" "}
+                    {isTruthDeclarationComplete(form.truthDeclaration)
+                      ? "✓ Confirmed"
+                      : "Incomplete"}
+                  </p>
+                  <p className="sm:col-span-2">
+                    <span className="text-gray-500">Video proof:</span>{" "}
+                    {form.videoUrl ? "✓ Uploaded (optional)" : "Not added"}
                   </p>
                   {photos[0] && (
                     <div className="sm:col-span-2 flex gap-2 overflow-x-auto pb-1">
