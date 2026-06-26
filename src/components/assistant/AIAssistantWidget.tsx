@@ -1,7 +1,8 @@
 "use client";
 
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api";
+import { useVoiceAssistant } from "@/hooks/useVoiceAssistant";
 
 type ChatMessage = {
   id: string;
@@ -19,11 +20,34 @@ const QUICK_QUESTIONS = [
 const welcome: ChatMessage = {
   id: "welcome",
   role: "assistant",
-  text: "Namaste! Main Old Car Bazar AI assistant hoon. Buy, sell, EMI, loan, RC transfer ya listing se related kuch bhi poochiye.",
+  text: "Namaste! Main Old Car Bazar AI assistant hoon. Buy, sell, EMI, loan, RC transfer ya listing se related kuch bhi poochiye. Mic dabakar bol bhi sakte ho.",
 };
 
 function makeId() {
   return `msg-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+}
+
+function MicIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z" />
+    </svg>
+  );
+}
+
+function SpeakerIcon({ className, off }: { className?: string; off?: boolean }) {
+  if (off) {
+    return (
+      <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+        <path d="M16.5 12A4.5 4.5 0 0 0 14 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51A8.796 8.796 0 0 0 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3 3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06a8.99 8.99 0 0 0 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4 9.91 6.09 12 8.18V4z" />
+      </svg>
+    );
+  }
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+    </svg>
+  );
 }
 
 export default function AIAssistantWidget() {
@@ -32,42 +56,83 @@ export default function AIAssistantWidget() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+  const askRef = useRef<(text: string) => Promise<void>>(async () => {});
 
-  const ask = async (text: string) => {
-    const question = text.trim();
-    if (!question || loading) return;
-    setInput("");
-    setMessages((prev) => [...prev, { id: makeId(), role: "user", text: question }]);
-    setLoading(true);
-    try {
-      const data = await api.askAssistant(question);
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: makeId(),
-          role: "assistant",
-          text: data.reply || "Sorry, mujhe clear answer nahi mila.",
-        },
-      ]);
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: makeId(),
-          role: "assistant",
-          text: "Assistant se connect nahi ho pa raha. Thodi der baad try karein.",
-        },
-      ]);
-    } finally {
-      setLoading(false);
-      setTimeout(() => inputRef.current?.focus(), 50);
+  const {
+    supported: voiceSupported,
+    listening,
+    speaking,
+    readAloud,
+    setReadAloud,
+    interim,
+    speak,
+    stopSpeaking,
+    stopListening,
+    toggleListening,
+  } = useVoiceAssistant();
+
+  const ask = useCallback(
+    async (text: string) => {
+      const question = text.trim();
+      if (!question || loading) return;
+
+      stopListening();
+      stopSpeaking();
+      setInput("");
+      setMessages((prev) => [...prev, { id: makeId(), role: "user", text: question }]);
+      setLoading(true);
+
+      try {
+        const data = await api.askAssistant(question);
+        const reply = data.reply || "Sorry, mujhe clear answer nahi mila.";
+        setMessages((prev) => [
+          ...prev,
+          { id: makeId(), role: "assistant", text: reply },
+        ]);
+        speak(reply);
+      } catch {
+        const err =
+          "Assistant se connect nahi ho pa raha. Thodi der baad try karein.";
+        setMessages((prev) => [
+          ...prev,
+          { id: makeId(), role: "assistant", text: err },
+        ]);
+      } finally {
+        setLoading(false);
+        setTimeout(() => inputRef.current?.focus(), 50);
+      }
+    },
+    [loading, speak, stopListening, stopSpeaking]
+  );
+
+  askRef.current = ask;
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, loading, interim]);
+
+  useEffect(() => {
+    if (!open) {
+      stopListening();
+      stopSpeaking();
     }
-  };
+  }, [open, stopListening, stopSpeaking]);
 
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
     void ask(input);
   };
+
+  const handleMic = () => {
+    if (!voiceSupported) return;
+    toggleListening((transcript) => {
+      setInput(transcript);
+      void askRef.current(transcript);
+    });
+  };
+
+  const displayInput = listening && interim ? interim : input;
 
   return (
     <div className="fixed bottom-5 right-4 z-50 sm:bottom-6 sm:right-6">
@@ -77,15 +142,38 @@ export default function AIAssistantWidget() {
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-sm font-extrabold">Old Car Bazar AI</p>
-                <p className="text-xs text-white/85">Buy, sell, loan aur support help</p>
+                <p className="text-xs text-white/85">
+                  {listening
+                    ? "Sun raha hoon… boliye"
+                    : speaking
+                      ? "Jawab sun rahe hain…"
+                      : "Type karein ya mic se boliye"}
+                </p>
               </div>
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="rounded-full bg-white/15 px-3 py-1 text-xs font-bold hover:bg-white/25"
-              >
-                Close
-              </button>
+              <div className="flex items-center gap-1.5">
+                {voiceSupported && (
+                  <button
+                    type="button"
+                    onClick={() => setReadAloud(!readAloud)}
+                    title={readAloud ? "Voice reply band karein" : "Voice reply chalu karein"}
+                    aria-pressed={readAloud}
+                    className={`rounded-full p-2 transition ${
+                      readAloud
+                        ? "bg-white/20 hover:bg-white/30"
+                        : "bg-white/10 text-white/70 hover:bg-white/20"
+                    }`}
+                  >
+                    <SpeakerIcon className="h-4 w-4" off={!readAloud} />
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  className="rounded-full bg-white/15 px-3 py-1 text-xs font-bold hover:bg-white/25"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
 
@@ -100,6 +188,18 @@ export default function AIAssistantWidget() {
                 }`}
               >
                 {message.text}
+                {message.role === "assistant" && voiceSupported && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      speaking ? stopSpeaking() : speak(message.text)
+                    }
+                    className="mt-1.5 flex items-center gap-1 text-[11px] font-semibold text-[#f75d34] hover:underline"
+                  >
+                    <SpeakerIcon className="h-3.5 w-3.5" />
+                    {speaking ? "Ruken" : "Sunen"}
+                  </button>
+                )}
               </div>
             ))}
             {loading && (
@@ -107,32 +207,70 @@ export default function AIAssistantWidget() {
                 Typing...
               </div>
             )}
+            {listening && interim && (
+              <div className="ml-auto max-w-[88%] rounded-2xl border border-dashed border-[#f75d34]/40 bg-orange-50 px-3 py-2 text-sm italic text-[#f75d34]">
+                {interim}
+              </div>
+            )}
+            <div ref={chatEndRef} />
           </div>
 
           <div className="border-t border-slate-100 bg-white p-3">
+            {!voiceSupported && (
+              <p className="mb-2 text-center text-[11px] text-slate-400">
+                Voice ke liye Chrome / Edge browser use karein
+              </p>
+            )}
             <div className="mb-2 flex gap-2 overflow-x-auto pb-1">
               {QUICK_QUESTIONS.map((q) => (
                 <button
                   key={q}
                   type="button"
                   onClick={() => void ask(q)}
-                  className="shrink-0 rounded-full border border-orange-100 bg-orange-50 px-3 py-1.5 text-xs font-semibold text-[#f75d34]"
+                  disabled={loading || listening}
+                  className="shrink-0 rounded-full border border-orange-100 bg-orange-50 px-3 py-1.5 text-xs font-semibold text-[#f75d34] disabled:opacity-50"
                 >
                   {q}
                 </button>
               ))}
             </div>
             <form onSubmit={onSubmit} className="flex gap-2">
+              {voiceSupported && (
+                <button
+                  type="button"
+                  onClick={handleMic}
+                  disabled={loading}
+                  title={listening ? "Recording band karein" : "Mic — bol kar poochiye"}
+                  aria-pressed={listening}
+                  className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition disabled:opacity-50 ${
+                    listening
+                      ? "bg-red-500 text-white shadow-lg shadow-red-200"
+                      : "border border-slate-200 bg-slate-50 text-slate-600 hover:border-[#f75d34] hover:text-[#f75d34]"
+                  }`}
+                >
+                  {listening && (
+                    <span className="absolute inset-0 animate-ping rounded-full bg-red-400/40" />
+                  )}
+                  <MicIcon className="relative h-5 w-5" />
+                </button>
+              )}
               <input
                 ref={inputRef}
-                value={input}
+                value={displayInput}
                 onChange={(event) => setInput(event.target.value)}
-                placeholder="Apna question likhiye..."
-                className="min-w-0 flex-1 rounded-full border border-slate-200 px-4 py-2 text-sm outline-none focus:border-[#f75d34] focus:ring-2 focus:ring-[#f75d34]/15"
+                readOnly={listening}
+                placeholder={
+                  listening ? "Boliye…" : "Apna question likhiye ya mic dabayein"
+                }
+                className={`min-w-0 flex-1 rounded-full border px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-[#f75d34]/15 ${
+                  listening
+                    ? "border-[#f75d34] bg-orange-50/50 focus:border-[#f75d34]"
+                    : "border-slate-200 focus:border-[#f75d34]"
+                }`}
               />
               <button
                 type="submit"
-                disabled={loading || !input.trim()}
+                disabled={loading || !input.trim() || listening}
                 className="rounded-full bg-[#f75d34] px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
               >
                 Send
