@@ -17,6 +17,7 @@ type LoanToolsHubShellProps = {
 
 const pathToPageId: Record<string, LoanToolsPageId> = {
   "/used-car-loan": "used-car-loan",
+  "/loan-marketplace": "loan-marketplace",
   "/emi-calculator": "emi-calculator",
   "/loan-eligibility": "loan-eligibility",
   "/compare-loans": "compare-loans",

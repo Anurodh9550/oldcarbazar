@@ -34,7 +34,9 @@ export const getBuyCarsMenu = (city: string): MenuColumn[] => [
   {
     title: "Tools & Offers",
     links: [
+      { label: "Reverse Auction", href: "/reverse-auction" },
       { label: "Compare Cars", href: "/compare" },
+      { label: "Multi-Bank Loan", href: "/loan-marketplace" },
       { label: "Used Car Loan", href: "/used-car-loan" },
       { label: "EMI Calculator", href: "/emi-calculator" },
       { label: "Popular Cities", href: "#cities", hasSubmenu: true },
@@ -65,6 +67,7 @@ export const sellCarMenu: MenuColumn[] = [
     title: "After You Sell",
     links: [
       { label: "Find Dealers", href: "/dealers" },
+      { label: "OCB Digital Garage", href: "/my-garage" },
       { label: "RC Transfer Guide", href: "/rc-guide" },
       { label: "Insurance Renewal", href: "/insurance" },
       { label: "Chat with Buyers", href: "/messages" },
@@ -76,7 +79,9 @@ export const loanToolsMenu: MenuColumn[] = [
   {
     title: "Finance",
     links: [
+      { label: "Multi-Bank Loan Marketplace", href: "/loan-marketplace" },
       { label: "Used Car Loan", href: "/used-car-loan" },
+      { label: "Apply to One Bank", href: "/car-loan" },
       { label: "EMI Calculator", href: "/emi-calculator" },
       { label: "Loan Eligibility Check", href: "/loan-eligibility" },
       { label: "Compare Interest Rates", href: "/compare-loans" },

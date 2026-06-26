@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { api, ApiError } from "@/lib/api";
@@ -170,6 +171,16 @@ export default function BankLoanApplyContent() {
 
   return (
     <div className="space-y-10">
+      <div className="rounded-2xl border border-sky-200 bg-sky-50/80 p-4 text-sm">
+        <p className="font-bold text-sky-900">Want offers from multiple banks?</p>
+        <p className="mt-1 text-sky-800">
+          Try the{" "}
+          <Link href="/loan-marketplace" className="font-semibold underline">
+            Multi-Bank Loan Marketplace
+          </Link>{" "}
+          — one form, apply to HDFC, ICICI, SBI, Axis and more at once.
+        </p>
+      </div>
       {/* Benefits strip */}
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {benefits.map((b) => (

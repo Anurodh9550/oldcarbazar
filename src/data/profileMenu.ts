@@ -25,7 +25,7 @@ export const profileMenuItems: ProfileMenuItem[] = [
   { label: "Shortlisted Vehicles", href: "/shortlisted", icon: "heart" },
   { label: "My Activity", href: "/my-activity", icon: "activity" },
   { label: "My Vehicles", href: "/my-vehicles", icon: "car" },
-  { label: "My Garage", href: "/my-garage", icon: "garage", dividerAfter: true },
+  { label: "OCB Digital Garage", href: "/my-garage", icon: "garage", dividerAfter: true },
   { label: "Manage Consents", href: "/consents", icon: "consent" },
   { label: "Profile Settings", href: "/profile-settings", icon: "settings" },
 ];

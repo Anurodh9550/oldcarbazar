@@ -38,9 +38,9 @@ export const profileHubPageMeta: Record<
     icon: "car",
   },
   "my-garage": {
-    badge: "Account",
-    title: "My Garage",
-    subtitle: "A digital garage for your cars — service reminders and documents.",
+    badge: "Post-purchase",
+    title: "OCB Digital Garage",
+    subtitle: "Your post-purchase hub — RC notes, insurance renewal, service reminders and documents.",
     icon: "garage",
   },
   consents: {

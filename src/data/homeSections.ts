@@ -18,10 +18,10 @@ export const quickActions = [
     icon: "📊",
   },
   {
-    title: "Used Car Loan",
-    desc: "Low EMI, quick approval",
-    href: "/used-car-loan",
-    icon: "🏦",
+    title: "Multi-Bank Loan",
+    desc: "One form → many banks",
+    href: "/loan-marketplace",
+    icon: "🏛",
   },
 ];
 

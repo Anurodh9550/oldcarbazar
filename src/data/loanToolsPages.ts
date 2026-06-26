@@ -1,5 +1,6 @@
 export type LoanToolsPageId =
   | "used-car-loan"
+  | "loan-marketplace"
   | "emi-calculator"
   | "loan-eligibility"
   | "compare-loans"
@@ -12,6 +13,7 @@ export const loanToolsNavGroups = [
   {
     title: "Finance",
     links: [
+      { id: "loan-marketplace" as const, href: "/loan-marketplace", label: "Multi-Bank Loan", icon: "🏛" },
       { id: "used-car-loan" as const, href: "/used-car-loan", label: "Car Loan", icon: "💰" },
       { id: "emi-calculator" as const, href: "/emi-calculator", label: "EMI Calculator", icon: "🧮" },
       { id: "loan-eligibility" as const, href: "/loan-eligibility", label: "Eligibility", icon: "✅" },
@@ -40,6 +42,14 @@ export const loanToolsPageMeta: Record<
       "Get an easy car loan in 2 minutes — best offers from top banks and NBFCs, all in one place.",
     description:
       "Apply for used car loan online at best interest rates on Old Car Bazar.",
+  },
+  "loan-marketplace": {
+    badge: "One form · Many banks",
+    title: "Multi-Bank Loan Marketplace",
+    subtitle:
+      "One application routed to multiple banks — compare offers and pick the lowest EMI.",
+    description:
+      "Apply to HDFC, ICICI, SBI, Axis and more with a single used car loan application.",
   },
   "emi-calculator": {
     badge: "Smart Planner",

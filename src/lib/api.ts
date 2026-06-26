@@ -1520,6 +1520,29 @@ export const api = {
     return apiLoanInquiryToLoanInquiry(data);
   },
 
+  async createMultiBankLoanInquiries(
+    banks: { bank_name: string; loan_partner: string }[],
+    payload: Omit<CreateLoanInquiryPayload, "bank_name" | "loan_partner">
+  ) {
+    const results = await Promise.allSettled(
+      banks.map((bank) =>
+        this.createLoanInquiry({
+          ...payload,
+          bank_name: bank.bank_name,
+          loan_partner: bank.loan_partner,
+        })
+      )
+    );
+    const succeeded: string[] = [];
+    const failed: string[] = [];
+    results.forEach((r, i) => {
+      const name = banks[i]?.bank_name ?? "Unknown";
+      if (r.status === "fulfilled") succeeded.push(name);
+      else failed.push(name);
+    });
+    return { succeeded, failed };
+  },
+
   async adminLoanInquiries() {
     const data = await adminApiFetch<ApiLoanInquiry[] | Paginated<ApiLoanInquiry>>(
       "/loan-inquiries/?limit=500"
