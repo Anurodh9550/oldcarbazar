@@ -136,12 +136,6 @@ export default function SellCarForm({
       if (photoErr) return photoErr;
       return "";
     }
-    if (s === 3) {
-      if (!isTruthDeclarationComplete(form.truthDeclaration)) {
-        return "Gaadi Ki Sachchai — sab statements confirm karein.";
-      }
-      return "";
-    }
     return "";
   };
 
@@ -735,6 +729,11 @@ export default function SellCarForm({
 
             {step === 3 && (
               <div className="space-y-5">
+                <p className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-600">
+                  This step is <span className="font-semibold">optional</span>.
+                  You can continue without the declaration or video — add them
+                  later from My Listings.
+                </p>
                 <TruthDeclarationForm
                   value={form.truthDeclaration}
                   onChange={(truthDeclaration) => {
@@ -799,10 +798,10 @@ export default function SellCarForm({
                     {photos.length} uploaded
                   </p>
                   <p className="sm:col-span-2">
-                    <span className="text-gray-500">Gaadi Ki Sachchai:</span>{" "}
+                    <span className="text-gray-500">Honest Car Declaration:</span>{" "}
                     {isTruthDeclarationComplete(form.truthDeclaration)
                       ? "✓ Confirmed"
-                      : "Incomplete"}
+                      : "Skipped (optional)"}
                   </p>
                   <p className="sm:col-span-2">
                     <span className="text-gray-500">Video proof:</span>{" "}

@@ -165,7 +165,7 @@ export default function UsedCarsExplorePage() {
               >
                 <span aria-hidden>✨</span> Find My Car
               </button>
-              <VoiceCarSearchButton label="Voice se dhoondo" />
+              <VoiceCarSearchButton label="Search by voice" />
             </div>
           </div>
           <div className="hidden lg:block lg:w-1/2" />

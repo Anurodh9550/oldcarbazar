@@ -2,6 +2,7 @@
 
 import type { CarListing } from "@/data/cars";
 import type { SellCarFormData } from "@/data/sellCarForm";
+import { isTruthDeclarationComplete } from "@/data/truthDeclaration";
 import type {
   ListingModeration,
   ListingStatus,
@@ -1039,7 +1040,7 @@ export function apiListingToCarListing(item: ApiListing): UserCarListing {
 }
 
 function formToApiPayload(form: SellCarFormData, photos: string[]) {
-  return {
+  const payload: Record<string, unknown> = {
     brand: form.brand,
     model: form.model,
     variant: form.variant,
@@ -1067,8 +1068,11 @@ function formToApiPayload(form: SellCarFormData, photos: string[]) {
     whatsapp: form.whatsapp,
     photos,
     video_url: form.videoUrl || "",
-    truth_declaration: form.truthDeclaration,
   };
+  if (isTruthDeclarationComplete(form.truthDeclaration)) {
+    payload.truth_declaration = form.truthDeclaration;
+  }
+  return payload;
 }
 
 async function dataUrlToFile(dataUrl: string, name: string) {

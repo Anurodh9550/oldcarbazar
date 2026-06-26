@@ -17,10 +17,11 @@ export default function TruthDeclarationForm({ value, onChange }: Props) {
     <div className="space-y-4 rounded-2xl border border-emerald-200 bg-emerald-50/40 p-4 sm:p-5">
       <div>
         <p className="text-xs font-bold uppercase tracking-wider text-emerald-700">
-          Gaadi Ki Sachchai
+          Honest Car Declaration{" "}
+          <span className="font-normal normal-case text-gray-500">(optional)</span>
         </p>
         <p className="mt-1 text-sm text-gray-700">
-          Buyers ko transparent information — sab statements confirm karein.
+          Give buyers transparent information — please confirm all statements below.
         </p>
       </div>
 
@@ -62,7 +63,7 @@ export default function TruthDeclarationForm({ value, onChange }: Props) {
           className="mt-0.5 accent-emerald-600"
         />
         <span className="font-semibold text-gray-900">
-          Main confirm karta/karti hoon ki upar di gayi jaankari sach hai.
+          I confirm that the information above is true.
         </span>
       </label>
     </div>

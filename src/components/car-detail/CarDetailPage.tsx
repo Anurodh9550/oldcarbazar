@@ -95,7 +95,7 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
     if (!detail) return;
     const copied = await copyListingShareLink(detail.id);
     if (copied) {
-      setShareToast("Listing link copied — WhatsApp par paste karein");
+      setShareToast("Listing link copied — paste in WhatsApp");
       setTimeout(() => setShareToast(""), 2500);
       return;
     }
@@ -113,7 +113,7 @@ export default function CarDetailPage({ carId }: CarDetailPageProps) {
     } catch {
       /* user cancelled */
     }
-    setShareToast("Could not copy link — URL manually share karein");
+    setShareToast("Could not copy link — share the URL manually");
     setTimeout(() => setShareToast(""), 2500);
   };
 

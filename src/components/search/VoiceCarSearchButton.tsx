@@ -15,7 +15,7 @@ type VoiceCarSearchButtonProps = {
 
 export default function VoiceCarSearchButton({
   className = "",
-  label = "Bol kar dhoondo",
+  label = "Search by voice",
 }: VoiceCarSearchButtonProps) {
   const router = useRouter();
   const { selectedCity } = useLocation();
@@ -35,7 +35,7 @@ export default function VoiceCarSearchButton({
       type="button"
       onClick={handleMic}
       aria-pressed={listening}
-      title={listening ? "Sun raha hoon…" : "Voice se car search karein"}
+      title={listening ? "Listening…" : "Search for cars with your voice"}
       className={`relative inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition ${
         listening
           ? "border-red-300 bg-red-50 text-red-700"
@@ -48,7 +48,7 @@ export default function VoiceCarSearchButton({
       <span className="relative text-base" aria-hidden>
         🎤
       </span>
-      <span className="relative">{listening ? "Boliye…" : label}</span>
+      <span className="relative">{listening ? "Speak now…" : label}</span>
     </button>
   );
 }

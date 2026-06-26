@@ -38,10 +38,10 @@ export function buildWhatsAppShareMessage(car: WhatsAppShareInput): string {
     `💰 ${car.price}`,
     specs ? `📍 ${place} | ${specs}` : `📍 ${place}`,
     "",
-    "Dekhiye aur seedha owner se baat karein:",
+    "View and contact the owner directly:",
     url,
     "",
-    "_India ka direct-owner used car marketplace_",
+    "_India's direct-owner used car marketplace_",
   ].join("\n");
 }
 

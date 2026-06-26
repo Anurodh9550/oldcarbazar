@@ -24,11 +24,11 @@ export default function ListingVideoUpload({
     const file = files?.[0];
     if (!file) return;
     if (!ALLOWED_TYPES.includes(file.type)) {
-      onError?.("Sirf MP4, MOV ya WEBM video upload karein.");
+      onError?.("Upload MP4, MOV, or WEBM video only.");
       return;
     }
     if (file.size > MAX_VIDEO_BYTES) {
-      onError?.("Video 100 MB se chhoti honi chahiye.");
+      onError?.("Video must be under 100 MB.");
       return;
     }
     setBusy(true);
@@ -38,7 +38,7 @@ export default function ListingVideoUpload({
       onError?.("");
     } catch (e) {
       onError?.(
-        e instanceof Error ? e.message : "Video upload fail ho gaya."
+        e instanceof Error ? e.message : "Video upload failed."
       );
     } finally {
       setBusy(false);
@@ -55,8 +55,8 @@ export default function ListingVideoUpload({
             <span className="font-normal text-gray-500">(optional)</span>
           </p>
           <p className="mt-1 text-xs text-gray-600">
-            30–60 sec: odometer, engine sound, exterior walk-around — trust
-            badhta hai.
+            30–60 sec: odometer, engine sound, exterior walk-around — builds buyer
+            trust.
           </p>
         </div>
         {!videoUrl && (

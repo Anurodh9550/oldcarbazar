@@ -15,28 +15,28 @@ export const TRUTH_QUESTIONS: {
 }[] = [
   {
     key: "no_accident",
-    label: "Koi major accident nahi hua",
-    hint: "Structural damage / total loss nahi",
+    label: "No major accident",
+    hint: "No structural damage or total loss",
   },
   {
     key: "no_flood",
-    label: "Flood / water damage nahi hai",
+    label: "No flood or water damage",
   },
   {
     key: "not_commercial",
-    label: "Taxi / commercial use mein nahi chali",
+    label: "Not used as taxi or for commercial purposes",
   },
   {
     key: "no_major_repair",
-    label: "Engine ya gearbox replace nahi hua",
+    label: "Engine or gearbox has not been replaced",
   },
   {
     key: "rc_available",
-    label: "Original RC aur keys available hain",
+    label: "Original RC and keys are available",
   },
   {
     key: "direct_owner",
-    label: "Main direct owner hoon — broker nahi",
+    label: "I am the direct owner — not a broker",
   },
 ];
 

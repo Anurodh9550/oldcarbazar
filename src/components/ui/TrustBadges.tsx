@@ -42,7 +42,7 @@ export default function TrustBadges({
   if (truthDeclared) {
     items.push({
       key: "truth",
-      label: compact ? "✓ Sachchai" : "✓ Gaadi Ki Sachchai",
+      label: compact ? "✓ Verified" : "✓ Honest Declaration",
       className: "bg-emerald-50 text-emerald-800 ring-emerald-200",
     });
   }

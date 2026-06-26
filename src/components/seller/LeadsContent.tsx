@@ -132,7 +132,7 @@ export default function LeadsContent() {
         <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
           <h2 className="text-base font-bold text-gray-900">Leads by car</h2>
           <p className="mt-1 text-xs text-gray-500">
-            Kis listing par kitni dilchaspi aa rahi hai.
+            See how much interest each listing is getting.
           </p>
           <div className="mt-4 overflow-x-auto">
             <table className="w-full min-w-[520px] text-sm">
@@ -198,8 +198,8 @@ export default function LeadsContent() {
             <span className="text-5xl">📭</span>
             <p className="mt-3 text-sm font-medium text-gray-700">No leads yet</p>
             <p className="mx-auto mt-1 max-w-sm text-xs text-gray-500">
-              Jab koi customer aapki listing dekhega ya inquiry karega, yahan
-              uska naam aur number dikhega.
+              When a customer views your listing or sends an inquiry, it will appear
+              here with their name and number.
             </p>
           </div>
         ) : (

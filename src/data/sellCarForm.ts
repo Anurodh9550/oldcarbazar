@@ -135,7 +135,7 @@ export const MAX_LISTING_PHOTO_BYTES = 2 * 1024 * 1024;
 export const sellSteps = [
   { id: 1, title: "Car & Contact", desc: "Car specs + your contact info" },
   { id: 2, title: "Price, Photos & More", desc: "Price, city, photos & features" },
-  { id: 3, title: "Gaadi Ki Sachchai", desc: "Honest declaration + optional video" },
+  { id: 3, title: "Honest Car Declaration", desc: "Optional — declaration & video" },
   { id: 4, title: "Review", desc: "Check & publish listing" },
 ];
 
