@@ -81,7 +81,7 @@ export default function SellerDashboardContent() {
             className={`overflow-hidden rounded-2xl bg-gradient-to-br ${card.bg} p-5 shadow-md ${card.text}`}
           >
             {card.label === "Inquiries" ? (
-              <WhatsAppIcon size={28} className="brightness-0 invert" />
+              <WhatsAppIcon size={28} variant="light" />
             ) : (
               <span className="text-2xl">{card.icon}</span>
             )}

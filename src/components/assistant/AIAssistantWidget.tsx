@@ -1,6 +1,10 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import { useSiteCopy } from "@/context/LanguageContext";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { api } from "@/lib/api";
 import { useVoiceAssistant } from "@/hooks/useVoiceAssistant";
 
@@ -11,16 +15,16 @@ type ChatMessage = {
 };
 
 const QUICK_QUESTIONS = [
-  "5 lakh me best used car kaunsi?",
-  "Apni car kaise sell karun?",
-  "EMI kaise calculate hoti hai?",
-  "RC transfer process kya hai?",
+  "Best used car under ₹5 lakh?",
+  "How do I sell my car?",
+  "How is EMI calculated?",
+  "What is the RC transfer process?",
 ];
 
 const welcome: ChatMessage = {
   id: "welcome",
   role: "assistant",
-  text: "Namaste! Main Old Car Bazar AI assistant hoon. Buy, sell, EMI, loan, RC transfer ya listing se related kuch bhi poochiye. Mic dabakar bol bhi sakte ho.",
+  text: "Hi! I'm the Old Car Bazar AI assistant. Ask me about buying, selling, EMI, loans, RC transfer, or your listings. You can type or use the mic.",
 };
 
 function makeId() {
@@ -51,6 +55,8 @@ function SpeakerIcon({ className, off }: { className?: string; off?: boolean }) 
 }
 
 export default function AIAssistantWidget() {
+  const pathname = usePathname();
+  const copy = useSiteCopy();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([welcome]);
   const [input, setInput] = useState("");
@@ -85,7 +91,7 @@ export default function AIAssistantWidget() {
 
       try {
         const data = await api.askAssistant(question);
-        const reply = data.reply || "Sorry, mujhe clear answer nahi mila.";
+        const reply = data.reply || "Sorry, I couldn't find a clear answer.";
         setMessages((prev) => [
           ...prev,
           { id: makeId(), role: "assistant", text: reply },
@@ -93,7 +99,7 @@ export default function AIAssistantWidget() {
         speak(reply);
       } catch {
         const err =
-          "Assistant se connect nahi ho pa raha. Thodi der baad try karein.";
+          "Could not reach the assistant. Please try again in a moment.";
         setMessages((prev) => [
           ...prev,
           { id: makeId(), role: "assistant", text: err },
@@ -135,7 +141,17 @@ export default function AIAssistantWidget() {
   const displayInput = listening && interim ? interim : input;
 
   return (
-    <div className="fixed bottom-5 right-4 z-50 sm:bottom-6 sm:right-6">
+    <div className="fixed bottom-5 right-4 z-50 flex flex-col items-end gap-2 sm:bottom-6 sm:right-6">
+      {pathname !== "/whatsapp-sell" && !pathname?.startsWith("/admin") && (
+        <Link
+          href="/whatsapp-sell"
+          className="flex items-center gap-2 rounded-full border border-emerald-500 bg-white px-4 py-2.5 text-sm font-semibold text-emerald-700 shadow-lg transition hover:bg-emerald-50"
+        >
+          <WhatsAppIcon size={18} />
+          <span className="max-w-[9rem] truncate sm:max-w-none">{copy.whatsapp.navLabel}</span>
+        </Link>
+      )}
+
       {open && (
         <div className="mb-3 flex h-[520px] w-[calc(100vw-2rem)] max-w-[380px] flex-col overflow-hidden rounded-3xl border border-orange-100 bg-white shadow-2xl">
           <div className="bg-gradient-to-r from-[#ff8a5c] via-[#f75d34] to-[#d8431d] px-4 py-3 text-white">
@@ -144,10 +160,10 @@ export default function AIAssistantWidget() {
                 <p className="text-sm font-extrabold">Old Car Bazar AI</p>
                 <p className="text-xs text-white/85">
                   {listening
-                    ? "Sun raha hoon… boliye"
+                    ? "Listening… speak now"
                     : speaking
-                      ? "Jawab sun rahe hain…"
-                      : "Type karein ya mic se boliye"}
+                      ? "Playing reply…"
+                      : "Type or tap the mic"}
                 </p>
               </div>
               <div className="flex items-center gap-1.5">
@@ -155,7 +171,7 @@ export default function AIAssistantWidget() {
                   <button
                     type="button"
                     onClick={() => setReadAloud(!readAloud)}
-                    title={readAloud ? "Voice reply band karein" : "Voice reply chalu karein"}
+                    title={readAloud ? "Turn off voice reply" : "Turn on voice reply"}
                     aria-pressed={readAloud}
                     className={`rounded-full p-2 transition ${
                       readAloud
@@ -197,7 +213,7 @@ export default function AIAssistantWidget() {
                     className="mt-1.5 flex items-center gap-1 text-[11px] font-semibold text-[#f75d34] hover:underline"
                   >
                     <SpeakerIcon className="h-3.5 w-3.5" />
-                    {speaking ? "Ruken" : "Sunen"}
+                    {speaking ? "Stop" : "Listen"}
                   </button>
                 )}
               </div>
@@ -218,7 +234,7 @@ export default function AIAssistantWidget() {
           <div className="border-t border-slate-100 bg-white p-3">
             {!voiceSupported && (
               <p className="mb-2 text-center text-[11px] text-slate-400">
-                Voice ke liye Chrome / Edge browser use karein
+                Voice input works best in Chrome or Edge.
               </p>
             )}
             <div className="mb-2 flex gap-2 overflow-x-auto pb-1">
@@ -240,7 +256,7 @@ export default function AIAssistantWidget() {
                   type="button"
                   onClick={handleMic}
                   disabled={loading}
-                  title={listening ? "Recording band karein" : "Mic — bol kar poochiye"}
+                  title={listening ? "Stop recording" : "Ask with your voice"}
                   aria-pressed={listening}
                   className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition disabled:opacity-50 ${
                     listening
@@ -260,7 +276,7 @@ export default function AIAssistantWidget() {
                 onChange={(event) => setInput(event.target.value)}
                 readOnly={listening}
                 placeholder={
-                  listening ? "Boliye…" : "Apna question likhiye ya mic dabayein"
+                  listening ? "Speak now…" : "Ask a question or use the mic"
                 }
                 className={`min-w-0 flex-1 rounded-full border px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-[#f75d34]/15 ${
                   listening

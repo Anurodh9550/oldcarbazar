@@ -7,6 +7,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { fadeInDown } from "@/lib/motion";
 import { useAuth } from "@/context/AuthContext";
+import { useLanguage } from "@/context/LanguageContext";
 import { useLocation } from "@/context/LocationContext";
 import type { MenuLink } from "@/data/navMenus";
 import {
@@ -19,6 +20,7 @@ import AuthModal from "./AuthModal";
 import LocationModal from "./LocationModal";
 import NavMegaMenu from "./NavMegaMenu";
 import ProfileDropdown from "./ProfileDropdown";
+import LanguageToggle from "./ui/LanguageToggle";
 import {
   ChevronDownIcon,
   HeartIcon,
@@ -28,18 +30,6 @@ import {
 } from "./icons";
 
 type OpenMenu = "buy-cars" | "sell-car" | "loan-tools" | "help" | null;
-
-const navItems: {
-  id: OpenMenu;
-  label: string;
-  /** Shorter label used on small screens to avoid horizontal scroll. */
-  shortLabel?: string;
-}[] = [
-  { id: "buy-cars", label: "BUY USED CARS", shortLabel: "BUY" },
-  { id: "sell-car", label: "SELL CAR", shortLabel: "SELL" },
-  { id: "loan-tools", label: "LOAN & TOOLS", shortLabel: "LOAN" },
-  { id: "help", label: "HELP" },
-];
 
 export default function Header() {
   const router = useRouter();
@@ -52,6 +42,18 @@ export default function Header() {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { selectedCity } = useLocation();
   const { isLoggedIn, loading: authLoading } = useAuth();
+  const { copy } = useLanguage();
+
+  const navItems: {
+    id: OpenMenu;
+    label: string;
+    shortLabel?: string;
+  }[] = [
+    { id: "buy-cars", label: copy.nav.buy, shortLabel: copy.nav.buyShort },
+    { id: "sell-car", label: copy.nav.sell, shortLabel: copy.nav.sellShort },
+    { id: "loan-tools", label: copy.nav.loan, shortLabel: copy.nav.loanShort },
+    { id: "help", label: copy.nav.help },
+  ];
 
   const submitSearch = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -147,10 +149,10 @@ export default function Header() {
   };
 
   const navButtonClass = (active: boolean) =>
-    `relative flex items-center gap-0.5 whitespace-nowrap rounded-md px-2 py-2.5 text-[11px] font-semibold tracking-wide sm:px-4 sm:text-[13px] ${
+    `relative flex items-center gap-0.5 whitespace-nowrap rounded-lg px-2.5 py-2.5 text-xs font-semibold tracking-wide sm:px-4 sm:text-sm ${
       active
-        ? "bg-orange-50 text-[#f75d34]"
-        : "text-gray-800 hover:bg-orange-50 hover:text-[#f75d34]"
+        ? "bg-orange-50 text-[#f75d34] ring-1 ring-orange-100"
+        : "text-gray-700 hover:bg-orange-50 hover:text-[#f75d34]"
     }`;
 
   return (
@@ -159,7 +161,7 @@ export default function Header() {
         initial="hidden"
         animate="visible"
         variants={fadeInDown}
-        className="sticky top-0 z-[70] border-b border-gray-200 bg-white shadow-sm"
+        className="sticky top-0 z-[70] border-b border-gray-200/80 bg-white/95 shadow-sm backdrop-blur-md"
       >
         {/* Signature accent strip */}
         <div className="h-1 w-full bg-gradient-to-r from-[#f75d34] via-[#ff9a6c] to-[#f75d34]" />
@@ -199,7 +201,7 @@ export default function Header() {
                   type="search"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search used cars — Swift, Creta, Maruti..."
+                  placeholder={copy.nav.searchPlaceholder}
                   className="w-full bg-transparent text-sm text-gray-800 outline-none placeholder:text-gray-400"
                 />
                 <kbd className="hidden shrink-0 rounded border border-gray-300 bg-white px-1.5 py-0.5 text-[10px] font-semibold text-gray-400 lg:block">
@@ -210,6 +212,8 @@ export default function Header() {
 
             {/* Right actions */}
             <motion.div className="ml-auto flex items-center gap-2 sm:gap-3">
+              <LanguageToggle compact className="hidden md:flex" />
+
               <motion.button
                 type="button"
                 whileHover={{ scale: 1.03 }}
@@ -227,13 +231,13 @@ export default function Header() {
                   href="/sell-car"
                   className="hidden rounded-full bg-[#f75d34] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#e54d24] sm:inline-block"
                 >
-                  Sell Car
+                  {copy.nav.sellCar}
                 </Link>
               </motion.div>
 
               <motion.button
                 type="button"
-                aria-label="Saved cars"
+                aria-label={copy.nav.savedCars}
                 whileHover={{ scale: 1.12, color: "#f75d34" }}
                 onClick={() => router.push("/shortlisted")}
                 className="hidden text-gray-600 sm:block"
@@ -260,7 +264,7 @@ export default function Header() {
                   className="flex items-center gap-1.5 text-sm font-medium text-gray-800"
                 >
                   <UserIcon className="h-5 w-5" />
-                  <span className="hidden sm:inline">Login</span>
+                  <span className="hidden sm:inline">{copy.nav.login}</span>
                 </motion.button>
               )}
             </motion.div>
@@ -284,7 +288,7 @@ export default function Header() {
                 type="search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search used cars..."
+                placeholder={copy.nav.searchPlaceholderMobile}
                 className="min-w-0 flex-1 bg-transparent px-2 py-2 text-sm outline-none"
               />
             </form>
@@ -292,7 +296,7 @@ export default function Header() {
               href="/sell-car"
               className="shrink-0 rounded-full bg-[#f75d34] px-3 py-2 text-xs font-semibold text-white"
             >
-              Sell
+              {copy.nav.sellShortMobile}
             </Link>
           </motion.div>
         </motion.div>
@@ -390,16 +394,19 @@ export default function Header() {
               </motion.li>
             </ul>
 
-            <motion.button
-              type="button"
-              whileHover={{ scale: 1.05, color: "#f75d34" }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setLocationOpen(true)}
-              className="flex shrink-0 items-center gap-1 py-3 text-xs font-medium text-gray-800 sm:hidden"
-            >
-              <PinIcon className="h-4 w-4 text-[#f75d34]" />
-              <span className="max-w-[70px] truncate">{selectedCity}</span>
-            </motion.button>
+            <div className="ml-auto flex shrink-0 items-center gap-2 md:hidden">
+              <LanguageToggle compact />
+              <motion.button
+                type="button"
+                whileHover={{ scale: 1.05, color: "#f75d34" }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setLocationOpen(true)}
+                className="flex shrink-0 items-center gap-1 py-3 text-xs font-medium text-gray-800 sm:hidden"
+              >
+                <PinIcon className="h-4 w-4 text-[#f75d34]" />
+                <span className="max-w-[70px] truncate">{selectedCity}</span>
+              </motion.button>
+            </div>
           </motion.div>
 
           <div

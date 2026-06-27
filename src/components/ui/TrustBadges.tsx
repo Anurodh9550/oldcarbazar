@@ -69,7 +69,7 @@ export default function TrustBadges({
       {items.map((item) => (
         <span
           key={item.key}
-          className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold ring-1 ${item.className}`}
+          className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold ring-1 ${item.className}`}
         >
           {item.label}
         </span>

@@ -2,29 +2,37 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { quickActions } from "@/data/homeSections";
+import { useSiteCopy } from "@/context/LanguageContext";
+import FeatureIcon from "@/components/ui/FeatureIcon";
 import { fadeInUp, staggerContainer } from "@/lib/motion";
 
 export default function QuickActionsSection() {
+  const copy = useSiteCopy();
+
   return (
-    <section className="bg-[#f5f5f5] px-4 py-8 lg:px-6">
+    <section className="px-4 py-10 lg:px-6">
       <motion.div
         variants={staggerContainer}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
-        className="mx-auto grid max-w-[1280px] grid-cols-2 gap-3 sm:grid-cols-4 lg:gap-4"
+        className="mx-auto grid max-w-[1280px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
       >
-        {quickActions.map((action) => (
-          <motion.div key={action.title} variants={fadeInUp}>
+        {copy.quickActions.map((action) => (
+          <motion.div key={action.href} variants={fadeInUp}>
             <Link
               href={action.href}
-              className="flex flex-col items-center rounded-xl border border-gray-200 bg-white p-4 text-center shadow-md transition hover:border-[#f75d34] hover:shadow-lg sm:flex-row sm:gap-3 sm:p-4 sm:text-left"
+              className="card-surface card-surface-hover group flex h-full items-start gap-4 p-5"
             >
-              <span className="text-2xl sm:text-3xl">{action.icon}</span>
-              <div>
-                <p className="text-sm font-bold text-gray-900">{action.title}</p>
-                <p className="mt-0.5 text-caption">{action.desc}</p>
+              <FeatureIcon
+                name={action.icon}
+                className="transition group-hover:scale-105 group-hover:ring-[#f75d34]/30"
+              />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-bold text-gray-900 group-hover:text-[#f75d34]">
+                  {action.title}
+                </p>
+                <p className="mt-1 text-sm text-gray-600">{action.desc}</p>
               </div>
             </Link>
           </motion.div>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useLocation } from "@/context/LocationContext";
+import { useLanguage } from "@/context/LanguageContext";
 import CarListingGrid from "./CarListingGrid";
 import FiltersSidebar from "./FiltersSidebar";
 import MobileFiltersDrawer from "./ui/MobileFiltersDrawer";
@@ -10,6 +11,7 @@ import { fadeInUp, staggerContainer } from "@/lib/motion";
 
 export default function ListingsSection() {
   const { selectedCity, totalCarsInCity } = useLocation();
+  const { copy, t } = useLanguage();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   return (
@@ -33,7 +35,7 @@ export default function ListingsSection() {
           viewport={{ once: true }}
           className="eyebrow"
         >
-          Featured Listings
+          {copy.listings.eyebrow}
         </motion.p>
         <motion.h2
           key={selectedCity}
@@ -41,7 +43,10 @@ export default function ListingsSection() {
           animate={{ opacity: 1, y: 0 }}
           className="mt-1 section-title-lg"
         >
-          {totalCarsInCity}+ used cars for sale from ₹45,000 in {selectedCity}
+          {t(copy.listings.title, {
+            count: totalCarsInCity,
+            city: selectedCity,
+          })}
         </motion.h2>
         <motion.p
           key={`${selectedCity}-desc`}

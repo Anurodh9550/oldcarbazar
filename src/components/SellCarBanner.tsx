@@ -2,9 +2,12 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useSiteCopy } from "@/context/LanguageContext";
 import { fadeInUp } from "@/lib/motion";
 
 export default function SellCarBanner() {
+  const copy = useSiteCopy();
+
   return (
     <section className="px-4 py-10 lg:px-6">
       <motion.div
@@ -16,11 +19,10 @@ export default function SellCarBanner() {
       >
         <div>
           <h2 className="text-xl font-bold text-white sm:text-2xl">
-            Want to sell your old car?
+            {copy.sellBanner.title}
           </h2>
           <p className="mt-2 max-w-md text-sm text-orange-100">
-            Post a free ad, get instant valuation, and connect with genuine buyers
-            in your city.
+            {copy.sellBanner.subtitle}
           </p>
         </div>
         <div className="flex shrink-0 flex-col gap-3 sm:flex-row">
@@ -28,13 +30,19 @@ export default function SellCarBanner() {
             href="/sell-car"
             className="rounded-full bg-white px-6 py-3 text-sm font-bold text-[#f75d34] shadow hover:bg-orange-50"
           >
-            Sell Car Free
+            {copy.sellBanner.sellFree}
+          </Link>
+          <Link
+            href="/whatsapp-sell"
+            className="rounded-full border-2 border-white px-6 py-3 text-sm font-bold text-white hover:bg-white/10"
+          >
+            {copy.whatsapp.navLabel}
           </Link>
           <Link
             href="/valuation"
-            className="rounded-full border-2 border-white px-6 py-3 text-sm font-bold text-white hover:bg-white/10"
+            className="rounded-full border-2 border-white/80 px-6 py-3 text-sm font-bold text-white hover:bg-white/10"
           >
-            Get Valuation
+            {copy.sellBanner.valuation}
           </Link>
         </div>
       </motion.div>

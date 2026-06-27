@@ -1,27 +1,34 @@
-export const quickActions = [
+import type { FeatureIconName } from "@/components/ui/FeatureIcon";
+
+export const quickActions: {
+  title: string;
+  desc: string;
+  href: string;
+  icon: FeatureIconName;
+}[] = [
   {
     title: "Buy Used Cars",
     desc: "Browse verified listings",
     href: "/used-cars",
-    icon: "🚗",
+    icon: "car",
   },
   {
     title: "Sell Your Car",
-    desc: "Post ad free in 2 min",
+    desc: "Post your ad in 2 minutes",
     href: "/sell-car",
-    icon: "💰",
+    icon: "sell",
   },
   {
     title: "Car Valuation",
-    desc: "Know your car's price",
+    desc: "Instant price estimate",
     href: "/valuation",
-    icon: "📊",
+    icon: "chart",
   },
   {
     title: "Multi-Bank Loan",
-    desc: "One form → many banks",
+    desc: "One form, many banks",
     href: "/loan-marketplace",
-    icon: "🏛",
+    icon: "bank",
   },
 ];
 
@@ -43,26 +50,30 @@ export const popularBrands = [
   "Suzuki",
 ];
 
-export const whyChooseUs = [
+export const whyChooseUs: {
+  title: string;
+  desc: string;
+  icon: FeatureIconName;
+}[] = [
   {
     title: "Verified Listings",
-    desc: "Every car checked for basic details before listing goes live.",
-    icon: "✓",
+    desc: "Every car is reviewed before it goes live on the marketplace.",
+    icon: "shield",
   },
   {
     title: "Direct Owner Deals",
-    desc: "Chat directly with owners — no hidden broker fees.",
-    icon: "👤",
+    desc: "Speak to sellers directly — no hidden broker commissions.",
+    icon: "user",
   },
   {
     title: "Free to Sell",
-    desc: "Post your car ad at zero cost. Reach thousands of buyers.",
-    icon: "🆓",
+    desc: "List your car at zero cost and reach buyers across India.",
+    icon: "free",
   },
   {
     title: "City-wise Search",
-    desc: "Find cars in Ahmedabad, Mumbai, Delhi and 12+ cities.",
-    icon: "📍",
+    desc: "Find cars in Ahmedabad, Mumbai, Delhi and 12+ major cities.",
+    icon: "map",
   },
 ];
 

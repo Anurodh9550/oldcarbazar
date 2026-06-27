@@ -35,6 +35,7 @@ export const getBuyCarsMenu = (city: string): MenuColumn[] => [
     title: "Tools & Offers",
     links: [
       { label: "Reverse Auction", href: "/reverse-auction" },
+      { label: "Sell via WhatsApp", href: "/whatsapp-sell" },
       { label: "Compare Cars", href: "/compare" },
       { label: "Multi-Bank Loan", href: "/loan-marketplace" },
       { label: "Used Car Loan", href: "/used-car-loan" },
@@ -50,6 +51,7 @@ export const sellCarMenu: MenuColumn[] = [
     links: [
       { label: "Sell Car Free", href: "/sell-car" },
       { label: "Post Ad in 2 Minutes", href: "/post-ad" },
+      { label: "Sell via WhatsApp", href: "/whatsapp-sell" },
       { label: "My Listings", href: "/my-listings" },
       { label: "Seller Dashboard", href: "/seller" },
     ],

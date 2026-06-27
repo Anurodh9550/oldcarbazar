@@ -26,6 +26,8 @@ import {
   transmissionTypes,
   type SellCarFormData,
 } from "@/data/sellCarForm";
+import { fieldClass } from "@/components/ui/Input";
+import Button from "@/components/ui/Button";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import ListingPhotoUpload from "@/components/seller/ListingPhotoUpload";
 import ListingVideoUpload from "@/components/seller/ListingVideoUpload";
@@ -38,10 +40,9 @@ import { PinIcon } from "@/components/icons";
 
 const TOTAL_STEPS = sellSteps.length;
 
-const inputClass =
-  "w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-[#f75d34] focus:ring-2 focus:ring-[#f75d34]/20";
+const inputClass = fieldClass;
 
-const labelClass = "mb-1 block text-xs font-medium text-gray-600";
+const labelClass = "mb-1.5 block text-xs font-semibold text-gray-600";
 
 type SellCarFormProps = {
   defaultContact?: {
@@ -838,21 +839,13 @@ export default function SellCarForm({
 
         <div className="mt-6 flex justify-between gap-3">
           {step > 1 ? (
-            <button
-              type="button"
-              onClick={back}
-              className="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
+            <Button type="button" variant="outline" onClick={back}>
               Back
-            </button>
+            </Button>
           ) : (
             <div />
           )}
-          <button
-            type="submit"
-            disabled={submitting}
-            className="inline-flex items-center gap-2 rounded-lg bg-[#f75d34] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#e54d24] disabled:cursor-not-allowed disabled:opacity-70"
-          >
+          <Button type="submit" disabled={submitting} className="min-w-[140px]">
             {submitting && <Spinner size="sm" tone="white" />}
             {submitting
               ? isEdit
@@ -863,7 +856,7 @@ export default function SellCarForm({
                 : isEdit
                   ? "Save Changes"
                   : "Publish Listing"}
-          </button>
+          </Button>
         </div>
       </form>
 

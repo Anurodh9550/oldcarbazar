@@ -1,7 +1,8 @@
 ﻿"use client";
 
 import { motion } from "framer-motion";
-import { howItWorksBuy, howItWorksSell } from "@/data/homeSections";
+import { useSiteCopy } from "@/context/LanguageContext";
+import SectionHeader from "@/components/ui/SectionHeader";
 import { fadeInUp, staggerContainer } from "@/lib/motion";
 
 function StepsColumn({
@@ -11,22 +12,25 @@ function StepsColumn({
 }: {
   title: string;
   steps: { step: string; title: string; desc: string }[];
-  accent: string;
+  accent: "orange" | "slate";
 }) {
+  const stepBg = accent === "orange" ? "bg-[#f75d34]" : "bg-gray-800";
+  const titleClass = accent === "orange" ? "text-[#f75d34]" : "text-gray-900";
+
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6">
-      <h3 className={`text-base font-bold ${accent}`}>{title}</h3>
-      <ul className="mt-5 space-y-5">
+    <div className="card-surface p-6 lg:p-8">
+      <h3 className={`text-lg font-bold ${titleClass}`}>{title}</h3>
+      <ul className="mt-6 space-y-6">
         {steps.map((item) => (
           <li key={item.step} className="flex gap-4">
             <span
-              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ${accent === "text-[#f75d34]" ? "bg-[#f75d34]" : "bg-gray-800"}`}
+              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ${stepBg}`}
             >
               {item.step}
             </span>
             <motion.div>
               <p className="font-semibold text-gray-900">{item.title}</p>
-              <p className="mt-0.5 text-caption sm:text-sm">{item.desc}</p>
+              <p className="mt-1 text-sm leading-relaxed text-gray-600">{item.desc}</p>
             </motion.div>
           </li>
         ))}
@@ -36,45 +40,38 @@ function StepsColumn({
 }
 
 export default function HowItWorksSection() {
+  const copy = useSiteCopy();
+
   return (
-    <section className="bg-[#f5f5f5] py-12">
+    <section className="py-14">
       <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
-        <motion.h2
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center section-title"
-        >
-          How It Works
-        </motion.h2>
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="mt-1 text-center text-caption sm:text-sm"
-        >
-          Simple steps to buy or sell on Old Car Bazar
-        </motion.p>
+        <SectionHeader
+          eyebrow={copy.howItWorks.eyebrow}
+          title={copy.howItWorks.title}
+          subtitle={copy.howItWorks.subtitle}
+          align="center"
+          className="mx-auto max-w-2xl"
+        />
 
         <motion.div
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="mt-8 grid gap-6 lg:grid-cols-2"
+          className="mt-10 grid gap-6 lg:grid-cols-2"
         >
           <motion.div variants={fadeInUp}>
             <StepsColumn
-              title="How to Buy a Used Car"
-              steps={howItWorksBuy}
-              accent="text-[#f75d34]"
+              title={copy.howItWorks.buyersTitle}
+              steps={copy.howItWorks.buySteps}
+              accent="orange"
             />
           </motion.div>
           <motion.div variants={fadeInUp}>
             <StepsColumn
-              title="How to Sell Your Car"
-              steps={howItWorksSell}
-              accent="text-gray-800"
+              title={copy.howItWorks.sellersTitle}
+              steps={copy.howItWorks.sellSteps}
+              accent="slate"
             />
           </motion.div>
         </motion.div>

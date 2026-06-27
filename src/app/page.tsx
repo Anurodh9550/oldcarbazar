@@ -2,6 +2,7 @@ import AdSlot from "@/components/ads/AdSlot";
 import BrowseByBudgetSection from "@/components/BrowseByBudgetSection";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
+import HomeTrustStrip from "@/components/home/HomeTrustStrip";
 import HowItWorksSection from "@/components/HowItWorksSection";
 import ListingsSection from "@/components/ListingsSection";
 import PopularBrandsSection from "@/components/PopularBrandsSection";
@@ -14,6 +15,7 @@ export default function Home() {
     <>
       <Header />
       <HeroSection />
+      <HomeTrustStrip />
       <AdSlot page="home" placement="top" className="mt-6" />
       <ListingsSection />
       <AdSlot page="home" placement="inline" className="my-6" />

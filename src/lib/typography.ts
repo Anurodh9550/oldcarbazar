@@ -15,6 +15,8 @@ export const type = {
   heroLead: "hero-lead",
   shellTitle: "shell-title",
   shellSubtitle: "shell-subtitle",
+  cardSurface: "card-surface",
+  cardSurfaceHover: "card-surface-hover",
   cardTitle: "card-title",
   cardMeta: "card-meta",
   body: "text-body",

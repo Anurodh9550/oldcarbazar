@@ -65,8 +65,8 @@ export default function ExploreCarCard({
 
   return (
     <article
-      className={`overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:shadow-md ${
-        layout === "carousel" ? "w-[260px] shrink-0 sm:w-[280px]" : "w-full"
+      className={`card-surface card-surface-hover overflow-hidden ${
+        layout === "carousel" ? "w-[272px] shrink-0 sm:w-[292px]" : "w-full"
       }`}
     >
       <Link href={detailHref} className="block">
@@ -92,7 +92,7 @@ export default function ExploreCarCard({
           )}
         </div>
 
-        <div className="p-3">
+        <div className="p-3.5">
           <div className="flex items-start justify-between gap-2">
             <h3 className="card-title line-clamp-2 flex-1 leading-snug">{car.title}</h3>
             <button
