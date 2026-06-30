@@ -14,6 +14,14 @@ export type ShowroomReview = {
   date: string;
 };
 
+export type ShowroomGalleryItem = {
+  id: string;
+  title: string;
+  photoUrl: string;
+  priceLabel?: string;
+  note?: string;
+};
+
 export type DealerShowroom = {
   dealerId: string;
   dealerName: string;
@@ -27,6 +35,7 @@ export type DealerShowroom = {
   address?: string;
   team: ShowroomTeamMember[];
   reviews: ShowroomReview[];
+  gallery: ShowroomGalleryItem[];
   updatedAt: number;
 };
 
@@ -45,5 +54,6 @@ export const DEFAULT_SHOWROOM = (
     "We offer verified pre-owned cars with transparent pricing, easy finance, and after-sales support.",
   team: [],
   reviews: [],
+  gallery: [],
   updatedAt: Date.now(),
 });

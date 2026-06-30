@@ -47,9 +47,16 @@ export default function VirtualShowroomView({
   const phone = showroom.phone || dealer?.phone || "";
   const whatsappHref = phone
     ? `https://wa.me/91${phone.replace(/\D/g, "")}?text=${encodeURIComponent(
-        `Hi ${showroom.dealerName}, I visited your Virtual Showroom on Old Car Bazar.`
+        `Hi ${showroom.dealerName}, I visited your Showroom on Old Car Bazar.`
       )}`
     : "#";
+
+  const galleryWhatsApp = (title: string) =>
+    phone
+      ? `https://wa.me/91${phone.replace(/\D/g, "")}?text=${encodeURIComponent(
+          `Hi ${showroom.dealerName}, I'm interested in ${title} from your Showroom.`
+        )}`
+      : "#";
 
   const avgRating =
     showroom.reviews.length > 0
@@ -96,7 +103,7 @@ export default function VirtualShowroomView({
             </div>
             <div className="flex-1 text-white">
               <p className="text-xs font-semibold uppercase tracking-widest text-orange-300">
-                Virtual Showroom
+                Showroom
               </p>
               <h1 className="mt-1 text-3xl font-extrabold sm:text-4xl">
                 {showroom.dealerName}
@@ -236,6 +243,66 @@ export default function VirtualShowroomView({
           )}
         </div>
       </section>
+
+      {/* Unlisted cars / gallery */}
+      {(showroom.gallery?.length ?? 0) > 0 && (
+        <section className="bg-white px-4 py-12 sm:px-8 lg:px-12">
+          <div className="mx-auto max-w-6xl">
+            <SectionHeader
+              eyebrow="More stock"
+              title="More in our showroom"
+              subtitle="These cars are in our yard — contact us for details. Not yet listed on Old Car Bazar."
+            />
+            <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {showroom.gallery.map((item) => (
+                <li
+                  key={item.id}
+                  className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:border-orange-200 hover:shadow-md"
+                >
+                  <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
+                    {item.photoUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={item.photoUrl}
+                        alt={item.title}
+                        className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-4xl text-gray-300">
+                        🚗
+                      </div>
+                    )}
+                    <span className="absolute left-3 top-3 rounded-full bg-indigo-600/90 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                      Not listed
+                    </span>
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-bold text-gray-900">{item.title}</h3>
+                    {item.priceLabel && (
+                      <p className="mt-1 text-sm font-semibold text-[#f75d34]">
+                        {item.priceLabel}
+                      </p>
+                    )}
+                    {item.note && (
+                      <p className="mt-2 text-sm text-gray-600">{item.note}</p>
+                    )}
+                    {phone && (
+                      <a
+                        href={galleryWhatsApp(item.title)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-3 inline-block text-xs font-semibold text-[#f75d34] hover:underline"
+                      >
+                        Ask on WhatsApp →
+                      </a>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
 
       {/* Reviews */}
       {showroom.reviews.length > 0 && (

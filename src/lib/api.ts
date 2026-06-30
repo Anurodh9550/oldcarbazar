@@ -541,6 +541,14 @@ type ApiDealerShowroom = {
     review_date: string;
     created_at: string;
   }[];
+  gallery: {
+    id: string;
+    title: string;
+    photo_url: string;
+    price_label: string;
+    note: string;
+    sort_order: number;
+  }[];
   updated_at: string;
 };
 
@@ -579,6 +587,13 @@ export function apiShowroomToDealerShowroom(api: ApiDealerShowroom): DealerShowr
       text: r.text,
       date: r.review_date || r.created_at?.slice(0, 10) || "",
     })),
+    gallery: (api.gallery ?? []).map((g) => ({
+      id: g.id,
+      title: g.title,
+      photoUrl: g.photo_url,
+      priceLabel: g.price_label || undefined,
+      note: g.note || undefined,
+    })),
     updatedAt: new Date(api.updated_at).getTime(),
   };
 }
@@ -609,6 +624,15 @@ export function dealerShowroomToApiPayload(
       rating: r.rating,
       text: r.text,
       review_date: r.date,
+    }));
+  }
+  if (showroom.gallery) {
+    payload.gallery = showroom.gallery.map((g, i) => ({
+      title: g.title,
+      photo_url: g.photoUrl ?? "",
+      price_label: g.priceLabel ?? "",
+      note: g.note ?? "",
+      sort_order: i,
     }));
   }
   return payload;

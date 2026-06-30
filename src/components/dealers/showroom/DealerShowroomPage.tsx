@@ -57,7 +57,7 @@ export default function DealerShowroomPage({ dealerId }: { dealerId: string }) {
   if (loading) {
     return (
       <main className="bg-[#f7f7f7] px-4 py-16">
-        <PageLoader message="Loading virtual showroom…" />
+        <PageLoader message="Loading showroom…" />
       </main>
     );
   }
@@ -82,7 +82,7 @@ export default function DealerShowroomPage({ dealerId }: { dealerId: string }) {
         <div className="mx-auto max-w-lg rounded-2xl border-2 border-dashed border-gray-200 bg-white py-12 text-center">
           <span className="text-4xl">🏪</span>
           <h2 className="mt-3 text-lg font-bold text-gray-900">
-            Virtual Showroom coming soon
+            Showroom coming soon
           </h2>
           <p className="mt-2 text-sm text-gray-500">
             {dealer?.name} hasn&apos;t published their showroom yet.

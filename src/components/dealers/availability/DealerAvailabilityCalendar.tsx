@@ -121,7 +121,7 @@ export default function DealerAvailabilityCalendar() {
         <SectionHeader
           eyebrow="Dealer tool"
           title="Car Availability Calendar"
-          subtitle="Mark each car as Available, Reserved, Sold, or Coming Soon. Buyers see status on your Virtual Showroom."
+          subtitle="Mark each car as Available, Reserved, Sold, or Coming Soon. Buyers see status on your Showroom."
         />
       </div>
 

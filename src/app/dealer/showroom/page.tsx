@@ -3,8 +3,8 @@ import DealerShowroomEditor from "@/components/dealers/showroom/DealerShowroomEd
 import PageHero from "@/components/ui/PageHero";
 
 export const metadata = {
-  title: "Virtual Showroom Builder | Old Car Bazar",
-  description: "Create your dealer virtual showroom with banner, logo, team, and reviews.",
+  title: "Showroom Builder | Old Car Bazar",
+  description: "Create your dealer showroom with banner, logo, team, and reviews.",
 };
 
 export default function DealerShowroomBuilderPage() {
@@ -13,7 +13,7 @@ export default function DealerShowroomBuilderPage() {
       <Header />
       <PageHero
         badge="Dealer tools"
-        title="Virtual Showroom"
+        title="Showroom"
         subtitle="Build a mini website for your dealership — banner, logo, about, team, all cars, and customer reviews."
       />
       <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6">

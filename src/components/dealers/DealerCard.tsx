@@ -118,7 +118,7 @@ export default function DealerCard({ dealer }: { dealer: ApiDealerCard }) {
           href={`/dealers/${dealer.id}/showroom`}
           className="font-semibold text-violet-600 hover:text-violet-800"
         >
-          Virtual Showroom →
+          Showroom →
         </Link>
         <Link
           href={`/dealers/${dealer.id}`}

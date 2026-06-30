@@ -18,8 +18,9 @@ import type { DealerShowroom } from "@/types/dealerShowroom";
 import { fieldClass } from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import ShowroomImageUpload from "@/components/dealers/showroom/ShowroomImageUpload";
+import ShowroomGalleryEditor from "@/components/dealers/showroom/ShowroomGalleryEditor";
 
-type Tab = "brand" | "about" | "team" | "reviews";
+type Tab = "brand" | "about" | "gallery" | "team" | "reviews";
 
 export default function DealerShowroomEditor() {
   const { user, isLoggedIn } = useAuth();
@@ -56,7 +57,7 @@ export default function DealerShowroomEditor() {
   if (!isLoggedIn || !user) {
     return (
       <div className="card-surface p-8 text-center">
-        <p className="text-sm text-gray-600">Log in to build your Virtual Showroom.</p>
+        <p className="text-sm text-gray-600">Log in to build your Showroom.</p>
         <Link href="/seller" className="mt-4 inline-block text-sm font-semibold text-[#f75d34]">
           Go to seller dashboard →
         </Link>
@@ -84,6 +85,7 @@ export default function DealerShowroomEditor() {
   const tabs: { id: Tab; label: string }[] = [
     { id: "brand", label: "Banner & Logo" },
     { id: "about", label: "About" },
+    { id: "gallery", label: "More Cars" },
     { id: "team", label: "Team" },
     { id: "reviews", label: "Reviews" },
   ];
@@ -93,7 +95,7 @@ export default function DealerShowroomEditor() {
       <div className="flex flex-col gap-4 rounded-2xl border border-orange-100 bg-gradient-to-r from-orange-50 to-white p-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-[#f75d34]">
-            Virtual Showroom
+            Showroom
           </p>
           <p className="mt-1 section-title">Build your mini website</p>
           <p className="text-body-muted">
@@ -229,6 +231,20 @@ export default function DealerShowroomEditor() {
               </label>
             </div>
           </div>
+        )}
+
+        {tab === "gallery" && (
+          <ShowroomGalleryEditor
+            gallery={form.gallery ?? []}
+            onChange={(gallery) => update({ gallery })}
+            onPersist={async () => {
+              const saved = await persistMyDealerShowroom({
+                ...form,
+                dealerId: form.dealerId || dealerKey,
+              });
+              setForm(saved);
+            }}
+          />
         )}
 
         {tab === "team" && (

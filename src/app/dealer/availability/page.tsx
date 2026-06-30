@@ -15,7 +15,7 @@ export default function DealerAvailabilityPage() {
       <PageHero
         badge="Dealer tools"
         title="Car Availability Calendar"
-        subtitle="Track and update stock status — buyers see it on your Virtual Showroom."
+        subtitle="Track and update stock status — buyers see it on your Showroom."
       />
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
         <DealerAvailabilityCalendar />

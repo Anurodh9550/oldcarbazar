@@ -47,7 +47,7 @@ export const profileHubPageMeta: Record<
   },
   "my-showroom": {
     badge: "Dealer tools",
-    title: "Virtual Showroom",
+    title: "Showroom",
     subtitle:
       "Update banner, logo, about us, team and reviews — your mini dealer website on Old Car Bazar.",
     icon: "showroom",

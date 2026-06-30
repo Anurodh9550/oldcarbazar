@@ -2,8 +2,8 @@ import Header from "@/components/Header";
 import DealerShowroomPage from "@/components/dealers/showroom/DealerShowroomPage";
 
 export const metadata = {
-  title: "Virtual Showroom | Old Car Bazar",
-  description: "Explore this dealer's virtual showroom — cars, team, and reviews.",
+  title: "Showroom | Old Car Bazar",
+  description: "Explore this dealer's showroom — cars, team, and reviews.",
 };
 
 export default async function Page({

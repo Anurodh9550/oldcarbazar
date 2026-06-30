@@ -18,7 +18,7 @@ export default function MyShowroomPage() {
       <ProfileHubShell badge={meta.badge} title={meta.title} subtitle={meta.subtitle}>
         <AuthGate
           title="Login required"
-          description="Log in as a seller to edit your Virtual Showroom — banner, about, team and reviews."
+          description="Log in as a seller to edit your Showroom — banner, about, team and reviews."
         >
           <DealerShowroomEditor />
         </AuthGate>

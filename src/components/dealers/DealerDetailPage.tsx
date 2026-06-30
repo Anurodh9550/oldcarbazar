@@ -184,7 +184,7 @@ export default function DealerDetailPage({ dealerId }: { dealerId: string }) {
                   href={`/dealers/${dealer.id}/showroom`}
                   className="rounded-full bg-white/15 px-5 py-2 text-sm font-semibold text-white ring-1 ring-white/25 hover:bg-white/25"
                 >
-                  Virtual Showroom
+                  Showroom
                 </Link>
                 <a
                   href={`tel:+91${dealer.phone}`}

@@ -98,7 +98,7 @@ export default function SellerDashboardContent() {
           <ul className="mt-5 space-y-2">
             {[
               { href: "/sell-car", label: "Sell Car Free", icon: "➕", primary: true },
-              { href: "/dealer/showroom", label: "Virtual Showroom", icon: "🏪", primary: false },
+              { href: "/dealer/showroom", label: "Showroom", icon: "🏪", primary: false },
               { href: "/dealer/availability", label: "Availability Calendar", icon: "📅", primary: false },
               { href: "/leads", label: "Leads & Inquiries", icon: "🔔", primary: false },
               { href: "/post-ad", label: "Post Ad in 2 Minutes", icon: "⚡", primary: false },

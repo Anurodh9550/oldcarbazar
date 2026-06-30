@@ -536,7 +536,7 @@ export default function MyGarageContent() {
           className="rounded-xl border border-orange-200 bg-orange-50/50 p-4 text-sm hover:border-[#f75d34]"
         >
           <span className="text-lg">🏪</span>
-          <p className="mt-1 font-bold text-gray-900">Virtual Showroom</p>
+          <p className="mt-1 font-bold text-gray-900">Showroom</p>
           <p className="text-xs text-gray-500">Banner, about & dealer page</p>
         </Link>
         <Link

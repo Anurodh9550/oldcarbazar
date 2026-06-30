@@ -20,7 +20,7 @@ export type ProfileMenuItem = {
 export const profileMenuItems: ProfileMenuItem[] = [
   { label: "My Listings", href: "/my-listings", icon: "listings" },
   {
-    label: "Virtual Showroom",
+    label: "Showroom",
     href: "/my-showroom",
     icon: "showroom",
   },

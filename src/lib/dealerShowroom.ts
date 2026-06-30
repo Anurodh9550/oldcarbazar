@@ -38,7 +38,9 @@ export function getShowroomOrDefault(
   dealerId: string,
   dealerName: string
 ): DealerShowroom {
-  return readAll()[dealerId] ?? DEFAULT_SHOWROOM(dealerId, dealerName);
+  const room = readAll()[dealerId];
+  if (!room) return DEFAULT_SHOWROOM(dealerId, dealerName);
+  return { ...room, gallery: room.gallery ?? [] };
 }
 
 export function saveShowroom(showroom: DealerShowroom): DealerShowroom {
