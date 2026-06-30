@@ -17,6 +17,7 @@ import {
 import type { DealerShowroom } from "@/types/dealerShowroom";
 import { fieldClass } from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
+import ShowroomImageUpload from "@/components/dealers/showroom/ShowroomImageUpload";
 
 type Tab = "brand" | "about" | "team" | "reviews";
 
@@ -157,26 +158,20 @@ export default function DealerShowroomEditor() {
                 onChange={(e) => update({ dealerName: e.target.value })}
               />
             </label>
-            <label className="block">
-              <span className="mb-1 block text-sm font-medium text-gray-700">
-                Banner image URL
-              </span>
-              <input
-                className={fieldClass}
-                value={form.bannerUrl}
-                onChange={(e) => update({ bannerUrl: e.target.value })}
-                placeholder="https://..."
-              />
-            </label>
-            <label className="block">
-              <span className="mb-1 block text-sm font-medium text-gray-700">Logo URL</span>
-              <input
-                className={fieldClass}
-                value={form.logoUrl}
-                onChange={(e) => update({ logoUrl: e.target.value })}
-                placeholder="https://..."
-              />
-            </label>
+            <ShowroomImageUpload
+              label="Banner image"
+              variant="banner"
+              value={form.bannerUrl}
+              onChange={(bannerUrl) => update({ bannerUrl })}
+              hint="Wide image works best (1920×600 recommended). Upload or paste a link."
+            />
+            <ShowroomImageUpload
+              label="Logo"
+              variant="logo"
+              value={form.logoUrl}
+              onChange={(logoUrl) => update({ logoUrl })}
+              hint="Square or round logo — shown on your public showroom."
+            />
             <label className="block">
               <span className="mb-1 block text-sm font-medium text-gray-700">Tagline</span>
               <input
