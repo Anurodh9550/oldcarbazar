@@ -57,12 +57,20 @@ export const sellCarMenu: MenuColumn[] = [
     ],
   },
   {
+    title: "Dealer Tools",
+    links: [
+      { label: "Virtual Showroom Builder", href: "/dealer/showroom" },
+      { label: "Car Availability Calendar", href: "/dealer/availability" },
+      { label: "Find Dealers", href: "/dealers" },
+      { label: "Dealer / Partner Login", href: "/dealer" },
+    ],
+  },
+  {
     title: "Valuation & Help",
     links: [
       { label: "Free Car Valuation", href: "/valuation" },
       { label: "How Selling Works", href: "/sell-guide" },
       { label: "Tips to Sell Faster", href: "/sell-tips" },
-      { label: "Dealer / Partner Login", href: "/dealer" },
     ],
   },
   {

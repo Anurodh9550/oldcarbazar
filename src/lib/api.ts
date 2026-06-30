@@ -29,6 +29,8 @@ import type {
   LoanInquiry,
   LoanInquiryStatus,
 } from "@/types/loanInquiry";
+import type { CarAvailabilityEntry, CarAvailabilityStatus } from "@/types/dealerAvailability";
+import type { DealerShowroom } from "@/types/dealerShowroom";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
@@ -511,6 +513,121 @@ export type ApiDealerDetail = ApiDealerCard & {
   listings: ApiListing[];
   total_listings_count: number;
 };
+
+type ApiDealerShowroom = {
+  dealer_id: string;
+  dealer_name: string;
+  enabled: boolean;
+  banner_url: string;
+  logo_url: string;
+  tagline: string;
+  about: string;
+  address: string;
+  whatsapp: string;
+  phone?: string;
+  team: {
+    id: string;
+    name: string;
+    role: string;
+    photo_url: string;
+    bio: string;
+    sort_order: number;
+  }[];
+  reviews: {
+    id: string;
+    author: string;
+    rating: number;
+    text: string;
+    review_date: string;
+    created_at: string;
+  }[];
+  updated_at: string;
+};
+
+type ApiListingAvailability = {
+  listing_id: string;
+  title: string;
+  status: CarAvailabilityStatus;
+  note: string;
+  available_from: string | null;
+  updated_at: string;
+};
+
+export function apiShowroomToDealerShowroom(api: ApiDealerShowroom): DealerShowroom {
+  return {
+    dealerId: api.dealer_id,
+    dealerName: api.dealer_name,
+    enabled: api.enabled,
+    bannerUrl: api.banner_url,
+    logoUrl: api.logo_url,
+    tagline: api.tagline,
+    about: api.about,
+    phone: api.phone,
+    whatsapp: api.whatsapp || undefined,
+    address: api.address || undefined,
+    team: api.team.map((t) => ({
+      id: t.id,
+      name: t.name,
+      role: t.role,
+      photoUrl: t.photo_url || undefined,
+      bio: t.bio || undefined,
+    })),
+    reviews: api.reviews.map((r) => ({
+      id: r.id,
+      author: r.author,
+      rating: r.rating,
+      text: r.text,
+      date: r.review_date || r.created_at?.slice(0, 10) || "",
+    })),
+    updatedAt: new Date(api.updated_at).getTime(),
+  };
+}
+
+export function dealerShowroomToApiPayload(
+  showroom: Partial<DealerShowroom>
+): Record<string, unknown> {
+  const payload: Record<string, unknown> = {};
+  if (showroom.enabled !== undefined) payload.enabled = showroom.enabled;
+  if (showroom.bannerUrl !== undefined) payload.banner_url = showroom.bannerUrl;
+  if (showroom.logoUrl !== undefined) payload.logo_url = showroom.logoUrl;
+  if (showroom.tagline !== undefined) payload.tagline = showroom.tagline;
+  if (showroom.about !== undefined) payload.about = showroom.about;
+  if (showroom.address !== undefined) payload.address = showroom.address ?? "";
+  if (showroom.whatsapp !== undefined) payload.whatsapp = showroom.whatsapp ?? "";
+  if (showroom.team) {
+    payload.team = showroom.team.map((t, i) => ({
+      name: t.name,
+      role: t.role,
+      photo_url: t.photoUrl ?? "",
+      bio: t.bio ?? "",
+      sort_order: i,
+    }));
+  }
+  if (showroom.reviews) {
+    payload.reviews = showroom.reviews.map((r) => ({
+      author: r.author,
+      rating: r.rating,
+      text: r.text,
+      review_date: r.date,
+    }));
+  }
+  return payload;
+}
+
+export function apiAvailabilityToEntry(
+  api: ApiListingAvailability,
+  dealerId: string
+): CarAvailabilityEntry {
+  return {
+    listingId: api.listing_id,
+    dealerId,
+    title: api.title,
+    status: api.status,
+    note: api.note || undefined,
+    availableFrom: api.available_from ?? undefined,
+    updatedAt: new Date(api.updated_at).getTime(),
+  };
+}
 
 export class ApiError extends Error {
   status: number;
@@ -1778,6 +1895,54 @@ export const api = {
 
   async getDealer(id: string) {
     return apiFetch<ApiDealerDetail>(`/dealers/${id}/`);
+  },
+
+  async getDealerShowroom(dealerId: string) {
+    return apiFetch<ApiDealerShowroom>(`/dealers/${dealerId}/showroom/`);
+  },
+
+  async getMyDealerShowroom() {
+    return apiFetch<ApiDealerShowroom>("/dealers/me/showroom/", {}, true, true);
+  },
+
+  async updateMyDealerShowroom(payload: Record<string, unknown>) {
+    return apiFetch<ApiDealerShowroom>(
+      "/dealers/me/showroom/",
+      { method: "PATCH", body: JSON.stringify(payload) },
+      true,
+      true
+    );
+  },
+
+  async getDealerAvailabilityPublic(dealerId: string) {
+    return apiFetch<ApiListingAvailability[]>(
+      `/dealers/${dealerId}/availability/`
+    );
+  },
+
+  async getMyListingAvailability() {
+    return apiFetch<ApiListingAvailability[]>(
+      "/dealers/me/availability/",
+      {},
+      true,
+      true
+    );
+  },
+
+  async patchListingAvailability(
+    listingId: string,
+    payload: {
+      status: CarAvailabilityStatus;
+      note?: string;
+      available_from?: string | null;
+    }
+  ) {
+    return apiFetch<ApiListingAvailability>(
+      `/dealers/me/availability/${listingId}/`,
+      { method: "PATCH", body: JSON.stringify(payload) },
+      true,
+      true
+    );
   },
 };
 
