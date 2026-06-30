@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import ListingPhotoUpload from "@/components/seller/ListingPhotoUpload";
 import {
   addGarageVehicle,
   GARAGE_CHANGED_EVENT,
@@ -13,10 +14,11 @@ import {
 } from "@/lib/digitalGarage";
 import type { GarageVehicle } from "@/types/digitalGarage";
 import { carBrands } from "@/data/sellCarForm";
-import { bodyTypes } from "@/data/explorePage";
 
 const inputClass =
   "w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-[#f75d34] focus:ring-2 focus:ring-[#f75d34]/20";
+
+const MAX_GARAGE_PHOTOS = 10;
 
 const emptyForm = {
   make: "",
@@ -29,6 +31,7 @@ const emptyForm = {
   odometerKm: "",
   rcNotes: "",
   notes: "",
+  photos: [] as string[],
 };
 
 function formatDate(iso: string) {
@@ -42,6 +45,145 @@ function formatDate(iso: string) {
   });
 }
 
+function GarageVehicleCard({
+  vehicle,
+  onEdit,
+  onRemove,
+}: {
+  vehicle: GarageVehicle;
+  onEdit: () => void;
+  onRemove: () => void;
+}) {
+  const photos = vehicle.photos ?? [];
+  const [activePhoto, setActivePhoto] = useState(0);
+  const cover = photos[activePhoto];
+
+  return (
+    <li className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:border-indigo-200 hover:shadow-md">
+      <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-slate-800 via-slate-700 to-indigo-900">
+        {cover ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={cover}
+            alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+          />
+        ) : (
+          <div className="flex h-full flex-col items-center justify-center text-white/80">
+            <span className="text-5xl">🚗</span>
+            <p className="mt-2 text-xs font-semibold uppercase tracking-wider">
+              Add photos
+            </p>
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-4">
+          <h4 className="text-lg font-bold text-white drop-shadow">
+            {vehicle.year} {vehicle.make} {vehicle.model}
+          </h4>
+          <p className="text-xs text-white/90">
+            {vehicle.regNumber || "No RC entered"}
+            {vehicle.odometerKm > 0 &&
+              ` · ${vehicle.odometerKm.toLocaleString("en-IN")} km`}
+          </p>
+        </div>
+        <span className="absolute right-3 top-3 rounded-full bg-white/90 px-2.5 py-0.5 text-[10px] font-bold text-indigo-700 shadow">
+          Digital Garage
+        </span>
+        {photos.length > 1 && (
+          <div className="absolute bottom-3 right-3 flex gap-1">
+            {photos.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                aria-label={`Photo ${i + 1}`}
+                onClick={() => setActivePhoto(i)}
+                className={`h-1.5 w-1.5 rounded-full transition ${
+                  i === activePhoto ? "bg-white" : "bg-white/40 hover:bg-white/70"
+                }`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {photos.length > 1 && (
+        <div className="flex gap-1.5 overflow-x-auto border-b border-gray-100 bg-gray-50 px-3 py-2 scrollbar-hide">
+          {photos.map((src, i) => (
+            <button
+              key={`${i}-${src.slice(0, 24)}`}
+              type="button"
+              onClick={() => setActivePhoto(i)}
+              className={`relative h-12 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition ${
+                i === activePhoto
+                  ? "border-[#f75d34] ring-2 ring-[#f75d34]/30"
+                  : "border-transparent opacity-70 hover:opacity-100"
+              }`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={src} alt="" className="h-full w-full object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="p-4">
+        <dl className="grid grid-cols-2 gap-2 text-xs">
+          <div>
+            <dt className="text-gray-500">Purchased</dt>
+            <dd className="font-medium text-gray-900">
+              {formatDate(vehicle.purchaseDate)}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-gray-500">Insurance</dt>
+            <dd className="font-medium text-gray-900">
+              {formatDate(vehicle.insuranceExpiry)}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-gray-500">Service due</dt>
+            <dd className="font-medium text-gray-900">
+              {formatDate(vehicle.serviceDueDate)}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-gray-500">Photos</dt>
+            <dd className="font-medium text-gray-900">{photos.length}</dd>
+          </div>
+        </dl>
+        {vehicle.rcNotes && (
+          <p className="mt-2 text-xs text-gray-600">
+            <span className="font-semibold">RC:</span> {vehicle.rcNotes}
+          </p>
+        )}
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={onEdit}
+            className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:border-[#f75d34] hover:text-[#f75d34]"
+          >
+            Edit & photos
+          </button>
+          <button
+            type="button"
+            onClick={onRemove}
+            className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50"
+          >
+            Remove
+          </button>
+          <Link
+            href="/rc-guide"
+            className="rounded-lg bg-gray-50 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-100"
+          >
+            RC guide
+          </Link>
+        </div>
+      </div>
+    </li>
+  );
+}
+
 export default function MyGarageContent() {
   const { user } = useAuth();
   const [vehicles, setVehicles] = useState<GarageVehicle[]>([]);
@@ -49,6 +191,7 @@ export default function MyGarageContent() {
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [photoError, setPhotoError] = useState("");
 
   const refresh = () => setVehicles(getGarageVehicles());
 
@@ -66,6 +209,7 @@ export default function MyGarageContent() {
     setEditingId(null);
     setShowForm(false);
     setError("");
+    setPhotoError("");
   };
 
   const startEdit = (v: GarageVehicle) => {
@@ -81,6 +225,7 @@ export default function MyGarageContent() {
       odometerKm: v.odometerKm ? String(v.odometerKm) : "",
       rcNotes: v.rcNotes,
       notes: v.notes,
+      photos: v.photos ?? [],
     });
     setShowForm(true);
   };
@@ -102,6 +247,7 @@ export default function MyGarageContent() {
       odometerKm: Number(form.odometerKm) || 0,
       rcNotes: form.rcNotes.trim(),
       notes: form.notes.trim(),
+      photos: form.photos,
     };
     if (editingId) {
       updateGarageVehicle(editingId, payload);
@@ -114,16 +260,16 @@ export default function MyGarageContent() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-2xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-white p-5">
+      <div className="rounded-2xl border border-indigo-200 bg-gradient-to-br from-indigo-50 via-white to-orange-50/40 p-5">
         <p className="text-xs font-bold uppercase tracking-wider text-indigo-700">
           OCB Digital Garage
         </p>
         <h2 className="mt-1 text-lg font-bold text-gray-900">
-          Your post-purchase car hub
+          Your cars — photos, RC & reminders
         </h2>
         <p className="mt-2 text-sm text-gray-600">
-          Track RC notes, insurance renewal, service schedules and documents for
-          every car you own — all in one place after you buy on Old Car Bazar.
+          Add car photos, track insurance renewal, service schedules and RC notes
+          for every vehicle you own after buying on Old Car Bazar.
         </p>
         {user && (
           <p className="mt-2 text-xs text-gray-500">
@@ -169,7 +315,7 @@ export default function MyGarageContent() {
             resetForm();
             setShowForm(true);
           }}
-          className="rounded-full bg-[#f75d34] px-4 py-2 text-sm font-semibold text-white hover:bg-[#e54d24]"
+          className="rounded-full bg-[#f75d34] px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-[#e54d24]"
         >
           + Add vehicle
         </button>
@@ -178,11 +324,32 @@ export default function MyGarageContent() {
       {showForm && (
         <form
           onSubmit={handleSubmit}
-          className="space-y-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
+          className="space-y-5 rounded-2xl border border-indigo-100 bg-gradient-to-b from-white to-indigo-50/30 p-5 shadow-sm sm:p-6"
         >
-          <h4 className="font-bold text-gray-900">
-            {editingId ? "Edit vehicle" : "Add to Digital Garage"}
-          </h4>
+          <div>
+            <h4 className="font-bold text-gray-900">
+              {editingId ? "Edit vehicle" : "Add to Digital Garage"}
+            </h4>
+            <p className="mt-1 text-sm text-gray-500">
+              Upload clear photos first — they appear as a gallery on your garage card.
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-gray-200 bg-white p-4">
+            <ListingPhotoUpload
+              photos={form.photos}
+              onChange={(photos) => setForm((f) => ({ ...f, photos }))}
+              onError={setPhotoError}
+              optional
+              maxPhotos={MAX_GARAGE_PHOTOS}
+              label={`Car photos (up to ${MAX_GARAGE_PHOTOS})`}
+              hint="Exterior, interior, dashboard & odometer. First photo is the cover image."
+            />
+            {photoError && (
+              <p className="mt-2 text-xs text-red-600">{photoError}</p>
+            )}
+          </div>
+
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="block text-sm">
               <span className="mb-1 block text-xs font-semibold text-gray-600">
@@ -314,7 +481,7 @@ export default function MyGarageContent() {
           <div className="flex gap-2">
             <button
               type="submit"
-              className="rounded-lg bg-[#f75d34] px-5 py-2 text-sm font-semibold text-white"
+              className="rounded-lg bg-[#f75d34] px-5 py-2 text-sm font-semibold text-white shadow hover:bg-[#e54d24]"
             >
               {editingId ? "Save changes" : "Save to garage"}
             </button>
@@ -330,94 +497,48 @@ export default function MyGarageContent() {
       )}
 
       {vehicles.length === 0 && !showForm ? (
-        <div className="rounded-2xl border-2 border-dashed border-gray-200 bg-white py-14 text-center">
+        <div className="rounded-2xl border-2 border-dashed border-indigo-200 bg-white py-14 text-center">
           <span className="text-5xl">🏠</span>
           <p className="mt-3 font-semibold text-gray-800">Your garage is empty</p>
           <p className="mx-auto mt-1 max-w-md text-sm text-gray-500">
-            Bought a car on Old Car Bazar? Add it here to track insurance, service
-            and RC documents.
+            Add a vehicle with photos to build your personal car gallery — plus
+            insurance and service tracking.
           </p>
-          <Link
-            href="/insurance"
-            className="mt-4 inline-block text-sm font-semibold text-[#f75d34] hover:underline"
+          <button
+            type="button"
+            onClick={() => setShowForm(true)}
+            className="mt-4 inline-block rounded-full bg-[#f75d34] px-5 py-2 text-sm font-semibold text-white"
           >
-            Insurance renewal →
-          </Link>
+            + Add first vehicle
+          </button>
         </div>
       ) : (
-        <ul className="grid gap-4 sm:grid-cols-2">
+        <ul className="grid gap-5 sm:grid-cols-2">
           {vehicles.map((v) => (
-            <li
+            <GarageVehicleCard
               key={v.id}
-              className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm"
-            >
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <h4 className="font-bold text-gray-900">
-                    {v.year} {v.make} {v.model}
-                  </h4>
-                  <p className="text-xs text-gray-500">
-                    {v.regNumber || "No RC entered"}
-                    {v.odometerKm > 0 &&
-                      ` · ${v.odometerKm.toLocaleString("en-IN")} km`}
-                  </p>
-                </div>
-                <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-bold text-indigo-700">
-                  Digital Garage
-                </span>
-              </div>
-              <dl className="mt-3 grid grid-cols-2 gap-2 text-xs">
-                <div>
-                  <dt className="text-gray-500">Purchased</dt>
-                  <dd className="font-medium">{formatDate(v.purchaseDate)}</dd>
-                </div>
-                <div>
-                  <dt className="text-gray-500">Insurance</dt>
-                  <dd className="font-medium">{formatDate(v.insuranceExpiry)}</dd>
-                </div>
-                <div>
-                  <dt className="text-gray-500">Service due</dt>
-                  <dd className="font-medium">{formatDate(v.serviceDueDate)}</dd>
-                </div>
-              </dl>
-              {v.rcNotes && (
-                <p className="mt-2 text-xs text-gray-600">
-                  <span className="font-semibold">RC:</span> {v.rcNotes}
-                </p>
-              )}
-              <div className="mt-3 flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() => startEdit(v)}
-                  className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:border-[#f75d34]"
-                >
-                  Edit
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (confirm("Remove this vehicle from your garage?")) {
-                      removeGarageVehicle(v.id);
-                      refresh();
-                    }
-                  }}
-                  className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600"
-                >
-                  Remove
-                </button>
-                <Link
-                  href="/rc-guide"
-                  className="rounded-lg bg-gray-50 px-3 py-1.5 text-xs font-semibold text-gray-700"
-                >
-                  RC guide
-                </Link>
-              </div>
-            </li>
+              vehicle={v}
+              onEdit={() => startEdit(v)}
+              onRemove={() => {
+                if (confirm("Remove this vehicle from your garage?")) {
+                  removeGarageVehicle(v.id);
+                  refresh();
+                }
+              }}
+            />
           ))}
         </ul>
       )}
 
       <div className="grid gap-3 sm:grid-cols-3">
+        <Link
+          href="/my-showroom"
+          className="rounded-xl border border-orange-200 bg-orange-50/50 p-4 text-sm hover:border-[#f75d34]"
+        >
+          <span className="text-lg">🏪</span>
+          <p className="mt-1 font-bold text-gray-900">Virtual Showroom</p>
+          <p className="text-xs text-gray-500">Banner, about & dealer page</p>
+        </Link>
         <Link
           href="/insurance"
           className="rounded-xl border border-gray-200 bg-white p-4 text-sm hover:border-[#f75d34]"
@@ -433,14 +554,6 @@ export default function MyGarageContent() {
           <span className="text-lg">📋</span>
           <p className="mt-1 font-bold text-gray-900">History report</p>
           <p className="text-xs text-gray-500">RC, challan & ownership</p>
-        </Link>
-        <Link
-          href="/cost-of-ownership"
-          className="rounded-xl border border-gray-200 bg-white p-4 text-sm hover:border-[#f75d34]"
-        >
-          <span className="text-lg">🧾</span>
-          <p className="mt-1 font-bold text-gray-900">Running cost</p>
-          <p className="text-xs text-gray-500">Fuel, service & depreciation</p>
         </Link>
       </div>
     </div>

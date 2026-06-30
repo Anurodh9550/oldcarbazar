@@ -12,12 +12,18 @@ export type ProfileMenuItem = {
     | "settings"
     | "consent"
     | "pro"
-    | "billing";
+    | "billing"
+    | "showroom";
   dividerAfter?: boolean;
 };
 
 export const profileMenuItems: ProfileMenuItem[] = [
   { label: "My Listings", href: "/my-listings", icon: "listings" },
+  {
+    label: "Virtual Showroom",
+    href: "/my-showroom",
+    icon: "showroom",
+  },
   { label: "Leads & Inquiries", href: "/leads", icon: "leads" },
   { label: "Upgrade to Pro", href: "/pricing", icon: "pro" },
   { label: "Billing & Invoices", href: "/my-subscriptions", icon: "billing", dividerAfter: true },

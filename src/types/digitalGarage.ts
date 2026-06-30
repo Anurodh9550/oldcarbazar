@@ -10,6 +10,7 @@ export type GarageVehicle = {
   odometerKm: number;
   rcNotes: string;
   notes: string;
+  photos: string[];
   listingId?: string;
   addedAt: number;
 };

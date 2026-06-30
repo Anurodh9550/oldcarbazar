@@ -14,24 +14,37 @@ type ListingPhotoUploadProps = {
   photos: string[];
   onChange: (photos: string[]) => void;
   onError?: (message: string) => void;
+  /** Garage / optional flows — no minimum photo count */
+  optional?: boolean;
+  maxPhotos?: number;
+  label?: string;
+  hint?: string;
 };
 
 export default function ListingPhotoUpload({
   photos,
   onChange,
   onError,
+  optional = false,
+  maxPhotos = MAX_LISTING_PHOTOS,
+  label,
+  hint,
 }: ListingPhotoUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
 
-  const remaining = MAX_LISTING_PHOTOS - photos.length;
-  const countMsg = validatePhotoCount(photos.length);
+  const remaining = maxPhotos - photos.length;
+  const countMsg = optional
+    ? photos.length > maxPhotos
+      ? `Maximum ${maxPhotos} photos allowed.`
+      : ""
+    : validatePhotoCount(photos.length);
 
   const addFiles = async (files: FileList | null) => {
     if (!files?.length) return;
-    const slots = MAX_LISTING_PHOTOS - photos.length;
+    const slots = maxPhotos - photos.length;
     if (slots <= 0) {
-      onError?.(`Maximum ${MAX_LISTING_PHOTOS} photos allowed.`);
+      onError?.(`Maximum ${maxPhotos} photos allowed.`);
       return;
     }
 
@@ -69,19 +82,29 @@ export default function ListingPhotoUpload({
     <div className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="text-xs font-medium text-gray-600">
-          Car photos * ({MIN_LISTING_PHOTOS}–{MAX_LISTING_PHOTOS})
+          {label ??
+            (optional
+              ? `Car photos (up to ${maxPhotos})`
+              : `Car photos * (${MIN_LISTING_PHOTOS}–${MAX_LISTING_PHOTOS})`)}
         </span>
         <span
           className={`text-xs font-semibold ${
-            photos.length >= MIN_LISTING_PHOTOS ? "text-green-600" : "text-amber-600"
+            optional
+              ? "text-gray-600"
+              : photos.length >= MIN_LISTING_PHOTOS
+                ? "text-green-600"
+                : "text-amber-600"
           }`}
         >
-          {photos.length} / {MAX_LISTING_PHOTOS}
+          {photos.length} / {maxPhotos}
         </span>
       </div>
 
       <p className="text-caption text-gray-500">
-        Front, back, interior & odometer recommended. First photo is cover image.
+        {hint ??
+          (optional
+            ? "Add exterior, interior and odometer shots. First photo is the cover."
+            : "Front, back, interior & odometer recommended. First photo is cover image.")}
       </p>
 
       {photos.length > 0 && (

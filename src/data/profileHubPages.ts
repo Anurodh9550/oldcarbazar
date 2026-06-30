@@ -6,6 +6,7 @@ export type ProfileHubPageId =
   | "my-activity"
   | "my-vehicles"
   | "my-garage"
+  | "my-showroom"
   | "consents"
   | "profile-settings";
 
@@ -40,8 +41,16 @@ export const profileHubPageMeta: Record<
   "my-garage": {
     badge: "Post-purchase",
     title: "OCB Digital Garage",
-    subtitle: "Your post-purchase hub — RC notes, insurance renewal, service reminders and documents.",
+    subtitle:
+      "Your cars in one place — add photos, track RC notes, insurance renewal and service reminders.",
     icon: "garage",
+  },
+  "my-showroom": {
+    badge: "Dealer tools",
+    title: "Virtual Showroom",
+    subtitle:
+      "Update banner, logo, about us, team and reviews — your mini dealer website on Old Car Bazar.",
+    icon: "showroom",
   },
   consents: {
     badge: "Privacy",

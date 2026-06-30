@@ -30,6 +30,7 @@ export function addGarageVehicle(
 ): GarageVehicle {
   const vehicle: GarageVehicle = {
     ...input,
+    photos: input.photos ?? [],
     id: `gv-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     addedAt: Date.now(),
   };
