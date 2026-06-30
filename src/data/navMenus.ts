@@ -59,7 +59,7 @@ export const sellCarMenu: MenuColumn[] = [
   {
     title: "Dealer Tools",
     links: [
-      { label: "Virtual Showroom Builder", href: "/dealer/showroom" },
+      { label: "Virtual Showroom Builder", href: "/my-showroom" },
       { label: "Car Availability Calendar", href: "/dealer/availability" },
       { label: "Find Dealers", href: "/dealers" },
       { label: "Dealer / Partner Login", href: "/dealer" },

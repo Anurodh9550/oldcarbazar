@@ -12,6 +12,16 @@ type NavMegaMenuProps = {
   onItemClick?: (item: MenuLink) => void;
 };
 
+function menuGridClass(columnCount: number): string {
+  if (columnCount >= 4) {
+    return "grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6";
+  }
+  if (columnCount === 3) {
+    return "grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-10";
+  }
+  return "grid grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-10";
+}
+
 export default function NavMegaMenu({
   isOpen,
   onClose,
@@ -29,7 +39,7 @@ export default function NavMegaMenu({
           className="absolute left-0 right-0 top-full z-[80] border-t-2 border-[#f75d34]/30 bg-white shadow-2xl"
         >
           <div className="mx-auto max-w-[1280px] px-6 py-6 lg:px-8">
-            <motion.div className="grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-10">
+            <motion.div className={menuGridClass(columns.length)}>
               {columns.map((column) => (
                 <div key={column.title}>
                   <p className="mb-3 text-xs font-bold uppercase tracking-wider text-[#f75d34]">
