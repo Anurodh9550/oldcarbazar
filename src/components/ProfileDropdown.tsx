@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
+import { useChromeCopy } from "@/context/LanguageContext";
 import { profileMenuItems, type ProfileMenuItem } from "@/data/profileMenu";
 import { ChevronDownIcon, UserIcon } from "./icons";
 
@@ -93,6 +94,7 @@ function MenuIcon({ type }: { type: ProfileMenuItem["icon"] }) {
 
 export default function ProfileDropdown() {
   const { user, logout } = useAuth();
+  const copy = useChromeCopy();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -133,7 +135,7 @@ export default function ProfileDropdown() {
           <UserIcon className="h-4 w-4" />
         </span>
         <span className="hidden max-w-[120px] truncate sm:inline">
-          Hello, {firstName}
+          {copy.common.hello}, {firstName}
         </span>
         <ChevronDownIcon
           className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`}
@@ -161,14 +163,14 @@ export default function ProfileDropdown() {
 
             <ul className="py-1">
               {profileMenuItems.map((item) => (
-                <li key={item.label}>
+                <li key={item.id}>
                   <Link
                     href={item.href}
                     onClick={() => setOpen(false)}
                     className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 transition hover:bg-orange-50 hover:text-[#f75d34]"
                   >
                     <MenuIcon type={item.icon} />
-                    {item.label}
+                    {copy.profileMenu[item.id]}
                   </Link>
                   {item.dividerAfter && (
                     <hr className="my-1 border-gray-100" />
@@ -189,7 +191,7 @@ export default function ProfileDropdown() {
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
                   <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-                Logout
+                {copy.common.logout}
               </button>
             </div>
           </motion.div>

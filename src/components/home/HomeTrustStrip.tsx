@@ -1,9 +1,9 @@
 "use client";
 
-import { useSiteCopy } from "@/context/LanguageContext";
+import { useChromeCopy } from "@/context/LanguageContext";
 
 export default function HomeTrustStrip() {
-  const copy = useSiteCopy();
+  const copy = useChromeCopy();
 
   return (
     <section className="border-y border-gray-200/80 bg-white/90 backdrop-blur-sm">

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { useChromeCopy, useLanguage } from "@/context/LanguageContext";
 import { ApiError, api, apiListingToCarListing, type ApiDealerDetail } from "@/lib/api";
 import { enrichCar } from "@/lib/carMeta";
 import ExploreCarCard from "@/components/explore/ExploreCarCard";
@@ -42,6 +43,8 @@ function formatDate(value: string | null | undefined): string {
 }
 
 export default function DealerDetailPage({ dealerId }: { dealerId: string }) {
+  const { t } = useLanguage();
+  const copy = useChromeCopy();
   const [dealer, setDealer] = useState<ApiDealerDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -57,10 +60,10 @@ export default function DealerDetailPage({ dealerId }: { dealerId: string }) {
       } catch (err) {
         if (!cancelled) {
           if (err instanceof ApiError && err.status === 404) {
-            setError("This dealer profile is no longer available.");
+            setError(copy.dealers.dealerUnavailable);
           } else {
             setError(
-              err instanceof Error ? err.message : "Could not load dealer."
+              err instanceof Error ? err.message : copy.dealers.loadError
             );
           }
         }
@@ -71,7 +74,7 @@ export default function DealerDetailPage({ dealerId }: { dealerId: string }) {
     return () => {
       cancelled = true;
     };
-  }, [dealerId]);
+  }, [dealerId, copy.dealers.dealerUnavailable, copy.dealers.loadError]);
 
   const enrichedListings = useMemo(() => {
     if (!dealer) return [];
@@ -82,7 +85,7 @@ export default function DealerDetailPage({ dealerId }: { dealerId: string }) {
     return (
       <main className="bg-[#f7f7f7] px-4 py-16 sm:px-8">
         <div className="mx-auto max-w-5xl rounded-2xl bg-white">
-          <PageLoader message="Loading dealer from database…" />
+          <PageLoader message={copy.dealers.loadingDealer} />
         </div>
       </main>
     );
@@ -94,16 +97,16 @@ export default function DealerDetailPage({ dealerId }: { dealerId: string }) {
         <div className="mx-auto max-w-2xl rounded-2xl border-2 border-dashed border-gray-200 bg-white py-16 text-center">
           <span className="text-5xl">🚘</span>
           <h2 className="mt-3 text-lg font-bold text-gray-900">
-            Dealer not found
+            {copy.dealers.notFoundTitle}
           </h2>
           <p className="mx-auto mt-1 max-w-md text-sm text-gray-500">
-            {error || "We couldn't find this dealer profile."}
+            {error || copy.dealers.notFoundDefault}
           </p>
           <Link
             href="/dealers"
             className="mt-6 inline-block rounded-full bg-[#f75d34] px-6 py-2 text-sm font-semibold text-white hover:bg-[#e54d24]"
           >
-            Back to dealers
+            {copy.dealers.backToDealers}
           </Link>
         </div>
       </main>
@@ -144,7 +147,7 @@ export default function DealerDetailPage({ dealerId }: { dealerId: string }) {
             href="/dealers"
             className="inline-flex items-center gap-1 text-xs text-gray-300 hover:text-white"
           >
-            <span>←</span> All dealers
+            <span>←</span> {copy.dealers.allDealers}
           </Link>
           <div className="mt-4 flex flex-col gap-5 sm:flex-row sm:items-center">
             {dealer.avatar_url ? (
@@ -166,17 +169,25 @@ export default function DealerDetailPage({ dealerId }: { dealerId: string }) {
                 </h1>
                 {dealer.is_pro && (
                   <span className="rounded-full bg-emerald-500/90 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
-                    Pro Dealer
+                    {copy.dealers.proDealer}
                   </span>
                 )}
               </div>
               <p className="mt-1 text-sm text-gray-300">
-                {dealer.primary_city || "Across India"}
+                {dealer.primary_city || copy.dealers.acrossIndia}
                 {dealer.cities.length > 1 && (
-                  <span> · operates in {dealer.cities.length} cities</span>
+                  <span>
+                    {" "}
+                    {t(copy.dealers.operatesInCities, {
+                      count: dealer.cities.length,
+                    })}
+                  </span>
                 )}
                 {memberSince && (
-                  <span className="text-gray-400"> · joined {memberSince}</span>
+                  <span className="text-gray-400">
+                    {" "}
+                    {t(copy.dealers.joined, { date: memberSince })}
+                  </span>
                 )}
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
@@ -184,13 +195,13 @@ export default function DealerDetailPage({ dealerId }: { dealerId: string }) {
                   href={`/dealers/${dealer.id}/showroom`}
                   className="rounded-full bg-white/15 px-5 py-2 text-sm font-semibold text-white ring-1 ring-white/25 hover:bg-white/25"
                 >
-                  Showroom
+                  {copy.dealers.showroom}
                 </Link>
                 <a
                   href={`tel:+91${dealer.phone}`}
                   className="rounded-full bg-[#f75d34] px-5 py-2 text-sm font-semibold text-white hover:bg-[#e54d24]"
                 >
-                  Call dealer
+                  {copy.dealers.callDealer}
                 </a>
                 <a
                   href={whatsappHref}
@@ -205,13 +216,13 @@ export default function DealerDetailPage({ dealerId }: { dealerId: string }) {
           </div>
 
           <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <Stat label="Active listings" value={dealer.active_listings_count} />
+            <Stat label={copy.dealers.activeListings} value={dealer.active_listings_count} />
             <Stat
-              label="Total ever listed"
+              label={copy.dealers.totalEverListed}
               value={dealer.total_listings_count}
             />
-            {priceRange && <Stat label="Price range" value={priceRange} />}
-            <Stat label="Cities" value={dealer.cities.length || 1} />
+            {priceRange && <Stat label={copy.dealers.priceRange} value={priceRange} />}
+            <Stat label={copy.dealers.cities} value={dealer.cities.length || 1} />
           </div>
         </div>
       </section>
@@ -221,7 +232,7 @@ export default function DealerDetailPage({ dealerId }: { dealerId: string }) {
           {dealer.brands.length > 0 && (
             <div className="mb-6 flex flex-wrap items-center gap-2">
               <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                Brands available:
+                {copy.dealers.brandsAvailable}
               </span>
               {dealer.brands.map((b) => (
                 <span
@@ -235,17 +246,16 @@ export default function DealerDetailPage({ dealerId }: { dealerId: string }) {
           )}
 
           <h2 className="text-xl font-bold text-gray-900">
-            Cars from {dealer.name}
+            {t(copy.dealers.carsFrom, { name: dealer.name })}
           </h2>
           <p className="mt-1 text-sm text-gray-500">
-            {enrichedListings.length} car{enrichedListings.length === 1 ? "" : "s"}{" "}
-            currently available
+            {t(copy.dealers.carsAvailable, { count: enrichedListings.length })}
           </p>
 
           {enrichedListings.length === 0 ? (
             <div className="mt-8 rounded-2xl border-2 border-dashed border-gray-200 bg-white py-12 text-center">
               <p className="text-sm text-gray-500">
-                This dealer has no active listings right now.
+                {copy.dealers.noActiveListings}
               </p>
             </div>
           ) : (

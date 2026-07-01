@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { useSiteCopy } from "@/context/LanguageContext";
+import { useChromeCopy } from "@/context/LanguageContext";
 import FeatureIcon from "@/components/ui/FeatureIcon";
 import { fadeInUp, staggerContainer } from "@/lib/motion";
 
 export default function QuickActionsSection() {
-  const copy = useSiteCopy();
+  const copy = useChromeCopy();
 
   return (
     <section className="px-4 py-10 lg:px-6">

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
-import { useSiteCopy } from "@/context/LanguageContext";
+import { useChromeCopy } from "@/context/LanguageContext";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { api } from "@/lib/api";
 import { useVoiceAssistant } from "@/hooks/useVoiceAssistant";
@@ -56,7 +56,7 @@ function SpeakerIcon({ className, off }: { className?: string; off?: boolean }) 
 
 export default function AIAssistantWidget() {
   const pathname = usePathname();
-  const copy = useSiteCopy();
+  const copy = useChromeCopy();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([welcome]);
   const [input, setInput] = useState("");

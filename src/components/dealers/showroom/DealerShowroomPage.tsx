@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useChromeCopy, useLanguage } from "@/context/LanguageContext";
 import { ApiError, api, type ApiDealerDetail } from "@/lib/api";
 import {
   fetchDealerShowroom,
@@ -14,6 +15,8 @@ import PageLoader from "@/components/ui/PageLoader";
 import type { DealerShowroom } from "@/types/dealerShowroom";
 
 export default function DealerShowroomPage({ dealerId }: { dealerId: string }) {
+  const { t } = useLanguage();
+  const copy = useChromeCopy();
   const [dealer, setDealer] = useState<ApiDealerDetail | null>(null);
   const [showroom, setShowroom] = useState<DealerShowroom | null>(null);
   const [loading, setLoading] = useState(true);
@@ -40,8 +43,8 @@ export default function DealerShowroomPage({ dealerId }: { dealerId: string }) {
         if (!cancelled) {
           setError(
             err instanceof ApiError && err.status === 404
-              ? "Dealer not found."
-              : "Could not load dealer."
+              ? copy.dealers.notFoundTitle
+              : copy.dealers.loadError
           );
           setShowroom(getShowroomOrDefault(dealerId, "Dealer Showroom"));
         }
@@ -52,12 +55,12 @@ export default function DealerShowroomPage({ dealerId }: { dealerId: string }) {
     return () => {
       cancelled = true;
     };
-  }, [dealerId]);
+  }, [dealerId, copy.dealers.notFoundTitle, copy.dealers.loadError]);
 
   if (loading) {
     return (
       <main className="bg-[#f7f7f7] px-4 py-16">
-        <PageLoader message="Loading showroom…" />
+        <PageLoader message={copy.showroom.loadingShowroom} />
       </main>
     );
   }
@@ -67,7 +70,7 @@ export default function DealerShowroomPage({ dealerId }: { dealerId: string }) {
       <main className="bg-[#f7f7f7] px-4 py-16 text-center">
         <p className="text-sm text-gray-500">{error}</p>
         <Link href="/dealers" className="mt-4 inline-block text-sm font-semibold text-[#f75d34]">
-          ← All dealers
+          ← {copy.dealers.allDealers}
         </Link>
       </main>
     );
@@ -82,17 +85,17 @@ export default function DealerShowroomPage({ dealerId }: { dealerId: string }) {
         <div className="mx-auto max-w-lg rounded-2xl border-2 border-dashed border-gray-200 bg-white py-12 text-center">
           <span className="text-4xl">🏪</span>
           <h2 className="mt-3 text-lg font-bold text-gray-900">
-            Showroom coming soon
+            {copy.showroom.comingSoonTitle}
           </h2>
           <p className="mt-2 text-sm text-gray-500">
-            {dealer?.name} hasn&apos;t published their showroom yet.
+            {t(copy.showroom.comingSoonSub, { name: dealer?.name ?? "" })}
           </p>
           {dealer && (
             <Link
               href={`/dealers/${dealer.id}`}
               className="mt-6 inline-block rounded-full bg-[#f75d34] px-6 py-2 text-sm font-semibold text-white"
             >
-              View dealer profile
+              {copy.showroom.viewDealerProfile}
             </Link>
           )}
         </div>

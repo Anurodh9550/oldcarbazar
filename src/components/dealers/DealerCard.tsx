@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useChromeCopy, useLanguage } from "@/context/LanguageContext";
 import type { ApiDealerCard } from "@/lib/api";
 
 function initials(name: string): string {
@@ -26,6 +27,8 @@ function formatPriceRange(min: string | null, max: string | null): string {
 }
 
 export default function DealerCard({ dealer }: { dealer: ApiDealerCard }) {
+  const { t } = useLanguage();
+  const copy = useChromeCopy();
   const priceRange = formatPriceRange(dealer.min_price_inr, dealer.max_price_inr);
   return (
     <div className="group flex h-full flex-col rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-[#f75d34]/30 hover:shadow-lg">
@@ -53,7 +56,7 @@ export default function DealerCard({ dealer }: { dealer: ApiDealerCard }) {
               </h3>
               {dealer.is_pro && (
                 <span className="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-700">
-                  Pro
+                  {copy.dealers.proBadge}
                 </span>
               )}
             </div>
@@ -62,11 +65,11 @@ export default function DealerCard({ dealer }: { dealer: ApiDealerCard }) {
                 <path d="M12 22s-7-7.58-7-12a7 7 0 1 1 14 0c0 4.42-7 12-7 12z" />
                 <circle cx="12" cy="10" r="2.5" />
               </svg>
-              {dealer.primary_city || "Across India"}
+              {dealer.primary_city || copy.dealers.acrossIndia}
               {dealer.cities.length > 1 && (
                 <span className="text-gray-400">
                   {" "}
-                  +{dealer.cities.length - 1} more
+                  {t(copy.dealers.moreCities, { count: dealer.cities.length - 1 })}
                 </span>
               )}
             </p>
@@ -79,7 +82,7 @@ export default function DealerCard({ dealer }: { dealer: ApiDealerCard }) {
               {dealer.active_listings_count}
             </p>
             <p className="text-[11px] uppercase tracking-wide text-gray-500">
-              Active listings
+              {copy.dealers.activeListings}
             </p>
           </div>
           {priceRange && (
@@ -88,7 +91,7 @@ export default function DealerCard({ dealer }: { dealer: ApiDealerCard }) {
                 {priceRange}
               </p>
               <p className="text-[11px] uppercase tracking-wide text-gray-500">
-                Price range
+                {copy.dealers.priceRange}
               </p>
             </div>
           )}
@@ -118,13 +121,13 @@ export default function DealerCard({ dealer }: { dealer: ApiDealerCard }) {
           href={`/dealers/${dealer.id}/showroom`}
           className="font-semibold text-violet-600 hover:text-violet-800"
         >
-          Showroom →
+          {copy.dealers.showroom} →
         </Link>
         <Link
           href={`/dealers/${dealer.id}`}
           className="font-semibold text-[#f75d34] hover:underline"
         >
-          Profile
+          {copy.dealers.profile}
         </Link>
       </div>
     </div>

@@ -1,24 +1,21 @@
 import Header from "@/components/Header";
 import ConsentsContent from "@/components/profile-hub/ConsentsContent";
+import ProfileAuthGate from "@/components/profile-hub/ProfileAuthGate";
 import ProfileHubShell from "@/components/profile-hub/ProfileHubShell";
-import AuthGate from "@/components/seller/AuthGate";
-import { profileHubPageMeta } from "@/data/profileHubPages";
-
-const meta = profileHubPageMeta.consents;
 
 export const metadata = {
-  title: `${meta.title} | Old Car Bazar`,
-  description: meta.subtitle,
+  title: "Manage Consents | Old Car Bazar",
+  description: "Control marketing, WhatsApp alerts and data-sharing preferences.",
 };
 
 export default function ConsentsPage() {
   return (
     <>
       <Header />
-      <ProfileHubShell badge={meta.badge} title={meta.title} subtitle={meta.subtitle}>
-        <AuthGate title="Login required" description="Please log in to manage your consent settings.">
+      <ProfileHubShell pageKey="consents">
+        <ProfileAuthGate gateKey="consents">
           <ConsentsContent />
-        </AuthGate>
+        </ProfileAuthGate>
       </ProfileHubShell>
     </>
   );

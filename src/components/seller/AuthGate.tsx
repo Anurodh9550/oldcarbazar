@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { useChromeCopy } from "@/context/LanguageContext";
 import AuthModal from "@/components/AuthModal";
 
 type AuthGateProps = {
@@ -18,6 +19,7 @@ export default function AuthGate({
   features = [],
 }: AuthGateProps) {
   const { isLoggedIn } = useAuth();
+  const copy = useChromeCopy();
   const [authOpen, setAuthOpen] = useState(false);
 
   useEffect(() => {
@@ -48,7 +50,7 @@ export default function AuthGate({
             onClick={() => setAuthOpen(true)}
             className="mt-8 rounded-full bg-[#f75d34] px-8 py-3 text-sm font-semibold text-white hover:bg-[#e54d24]"
           >
-            Login / Register
+            {copy.common.loginRegister}
           </button>
         </div>
         <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} />

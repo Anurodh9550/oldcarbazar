@@ -1,24 +1,21 @@
 import Header from "@/components/Header";
 import MyVehiclesContent from "@/components/profile-hub/MyVehiclesContent";
+import ProfileAuthGate from "@/components/profile-hub/ProfileAuthGate";
 import ProfileHubShell from "@/components/profile-hub/ProfileHubShell";
-import AuthGate from "@/components/seller/AuthGate";
-import { profileHubPageMeta } from "@/data/profileHubPages";
-
-const meta = profileHubPageMeta["my-vehicles"];
 
 export const metadata = {
-  title: `${meta.title} | Old Car Bazar`,
-  description: meta.subtitle,
+  title: "My Vehicles | Old Car Bazar",
+  description: "Your owned cars and posted listings in one dashboard.",
 };
 
 export default function MyVehiclesPage() {
   return (
     <>
       <Header />
-      <ProfileHubShell badge={meta.badge} title={meta.title} subtitle={meta.subtitle}>
-        <AuthGate title="Login required" description="Please log in to view your vehicles.">
+      <ProfileHubShell pageKey="myVehicles">
+        <ProfileAuthGate gateKey="vehicles">
           <MyVehiclesContent />
-        </AuthGate>
+        </ProfileAuthGate>
       </ProfileHubShell>
     </>
   );

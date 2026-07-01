@@ -1,24 +1,21 @@
 import Header from "@/components/Header";
 import MyActivityContent from "@/components/profile-hub/MyActivityContent";
+import ProfileAuthGate from "@/components/profile-hub/ProfileAuthGate";
 import ProfileHubShell from "@/components/profile-hub/ProfileHubShell";
-import AuthGate from "@/components/seller/AuthGate";
-import { profileHubPageMeta } from "@/data/profileHubPages";
-
-const meta = profileHubPageMeta["my-activity"];
 
 export const metadata = {
-  title: `${meta.title} | Old Car Bazar`,
-  description: meta.subtitle,
+  title: "My Activity | Old Car Bazar",
+  description: "History of recent searches, viewed listings and inquiries.",
 };
 
 export default function MyActivityPage() {
   return (
     <>
       <Header />
-      <ProfileHubShell badge={meta.badge} title={meta.title} subtitle={meta.subtitle}>
-        <AuthGate title="Login required" description="Please log in to view your activity history.">
+      <ProfileHubShell pageKey="myActivity">
+        <ProfileAuthGate gateKey="activity">
           <MyActivityContent />
-        </AuthGate>
+        </ProfileAuthGate>
       </ProfileHubShell>
     </>
   );

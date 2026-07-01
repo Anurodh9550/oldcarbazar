@@ -1,13 +1,13 @@
 ﻿"use client";
 
 import { motion } from "framer-motion";
-import { useSiteCopy } from "@/context/LanguageContext";
+import { useChromeCopy } from "@/context/LanguageContext";
 import SectionHeader from "@/components/ui/SectionHeader";
 import FeatureIcon from "@/components/ui/FeatureIcon";
 import { fadeInUp, staggerContainer } from "@/lib/motion";
 
 export default function WhyChooseUsSection() {
-  const copy = useSiteCopy();
+  const copy = useChromeCopy();
 
   return (
     <section className="bg-white py-14">

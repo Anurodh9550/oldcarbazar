@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useLanguage, useSiteCopy } from "@/context/LanguageContext";
+import { useChromeCopy, useLanguage } from "@/context/LanguageContext";
 import { useLocation } from "@/context/LocationContext";
 import { openWhatsAppBot } from "@/lib/whatsappBot";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
@@ -9,7 +9,7 @@ import WhatsAppIcon from "@/components/WhatsAppIcon";
 export default function WhatsAppBotWidget() {
   const pathname = usePathname();
   const { language } = useLanguage();
-  const copy = useSiteCopy();
+  const copy = useChromeCopy();
   const { selectedCity } = useLocation();
 
   if (pathname?.startsWith("/admin") || pathname === "/whatsapp-sell") {

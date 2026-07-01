@@ -2,22 +2,24 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useChromeCopy } from "@/context/LanguageContext";
+import type { ExtendedCopy } from "@/data/i18n/extended";
 import { profileMenuItems } from "@/data/profileMenu";
 
+type ProfileHubPageKey = keyof ExtendedCopy["profileHub"];
+
 type ProfileHubShellProps = {
-  title: string;
-  subtitle: string;
-  badge?: string;
+  pageKey: ProfileHubPageKey;
   children: React.ReactNode;
 };
 
 export default function ProfileHubShell({
-  title,
-  subtitle,
-  badge = "My Account",
+  pageKey,
   children,
 }: ProfileHubShellProps) {
   const pathname = usePathname();
+  const copy = useChromeCopy();
+  const meta = copy.profileHub[pageKey];
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-[#f0f2f5]">
@@ -39,9 +41,9 @@ export default function ProfileHubShell({
           className="absolute -top-16 right-0 h-64 w-64 rounded-full bg-[#f75d34]/20 blur-3xl"
         />
         <div className="relative mx-auto max-w-[1280px] px-4 py-10 sm:px-6 lg:py-12">
-          <span className="eyebrow-sell">{badge}</span>
-          <h1 className="shell-title">{title}</h1>
-          <p className="shell-subtitle">{subtitle}</p>
+          <span className="eyebrow-sell">{meta.badge}</span>
+          <h1 className="shell-title">{meta.title}</h1>
+          <p className="shell-subtitle">{meta.subtitle}</p>
         </div>
       </div>
 
@@ -60,7 +62,7 @@ export default function ProfileHubShell({
                       : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                   }`}
                 >
-                  {item.label}
+                  {copy.profileMenu[item.id]}
                 </Link>
               );
             })}

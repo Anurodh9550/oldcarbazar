@@ -1,5 +1,5 @@
 export type ProfileMenuItem = {
-  label: string;
+  id: keyof import("@/data/i18n/extended").ExtendedCopy["profileMenu"];
   href: string;
   icon:
     | "orders"
@@ -18,20 +18,16 @@ export type ProfileMenuItem = {
 };
 
 export const profileMenuItems: ProfileMenuItem[] = [
-  { label: "My Listings", href: "/my-listings", icon: "listings" },
-  {
-    label: "Showroom",
-    href: "/my-showroom",
-    icon: "showroom",
-  },
-  { label: "Leads & Inquiries", href: "/leads", icon: "leads" },
-  { label: "Upgrade to Pro", href: "/pricing", icon: "pro" },
-  { label: "Billing & Invoices", href: "/my-subscriptions", icon: "billing", dividerAfter: true },
-  { label: "My Orders", href: "/my-orders", icon: "orders" },
-  { label: "Shortlisted Vehicles", href: "/shortlisted", icon: "heart" },
-  { label: "My Activity", href: "/my-activity", icon: "activity" },
-  { label: "My Vehicles", href: "/my-vehicles", icon: "car" },
-  { label: "OCB Digital Garage", href: "/my-garage", icon: "garage", dividerAfter: true },
-  { label: "Manage Consents", href: "/consents", icon: "consent" },
-  { label: "Profile Settings", href: "/profile-settings", icon: "settings" },
+  { id: "myListings", href: "/my-listings", icon: "listings" },
+  { id: "showroom", href: "/my-showroom", icon: "showroom" },
+  { id: "leads", href: "/leads", icon: "leads" },
+  { id: "upgradePro", href: "/pricing", icon: "pro" },
+  { id: "billing", href: "/my-subscriptions", icon: "billing", dividerAfter: true },
+  { id: "myOrders", href: "/my-orders", icon: "orders" },
+  { id: "shortlisted", href: "/shortlisted", icon: "heart" },
+  { id: "myActivity", href: "/my-activity", icon: "activity" },
+  { id: "myVehicles", href: "/my-vehicles", icon: "car" },
+  { id: "digitalGarage", href: "/my-garage", icon: "garage", dividerAfter: true },
+  { id: "consents", href: "/consents", icon: "consent" },
+  { id: "profileSettings", href: "/profile-settings", icon: "settings" },
 ];

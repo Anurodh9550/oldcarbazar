@@ -1,24 +1,21 @@
 import Header from "@/components/Header";
 import ProfileSettingsContent from "@/components/profile-hub/ProfileSettingsContent";
+import ProfileAuthGate from "@/components/profile-hub/ProfileAuthGate";
 import ProfileHubShell from "@/components/profile-hub/ProfileHubShell";
-import AuthGate from "@/components/seller/AuthGate";
-import { profileHubPageMeta } from "@/data/profileHubPages";
-
-const meta = profileHubPageMeta["profile-settings"];
 
 export const metadata = {
-  title: `${meta.title} | Old Car Bazar`,
-  description: meta.subtitle,
+  title: "Profile Settings | Old Car Bazar",
+  description: "Update your name, email, phone and account details.",
 };
 
 export default function ProfileSettingsPage() {
   return (
     <>
       <Header />
-      <ProfileHubShell badge={meta.badge} title={meta.title} subtitle={meta.subtitle}>
-        <AuthGate title="Login required" description="Please log in to edit your profile.">
+      <ProfileHubShell pageKey="profileSettings">
+        <ProfileAuthGate gateKey="settings">
           <ProfileSettingsContent />
-        </AuthGate>
+        </ProfileAuthGate>
       </ProfileHubShell>
     </>
   );

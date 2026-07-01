@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { useChromeCopy } from "@/context/LanguageContext";
 import { getSellerIdFromUser } from "@/context/ListingsContext";
 import {
   addReview,
@@ -24,6 +25,7 @@ type Tab = "brand" | "about" | "gallery" | "team" | "reviews";
 
 export default function DealerShowroomEditor() {
   const { user, isLoggedIn } = useAuth();
+  const copy = useChromeCopy();
   const [tab, setTab] = useState<Tab>("brand");
   const [saved, setSaved] = useState(false);
   const [form, setForm] = useState<DealerShowroom | null>(null);
@@ -57,9 +59,9 @@ export default function DealerShowroomEditor() {
   if (!isLoggedIn || !user) {
     return (
       <div className="card-surface p-8 text-center">
-        <p className="text-sm text-gray-600">Log in to build your Showroom.</p>
+        <p className="text-sm text-gray-600">{copy.showroom.loginToBuild}</p>
         <Link href="/seller" className="mt-4 inline-block text-sm font-semibold text-[#f75d34]">
-          Go to seller dashboard →
+          {copy.showroom.goSellerDashboard}
         </Link>
       </div>
     );
@@ -82,25 +84,26 @@ export default function DealerShowroomEditor() {
 
   const previewHref = `/dealers/${form.dealerId || dealerKey}/showroom`;
 
-  const tabs: { id: Tab; label: string }[] = [
-    { id: "brand", label: "Banner & Logo" },
-    { id: "about", label: "About" },
-    { id: "gallery", label: "More Cars" },
-    { id: "team", label: "Team" },
-    { id: "reviews", label: "Reviews" },
-  ];
+  const tabs: { id: Tab; label: string }[] = useMemo(
+    () => [
+      { id: "brand", label: copy.showroom.tabBrand },
+      { id: "about", label: copy.showroom.tabAbout },
+      { id: "gallery", label: copy.showroom.tabGallery },
+      { id: "team", label: copy.showroom.tabTeam },
+      { id: "reviews", label: copy.showroom.tabReviews },
+    ],
+    [copy.showroom]
+  );
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 rounded-2xl border border-orange-100 bg-gradient-to-r from-orange-50 to-white p-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-[#f75d34]">
-            Showroom
+            {copy.showroom.editorEyebrow}
           </p>
-          <p className="mt-1 section-title">Build your mini website</p>
-          <p className="text-body-muted">
-            Banner, logo, about, team, cars & reviews — like your own dealer site.
-          </p>
+          <p className="mt-1 section-title">{copy.showroom.editorTitle}</p>
+          <p className="text-body-muted">{copy.showroom.editorSub}</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Link
@@ -108,10 +111,10 @@ export default function DealerShowroomEditor() {
             target="_blank"
             className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-800 hover:border-[#f75d34]"
           >
-            Preview showroom
+            {copy.showroom.previewShowroom}
           </Link>
           <Button type="button" onClick={handleSave}>
-            {saved ? "Saved ✓" : "Save changes"}
+            {saved ? copy.common.saved : copy.showroom.saveChanges}
           </Button>
         </div>
       </div>

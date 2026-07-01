@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { useSiteCopy } from "@/context/LanguageContext";
+import { useChromeCopy, useLanguage } from "@/context/LanguageContext";
 import { fadeInUp } from "@/lib/motion";
 
 export default function SellCarBanner() {
-  const copy = useSiteCopy();
+  const { copy } = useLanguage();
+  const chrome = useChromeCopy();
 
   return (
     <section className="px-4 py-10 lg:px-6">
@@ -30,19 +31,19 @@ export default function SellCarBanner() {
             href="/sell-car"
             className="rounded-full bg-white px-6 py-3 text-sm font-bold text-[#f75d34] shadow hover:bg-orange-50"
           >
-            {copy.sellBanner.sellFree}
+            {chrome.sellBanner.sellFree}
           </Link>
           <Link
             href="/whatsapp-sell"
             className="rounded-full border-2 border-white px-6 py-3 text-sm font-bold text-white hover:bg-white/10"
           >
-            {copy.whatsapp.navLabel}
+            {chrome.whatsapp.navLabel}
           </Link>
           <Link
             href="/valuation"
             className="rounded-full border-2 border-white/80 px-6 py-3 text-sm font-bold text-white hover:bg-white/10"
           >
-            {copy.sellBanner.valuation}
+            {chrome.sellBanner.valuation}
           </Link>
         </div>
       </motion.div>

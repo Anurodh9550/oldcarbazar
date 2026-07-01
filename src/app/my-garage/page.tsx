@@ -1,24 +1,21 @@
 import Header from "@/components/Header";
 import MyGarageContent from "@/components/profile-hub/MyGarageContent";
+import ProfileAuthGate from "@/components/profile-hub/ProfileAuthGate";
 import ProfileHubShell from "@/components/profile-hub/ProfileHubShell";
-import AuthGate from "@/components/seller/AuthGate";
-import { profileHubPageMeta } from "@/data/profileHubPages";
-
-const meta = profileHubPageMeta["my-garage"];
 
 export const metadata = {
-  title: `${meta.title} | Old Car Bazar`,
-  description: meta.subtitle,
+  title: "OCB Digital Garage | Old Car Bazar",
+  description: "Your post-purchase car hub on Old Car Bazar.",
 };
 
 export default function MyGaragePage() {
   return (
     <>
       <Header />
-      <ProfileHubShell badge={meta.badge} title={meta.title} subtitle={meta.subtitle}>
-        <AuthGate title="Login required" description="Please log in to access your garage.">
+      <ProfileHubShell pageKey="myGarage">
+        <ProfileAuthGate gateKey="garage">
           <MyGarageContent />
-        </AuthGate>
+        </ProfileAuthGate>
       </ProfileHubShell>
     </>
   );

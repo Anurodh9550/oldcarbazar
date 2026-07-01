@@ -2,23 +2,27 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useChromeCopy, useLanguage } from "@/context/LanguageContext";
 import { api, type ApiDealerCard } from "@/lib/api";
 import PageLoader from "@/components/ui/PageLoader";
 import PageHero from "@/components/ui/PageHero";
 import DealerCard from "./DealerCard";
 
-const SORT_OPTIONS: {
-  value: "listings" | "newest" | "name";
-  label: string;
-}[] = [
-  { value: "listings", label: "Most listings" },
-  { value: "newest", label: "Newest listings" },
-  { value: "name", label: "Name (A–Z)" },
-];
-
 export default function DealersListPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t } = useLanguage();
+  const copy = useChromeCopy();
+
+  const sortOptions = useMemo(
+    () =>
+      [
+        { value: "listings" as const, label: copy.dealers.sortMostListings },
+        { value: "newest" as const, label: copy.dealers.sortNewest },
+        { value: "name" as const, label: copy.dealers.sortName },
+      ],
+    [copy.dealers.sortMostListings, copy.dealers.sortNewest, copy.dealers.sortName]
+  );
 
   const initialQ = searchParams.get("q") ?? "";
   const initialCity = searchParams.get("city") ?? "";
@@ -73,7 +77,7 @@ export default function DealersListPage() {
       } catch (err) {
         if (!cancelled) {
           setError(
-            err instanceof Error ? err.message : "Could not load dealers."
+            err instanceof Error ? err.message : copy.dealers.loadError
           );
           setDealers([]);
         }
@@ -99,9 +103,9 @@ export default function DealersListPage() {
   return (
     <main className="bg-[#f7f7f7]">
       <PageHero
-        badge="Dealer Directory"
-        title="Trusted used-car dealers"
-        subtitle="Browse verified dealers across India. Filter by city, sort by inventory size, and contact the right dealer directly."
+        badge={copy.dealers.pageBadge}
+        title={copy.dealers.pageHeroTitle}
+        subtitle={copy.dealers.pageHeroSubtitle}
         maxWidth="6xl"
       />
 
@@ -117,7 +121,7 @@ export default function DealersListPage() {
                 type="search"
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="Search dealer name or city..."
+                placeholder={copy.dealers.searchPlaceholder}
                 className="w-full bg-transparent text-sm outline-none placeholder:text-gray-400"
               />
             </label>
@@ -126,7 +130,7 @@ export default function DealersListPage() {
               onChange={(e) => setCity(e.target.value)}
               className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 focus:border-[#f75d34] focus:outline-none"
             >
-              <option value="">All cities</option>
+              <option value="">{copy.common.allCities}</option>
               {cityOptions.map((c) => (
                 <option key={c} value={c}>
                   {c}
@@ -140,7 +144,7 @@ export default function DealersListPage() {
               }
               className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 focus:border-[#f75d34] focus:outline-none"
             >
-              {SORT_OPTIONS.map((opt) => (
+              {sortOptions.map((opt) => (
                 <option key={opt.value} value={opt.value}>
                   {opt.label}
                 </option>
@@ -156,7 +160,7 @@ export default function DealersListPage() {
 
           {loading ? (
             <PageLoader
-              message="Loading dealers from database…"
+              message={copy.dealers.loadingDealers}
               compact
               className="mt-8 rounded-2xl border border-gray-100 bg-white"
             />
@@ -164,20 +168,16 @@ export default function DealersListPage() {
             <div className="mt-12 rounded-2xl border-2 border-dashed border-gray-200 bg-white py-16 text-center">
               <span className="text-5xl">🚘</span>
               <h2 className="mt-3 text-lg font-bold text-gray-900">
-                No dealers found
+                {copy.dealers.noDealersTitle}
               </h2>
               <p className="mx-auto mt-1 max-w-md text-sm text-gray-500">
-                Try a different city or clear your filters.
+                {copy.dealers.noDealersSubtitle}
               </p>
             </div>
           ) : (
             <>
               <p className="mt-6 mb-3 text-sm text-gray-500">
-                Showing{" "}
-                <span className="font-semibold text-gray-900">
-                  {dealers.length}
-                </span>{" "}
-                {dealers.length === 1 ? "dealer" : "dealers"}
+                {t(copy.common.showingDealers, { count: dealers.length })}
               </p>
               <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {dealers.map((d) => (

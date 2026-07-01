@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLocation } from "@/context/LocationContext";
-import { useLanguage } from "@/context/LanguageContext";
+import { useChromeCopy, useLanguage } from "@/context/LanguageContext";
 import {
   fadeIn,
   fadeInUp,
@@ -23,6 +23,7 @@ export default function HeroSection() {
   const router = useRouter();
   const { selectedCity } = useLocation();
   const { copy } = useLanguage();
+  const chrome = useChromeCopy();
   const [brand, setBrand] = useState("");
   const [budget, setBudget] = useState("");
   const [activeSlide, setActiveSlide] = useState(0);
@@ -110,7 +111,7 @@ export default function HeroSection() {
               href="/used-cars/search"
               className="inline-flex rounded-xl bg-[#f75d34] px-6 py-2.5 text-sm font-bold text-white hover:bg-[#e54d24]"
             >
-              {copy.hero.browseCars}
+              {chrome.hero.browseCars}
             </Link>
           </div>
 
@@ -121,23 +122,23 @@ export default function HeroSection() {
           >
             <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
             <label className="flex-1">
-              <span className="sr-only">{copy.hero.searchCarsSr}</span>
+              <span className="sr-only">{chrome.hero.searchCarsSr}</span>
               <input
                 type="text"
                 value={brand}
                 onChange={(e) => setBrand(e.target.value)}
-                placeholder={copy.hero.searchPlaceholder}
+                placeholder={chrome.hero.searchPlaceholder}
                 className={heroFieldClass}
               />
             </label>
             <label className="flex-1">
-              <span className="sr-only">{copy.hero.budgetSr}</span>
+              <span className="sr-only">{chrome.hero.budgetSr}</span>
               <select
                 value={budget}
                 onChange={(e) => setBudget(e.target.value)}
                 className={heroFieldClass}
               >
-                {copy.budgetOptions.map((opt) => (
+                {chrome.budgetOptions.map((opt) => (
                   <option key={opt.value} value={opt.value}>
                     {opt.label}
                   </option>
@@ -148,7 +149,7 @@ export default function HeroSection() {
               type="submit"
               className="w-full rounded-xl bg-[#f75d34] px-8 py-3.5 text-sm font-bold text-white shadow-none transition hover:bg-[#e54d24] lg:w-auto"
             >
-              {copy.hero.searchCars}
+              {chrome.hero.searchCars}
             </button>
             </div>
           </motion.form>
@@ -158,9 +159,9 @@ export default function HeroSection() {
             className="mt-4 hidden flex-wrap items-center gap-2 md:mt-5 md:flex"
           >
             <span className="text-xs font-semibold uppercase tracking-wider text-white/60">
-              {copy.hero.popular}
+              {chrome.hero.popular}
             </span>
-            {copy.quickLinks.map((car) => (
+            {chrome.quickLinks.map((car) => (
               <motion.div key={car.label} variants={fadeInUp}>
                 <Link
                   href={`/used-cars/search?${car.query}`}

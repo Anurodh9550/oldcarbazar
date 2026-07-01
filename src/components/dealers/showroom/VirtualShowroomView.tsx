@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo } from "react";
+import { useChromeCopy, useLanguage } from "@/context/LanguageContext";
 import type { ApiDealerDetail } from "@/lib/api";
 import { apiListingToCarListing } from "@/lib/api";
 import { enrichCar } from "@/lib/carMeta";
@@ -39,6 +40,8 @@ export default function VirtualShowroomView({
   showroom,
   dealer,
 }: VirtualShowroomViewProps) {
+  const { t } = useLanguage();
+  const copy = useChromeCopy();
   const enrichedListings = useMemo(() => {
     if (!dealer) return [];
     return dealer.listings.map((apiL) => enrichCar(apiListingToCarListing(apiL)));
@@ -84,7 +87,7 @@ export default function VirtualShowroomView({
             href={dealer ? `/dealers/${dealer.id}` : "/dealers"}
             className="inline-flex w-fit items-center gap-1 text-xs text-gray-300 hover:text-white"
           >
-            ← Back to dealer profile
+            {copy.showroom.backToProfile}
           </Link>
           <div className="flex flex-col gap-5 sm:flex-row sm:items-end">
             <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl border-4 border-white/20 bg-white shadow-xl sm:h-28 sm:w-28">
@@ -103,7 +106,7 @@ export default function VirtualShowroomView({
             </div>
             <div className="flex-1 text-white">
               <p className="text-xs font-semibold uppercase tracking-widest text-orange-300">
-                Showroom
+                {copy.showroom.editorEyebrow}
               </p>
               <h1 className="mt-1 text-3xl font-extrabold sm:text-4xl">
                 {showroom.dealerName}
@@ -117,7 +120,7 @@ export default function VirtualShowroomView({
                     href={`tel:+91${phone.replace(/\D/g, "")}`}
                     className="rounded-full bg-[#f75d34] px-5 py-2 text-sm font-semibold text-white hover:bg-[#e54d24]"
                   >
-                    Call now
+                    {copy.showroom.callNow}
                   </a>
                 )}
                 {phone && (
@@ -139,13 +142,13 @@ export default function VirtualShowroomView({
       {/* Stats strip */}
       <section className="border-b border-gray-200 bg-white">
         <div className="mx-auto grid max-w-6xl grid-cols-2 gap-4 px-4 py-6 sm:grid-cols-4 sm:px-8 lg:px-12">
-          <Stat label="Cars listed" value={enrichedListings.length} />
-          <Stat label="Team members" value={showroom.team.length} />
+          <Stat label={copy.showroom.carsListed} value={enrichedListings.length} />
+          <Stat label={copy.showroom.teamMembers} value={showroom.team.length} />
           <Stat
-            label="Customer reviews"
+            label={copy.showroom.customerReviews}
             value={showroom.reviews.length}
           />
-          {avgRating && <Stat label="Avg. rating" value={`${avgRating} ★`} />}
+          {avgRating && <Stat label={copy.showroom.avgRating} value={`${avgRating} ★`} />}
         </div>
       </section>
 
@@ -153,8 +156,8 @@ export default function VirtualShowroomView({
       <section className="px-4 py-12 sm:px-8 lg:px-12">
         <div className="mx-auto max-w-6xl">
           <SectionHeader
-            eyebrow="About us"
-            title={`Welcome to ${showroom.dealerName}`}
+            eyebrow={copy.showroom.aboutUs}
+            title={t(copy.showroom.welcomeTitle, { name: showroom.dealerName })}
             subtitle={showroom.about}
           />
           {showroom.address && (
@@ -170,7 +173,7 @@ export default function VirtualShowroomView({
       {showroom.team.length > 0 && (
         <section className="bg-white px-4 py-12 sm:px-8 lg:px-12">
           <div className="mx-auto max-w-6xl">
-            <SectionHeader eyebrow="Our team" title="Meet the people behind your deal" />
+            <SectionHeader eyebrow={copy.showroom.ourTeam} title={copy.showroom.meetTeam} />
             <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {showroom.team.map((member) => (
                 <li
@@ -209,13 +212,13 @@ export default function VirtualShowroomView({
       <section className="px-4 py-12 sm:px-8 lg:px-12">
         <div className="mx-auto max-w-6xl">
           <SectionHeader
-            eyebrow="Inventory"
-            title="All cars"
-            subtitle="Browse our complete stock with live availability status."
+            eyebrow={copy.showroom.inventory}
+            title={copy.showroom.allCars}
+            subtitle={copy.showroom.allCarsSub}
           />
           {enrichedListings.length === 0 ? (
             <div className="mt-8 rounded-2xl border-2 border-dashed border-gray-200 bg-white py-12 text-center">
-              <p className="text-sm text-gray-500">No cars listed right now.</p>
+              <p className="text-sm text-gray-500">{copy.dealers.noActiveListings}</p>
             </div>
           ) : (
             <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -249,9 +252,9 @@ export default function VirtualShowroomView({
         <section className="bg-white px-4 py-12 sm:px-8 lg:px-12">
           <div className="mx-auto max-w-6xl">
             <SectionHeader
-              eyebrow="More stock"
-              title="More in our showroom"
-              subtitle="These cars are in our yard — contact us for details. Not yet listed on Old Car Bazar."
+              eyebrow={copy.showroom.moreStock}
+              title={copy.showroom.moreInShowroom}
+              subtitle={copy.showroom.moreInShowroomSub}
             />
             <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {showroom.gallery.map((item) => (
@@ -308,7 +311,7 @@ export default function VirtualShowroomView({
       {showroom.reviews.length > 0 && (
         <section className="bg-white px-4 py-12 sm:px-8 lg:px-12">
           <div className="mx-auto max-w-6xl">
-            <SectionHeader eyebrow="Reviews" title="What customers say" />
+            <SectionHeader eyebrow={copy.showroom.reviews} title={copy.showroom.whatCustomersSay} />
             <ul className="mt-8 grid gap-4 sm:grid-cols-2">
               {showroom.reviews.map((review) => (
                 <li key={review.id} className="card-surface p-5">
@@ -349,7 +352,7 @@ export default function VirtualShowroomView({
               href={dealer ? `/dealers/${dealer.id}` : "/dealers"}
               className="rounded-full border-2 border-white px-6 py-2.5 text-sm font-bold text-white hover:bg-white/10"
             >
-              Dealer profile
+              {copy.dealers.profile}
             </Link>
           </div>
         </div>

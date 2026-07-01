@@ -7,7 +7,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { fadeInDown } from "@/lib/motion";
 import { useAuth } from "@/context/AuthContext";
-import { useLanguage } from "@/context/LanguageContext";
+import { useChromeCopy } from "@/context/LanguageContext";
 import { useLocation } from "@/context/LocationContext";
 import type { MenuLink } from "@/data/navMenus";
 import {
@@ -42,7 +42,7 @@ export default function Header() {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { selectedCity } = useLocation();
   const { isLoggedIn, loading: authLoading } = useAuth();
-  const { copy } = useLanguage();
+  const copy = useChromeCopy();
 
   const navItems: {
     id: OpenMenu;
@@ -69,6 +69,10 @@ export default function Header() {
     () => getBuyCarsMenu(selectedCity),
     [selectedCity]
   );
+
+  const sellCarMenuColumns = sellCarMenu;
+  const loanToolsMenuColumns = loanToolsMenu;
+  const helpMenuColumns = helpMenu;
 
   const openMenuNow = (menu: OpenMenu) => {
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
@@ -138,11 +142,11 @@ export default function Header() {
       case "buy-cars":
         return buyCarsMenu;
       case "sell-car":
-        return sellCarMenu;
+        return sellCarMenuColumns;
       case "loan-tools":
-        return loanToolsMenu;
+        return loanToolsMenuColumns;
       case "help":
-        return helpMenu;
+        return helpMenuColumns;
       default:
         return [];
     }
@@ -322,7 +326,7 @@ export default function Header() {
                     pathname === "/" ? "text-[#f75d34]" : "text-gray-800"
                   }`}
                 >
-                  Home
+                  {copy.navExtra.home}
                   {pathname === "/" && (
                     <motion.span
                       layoutId="navUnderline"
@@ -383,7 +387,7 @@ export default function Header() {
                       : "text-gray-800"
                   }`}
                 >
-                  DEALERS
+                  {copy.navExtra.dealers}
                   {pathname?.startsWith("/dealers") && (
                     <motion.span
                       layoutId="navUnderline"
